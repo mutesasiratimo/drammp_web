@@ -1,19 +1,21 @@
+import 'package:entebbe_dramp_web/auth/updatepassword.dart';
+import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:entebbe_dramp_web/config/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+class ForgotPasswordPage extends StatefulWidget {
+  const ForgotPasswordPage({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _ForgotPasswordPageState extends Base<ForgotPasswordPage> {
   bool rememberMe = false;
   bool obscurePassword = true;
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +60,7 @@ class _SignInPageState extends State<SignInPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Sign In",
+                            "Forgot Password",
                             textAlign: TextAlign.start,
                             style: TextStyle(
                               color: Colors.black,
@@ -71,7 +73,7 @@ class _SignInPageState extends State<SignInPage> {
                           ),
                           RichText(
                             text: TextSpan(
-                              text: "Don't have an account? ",
+                              text: "Already have an account? ",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 16,
@@ -79,7 +81,7 @@ class _SignInPageState extends State<SignInPage> {
                               ),
                               children: [
                                 TextSpan(
-                                  text: "Register Here",
+                                  text: "Login Here",
                                   style: TextStyle(
                                     color: AppConstants.primaryColor,
                                     fontWeight: FontWeight.bold,
@@ -111,94 +113,6 @@ class _SignInPageState extends State<SignInPage> {
                                     color: AppConstants.primaryColor)),
                           ),
                           SizedBox(
-                            height: 30,
-                          ),
-                          TextField(
-                            controller: passwordController,
-                            obscureText: obscurePassword,
-                            decoration: InputDecoration(
-                                prefixIcon: IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.lock_open_outlined),
-                                  color: AppConstants.secondaryColor,
-                                ),
-                                suffixIcon: obscurePassword
-                                    ? IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            obscurePassword = !obscurePassword;
-                                          });
-                                        },
-                                        icon: Icon(
-                                          Icons.visibility_off_outlined,
-                                          color: AppConstants.primaryColor,
-                                        ),
-                                      )
-                                    : IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            obscurePassword = !obscurePassword;
-                                          });
-                                        },
-                                        icon: Icon(
-                                          Icons.visibility_outlined,
-                                          color: AppConstants.primaryColor,
-                                        ),
-                                      ),
-                                hintText: "Enter your password",
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.grey),
-                                ),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConstants.primaryColor),
-                                ),
-                                labelText: "Password",
-                                labelStyle: TextStyle(
-                                    color: AppConstants.primaryColor)),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: width * 0.1,
-                                child: Row(
-                                  children: [
-                                    Checkbox(
-                                      semanticLabel: "Remember Me",
-                                      value: rememberMe,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          rememberMe = value!;
-                                        });
-                                      },
-                                    ),
-                                    Text(
-                                      'Remember Me',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Text(
-                                  'Forgot Password?',
-                                  style: TextStyle(
-                                      color: AppConstants.primaryColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
                             height: 60,
                           ),
                           Row(
@@ -207,7 +121,7 @@ class _SignInPageState extends State<SignInPage> {
                                 child: ElevatedButton(
                                   onPressed: () {},
                                   child: Text(
-                                    'Login',
+                                    'Send Reset Token',
                                     style: TextStyle(
                                         color: AppConstants.secondaryColor,
                                         fontWeight: FontWeight.w500,
@@ -282,5 +196,130 @@ class _SignInPageState extends State<SignInPage> {
         ],
       ),
     );
+  }
+
+  openOtpAlertBox() {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(32.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 220,
+                      width: 220,
+                      child: Image.asset("assets/images/otpvector.png"),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "OTP Verification - Password Reset",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Enter the 5 digit code sent to ********0862",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    OtpTextField(
+                      numberOfFields: 5,
+                      borderColor: Colors.amber,
+                      enabledBorderColor: AppConstants.secondaryColor,
+                      focusedBorderColor: AppConstants.primaryColor,
+                      showFieldAsBox: true,
+                      onCodeChanged: (String code) {},
+                      onSubmit: (String verificationCode) {
+                        // showDialog(
+                        //     context: context,
+                        //     builder: (context) {
+                        //       return AlertDialog(
+                        //         title: Text("Verification Code"),
+                        //         content:
+                        //             Text('Code entered is $verificationCode'),
+                        //       );
+                        //     });
+                      }, // end onSubmit
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.2),
+                      width: 200,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          pushAndRemoveUntil(UpdatePasswordPage());
+                        },
+                        child: const Text(
+                          'Verify',
+                          style: TextStyle(
+                              color: AppConstants.secondaryColor,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          backgroundColor: AppConstants.primaryColor,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: const TextSpan(
+                        text: "Didn't receive the OTP? ",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "Resend",
+                            style: TextStyle(
+                              color: AppConstants.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 }

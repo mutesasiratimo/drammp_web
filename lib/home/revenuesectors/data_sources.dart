@@ -3,12 +3,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:entebbe_dramp_web/config/constants.dart';
-import 'package:entebbe_dramp_web/config/functions.dart';
 import 'package:entebbe_dramp_web/models/revenuesector.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:data_table_2/data_table_2.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Keeps track of selected rows, feed the data into DesertsDataSource
 class RestorableDessertSelections extends RestorableProperty<Set<int>> {
@@ -143,7 +141,11 @@ class DessertDataSource extends DataTableSource {
         DataCell(Text(dessert.name)),
         DataCell(Text('${dessert.description}')),
         DataCell(Text("Sub-types")),
-        DataCell(Text('${dessert.status}')),
+        DataCell((dessert.status == "1")
+            ? Chip(label: Text("Active"))
+            : (dessert.status == "2")
+                ? Chip(label: Text("Archived"))
+                : Chip(label: Text("Pending"))),
         DataCell(Row(
           children: [
             IconButton(
@@ -183,7 +185,8 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
   //get sectors list
   Future<List<RevenueSectorsModel>> getSectors() async {
     List<RevenueSectorsModel> returnValue = [];
-    var url = Uri.parse("${AppConstants.baseUrl}revenuesectors/");
+    var url = Uri.parse("${AppConstants.baseUrl}revenuesectors");
+    debugPrint(url.toString());
     String _authToken = "";
     String _username = "";
     String _password = "";
@@ -310,7 +313,61 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
               DataCell(Text(dessert.name)),
               DataCell(Text('${dessert.description}')),
               DataCell(Text("Sub-types")),
-              DataCell(Text('${dessert.status}')),
+              DataCell((dessert.status == "2")
+                  ? SizedBox(
+                      height: 40,
+                      child: Chip(
+                          side: BorderSide(width: 1.0, color: Colors.green),
+                          elevation: 8.0,
+                          padding: EdgeInsets.all(2),
+                          backgroundColor: Colors.greenAccent[100],
+                          shadowColor: Colors.black,
+                          avatar: CircleAvatar(
+                            maxRadius: 4.0,
+                            backgroundColor: Colors.green,
+                          ),
+                          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                          label: Text(
+                            "Active",
+                          )),
+                    )
+                  : (dessert.status == "1")
+                      ? SizedBox(
+                          height: 40,
+                          child: Chip(
+                              side: BorderSide(width: 1.0, color: Colors.red),
+                              elevation: 8.0,
+                              padding: EdgeInsets.all(2),
+                              backgroundColor: Colors.red.shade50,
+                              shadowColor: Colors.black,
+                              avatar: CircleAvatar(
+                                maxRadius: 4.0,
+                                backgroundColor: Colors.red,
+                              ),
+                              labelStyle:
+                                  TextStyle(fontWeight: FontWeight.bold),
+                              label: Text(
+                                "Archived",
+                              )),
+                        )
+                      : SizedBox(
+                          height: 40,
+                          child: Chip(
+                              side: BorderSide(width: 1.0, color: Colors.amber),
+                              elevation: 8.0,
+                              padding: EdgeInsets.all(2),
+                              backgroundColor: Colors.amber.shade100,
+                              shadowColor: Colors.black,
+                              avatar: CircleAvatar(
+                                maxRadius: 4.0,
+                                backgroundColor: Colors.amber,
+                              ),
+                              labelStyle:
+                                  TextStyle(fontWeight: FontWeight.bold),
+                              label: Text(
+                                "Pending",
+                              )),
+                        )),
               DataCell(Row(
                 children: [
                   IconButton(

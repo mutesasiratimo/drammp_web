@@ -143,7 +143,7 @@ abstract class Base<T extends StatefulWidget> extends State<T>
           child: child,
         );
       },
-      icon: const Icon(Icons.check_circle),
+      icon: const Icon(Icons.warning),
       showIcon: true, // show or hide the icon
       primaryColor: Colors.amber.shade900,
       backgroundColor: Colors.amber.shade100,
@@ -196,7 +196,7 @@ abstract class Base<T extends StatefulWidget> extends State<T>
           child: child,
         );
       },
-      icon: const Icon(Icons.check_circle),
+      icon: const Icon(Icons.info),
       showIcon: true, // show or hide the icon
       primaryColor: Colors.blue.shade900,
       backgroundColor: Colors.blue.shade100,
@@ -249,7 +249,7 @@ abstract class Base<T extends StatefulWidget> extends State<T>
           child: child,
         );
       },
-      icon: const Icon(Icons.check_circle),
+      icon: const Icon(Icons.close_rounded),
       showIcon: true, // show or hide the icon
       primaryColor: Colors.red.shade900,
       backgroundColor: Colors.red.shade100,

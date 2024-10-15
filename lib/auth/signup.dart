@@ -1,11 +1,15 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:entebbe_dramp_web/config/constants.dart';
 import 'package:entebbe_dramp_web/home/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/registerusermodel.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -19,11 +23,83 @@ class _SignUpPageState extends Base<SignUpPage> {
   bool rememberMe = false;
   bool obscurePassword = true;
   String phoneNumber = "";
-  TextEditingController nameController = TextEditingController();
+  TextEditingController firstnameController = TextEditingController();
+  TextEditingController lastnameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+
+  _register(String firstname, String lastname, String email, String phone,
+      String password) async {
+    // context.loaderOverlay.show();
+    var url = Uri.parse(AppConstants.baseUrl + "users/signup");
+    // bool responseStatus = false;
+    // String _authToken = "";
+    // Navigator.pushNamed(context, AppRouter.home);
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // _validatedphoneNumber = _validateMobile(_countryCode, phone);
+      // debugPrint("++++++ VALIDATED PHONE NUMBER ++++" + _validatedphoneNumber);
+    });
+    FocusScopeNode currentFocus = FocusScope.of(context);
+
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    var bodyString = {
+      "id": "0",
+      "title": "Mr.",
+      "firstname": firstnameController.text,
+      "lastname": lastnameController.text,
+      "phone": phoneController.text,
+      "mobile": phoneController.text,
+      "email": emailController.text,
+      "password": passwordController.text,
+      "gender": "M",
+      "photo": "",
+      "dateofbirth": "1990-03-23",
+      "isadmin": false,
+      "isclerk": false,
+      "address": "",
+      "issuperadmin": false,
+      "status": "0"
+    };
+    debugPrint("THE BODY IS ++++++" + bodyString.toString() + "+++++++");
+    var body = jsonEncode(bodyString);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "Application/json",
+        },
+        body: body);
+    debugPrint("++++THE CODE IS +++" + response.statusCode.toString());
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      setState(() {
+        // context.loaderOverlay.hide();
+      });
+
+      final item = json.decode(response.body);
+      UserRegister userModel = UserRegister.fromJson(item);
+      // await pushAndRemoveUntil(VerifyPage(
+      //   user: userModel,
+      //   phonenumber: phonecontroller!.text,
+      // phonenumber: finalNumber.toString(),
+      // ));
+
+      debugPrint("++++THE USER IS +++" + item["id"].toString());
+    } else if (response.statusCode == 409) {
+      setState(() {
+        // context.loaderOverlay.hide();
+      });
+      showSnackBar("User already exists with this email.");
+    } else {
+      setState(() {
+        // context.loaderOverlay.hide();
+      });
+      showSnackBar("Registration Failure: Invalid data.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,13 +163,35 @@ class _SignUpPageState extends Base<SignUpPage> {
                             ),
                           ),
                           TextField(
-                            controller: this.nameController,
+                            controller: this.firstnameController,
                             decoration: const InputDecoration(
                                 prefixIcon: Icon(
                                   Icons.email_outlined,
                                   color: AppConstants.secondaryColor,
                                 ),
-                                hintText: "Enter your full name ",
+                                hintText: "Enter your first name ",
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.grey),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: AppConstants.primaryColor),
+                                ),
+                                labelText: "Name",
+                                labelStyle: TextStyle(
+                                    color: AppConstants.primaryColor)),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          TextField(
+                            controller: this.lastnameController,
+                            decoration: const InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.email_outlined,
+                                  color: AppConstants.secondaryColor,
+                                ),
+                                hintText: "Enter your last name ",
                                 enabledBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(color: Colors.grey),
                                 ),

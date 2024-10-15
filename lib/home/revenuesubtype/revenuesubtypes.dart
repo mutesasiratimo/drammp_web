@@ -1,38 +1,37 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:data_table_2/data_table_2.dart';
-import 'package:flutter/foundation.dart';
+import 'package:entebbe_dramp_web/home/revenuesectors/addrevenuesector.dart';
 import 'package:entebbe_dramp_web/config/base.dart';
 // import 'package:entebbe_dramp_web/home/appbar.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:paged_datatable/paged_datatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/constants.dart';
-import '../config/custom_pager.dart';
-import '../config/data_sources.dart';
-import '../config/functions.dart';
-import '../config/nav_helper.dart';
-import '../models/post.dart';
-import '../models/revenuesector.dart';
-import 'appbar.dart';
+import '../../config/constants.dart';
+import '../../config/custom_pager.dart';
+import 'data_sources.dart';
+import '../../config/functions.dart';
+import '../../config/nav_helper.dart';
+import '../../models/revenuesector.dart';
+import '../appbar.dart';
 
-class RevenuesectorsPage extends StatefulWidget {
-  const RevenuesectorsPage({super.key});
+class SectroSubtypePage extends StatefulWidget {
+  const SectroSubtypePage({super.key});
 
   @override
-  State<RevenuesectorsPage> createState() => _RevenuesectorsPageState();
+  State<SectroSubtypePage> createState() => _SectroSubtypePageState();
 }
 
-class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
+class _SectroSubtypePageState extends Base<SectroSubtypePage> {
   List<RevenueSectorsModel> revenueSector = [];
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
   int? _sortColumnIndex;
   DessertDataSourceAsync? _dessertsDataSource;
   final PaginatorController _controller = PaginatorController();
+  PageController revenuePageController = PageController();
 
   bool _dataSourceLoading = false;
   int _initialRow = 0;
@@ -66,28 +65,22 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
     int columnIndex,
     bool ascending,
   ) {
-    var columnName = "name";
+    var columnName = "Code";
     switch (columnIndex) {
       case 1:
-        columnName = "calories";
+        columnName = "Name";
         break;
       case 2:
-        columnName = "fat";
+        columnName = "Code";
         break;
       case 3:
-        columnName = "carbs";
+        columnName = "Parent Sector";
         break;
       case 4:
-        columnName = "protein";
+        columnName = "Status";
         break;
       case 5:
-        columnName = "sodium";
-        break;
-      case 6:
-        columnName = "calcium";
-        break;
-      case 7:
-        columnName = "iron";
+        columnName = "";
         break;
     }
     _dessertsDataSource!.sort(columnName, ascending);
@@ -150,79 +143,138 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
           accountToggle(context),
         ],
       ),
-      body: Container(
-        margin: EdgeInsets.all(16.0),
-        padding: EdgeInsets.all(8.0),
-        child: Card(
-          color: Colors.white,
-          child: Stack(alignment: Alignment.bottomCenter, children: [
-            AsyncPaginatedDataTable2(
-                horizontalMargin: 20,
-                checkboxHorizontalMargin: 12,
-                columnSpacing: 0,
-                wrapInCard: false,
-                header: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [],
-                ),
-                rowsPerPage: _rowsPerPage,
-                autoRowsToHeight: getCurrentRouteOption(context) == autoRows,
-                // Default - do nothing, autoRows - goToLast, other - goToFirst
-                pageSyncApproach: getCurrentRouteOption(context) == dflt
-                    ? PageSyncApproach.doNothing
-                    : getCurrentRouteOption(context) == autoRows
-                        ? PageSyncApproach.goToLast
-                        : PageSyncApproach.goToFirst,
-                minWidth: 800,
-                fit: FlexFit.tight,
-                border: TableBorder(
-                    top: const BorderSide(color: Colors.grey, width: 0.5),
-                    bottom: BorderSide(color: Colors.grey[300]!, width: 0.5),
-                    left: BorderSide(color: Colors.grey[300]!, width: 0.5),
-                    right: BorderSide(color: Colors.grey[300]!, width: 0.5),
-                    // verticalInside: BorderSide(color: Colors.grey[300]!),
-                    horizontalInside:
-                        const BorderSide(color: Colors.grey, width: 0.5)),
-                onRowsPerPageChanged: (value) {
-                  // No need to wrap into setState, it will be called inside the widget
-                  // and trigger rebuild
-                  //setState(() {
-                  print('Row per page changed to $value');
-                  _rowsPerPage = value!;
-                  //});
-                },
-                initialFirstRowIndex: _initialRow,
-                onPageChanged: (rowIndex) {
-                  //print(rowIndex / _rowsPerPage);
-                },
-                sortColumnIndex: _sortColumnIndex,
-                sortAscending: _sortAscending,
-                sortArrowIcon: Icons.keyboard_arrow_up,
-                sortArrowAnimationDuration: const Duration(milliseconds: 0),
-                onSelectAll: (select) => select != null && select
-                    ? (getCurrentRouteOption(context) != selectAllPage
-                        ? _dessertsDataSource!.selectAll()
-                        : _dessertsDataSource!.selectAllOnThePage())
-                    : (getCurrentRouteOption(context) != selectAllPage
-                        ? _dessertsDataSource!.deselectAll()
-                        : _dessertsDataSource!.deselectAllOnThePage()),
-                controller: _controller,
-                hidePaginator: getCurrentRouteOption(context) == custPager,
-                columns: _columns,
-                empty: Center(
-                    child: Container(
-                        padding: const EdgeInsets.all(20),
-                        color: Colors.grey[200],
-                        child: const Text('No data'))),
-                loading: _Loading(),
-                errorBuilder: (e) => _ErrorAndRetry(e.toString(),
-                    () => _dessertsDataSource!.refreshDatasource()),
-                source: _dessertsDataSource!),
-            if (getCurrentRouteOption(context) == custPager)
-              Positioned(bottom: 16, child: CustomPager(_controller))
-          ]),
-        ),
+      body: PageView(
+        controller: revenuePageController,
+        // physics: const NeverScrollableScrollPhysics(),
+        allowImplicitScrolling: false,
+        children: [
+          Container(
+            margin: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(8.0),
+            child: Card(
+              color: Colors.white,
+              child: Stack(alignment: Alignment.bottomCenter, children: [
+                AsyncPaginatedDataTable2(
+                    horizontalMargin: 20,
+                    checkboxHorizontalMargin: 12,
+                    columnSpacing: 0,
+                    wrapInCard: false,
+                    header: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          // width: 200,
+                          // color: Colors.grey[200],
+                          child: ElevatedButton(
+                            onPressed: () {
+                              revenuePageController.jumpToPage(1);
+                              showInfoToast("Navigate");
+                              // push(const AddRevenueSectorPage());
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.add,
+                                  color: AppConstants.secondaryColor,
+                                  size: 20,
+                                ),
+                                const SizedBox(
+                                  width: 8.0,
+                                ),
+                                const Text(
+                                  'New',
+                                  style: TextStyle(
+                                      color: AppConstants.secondaryColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              shape: const StadiumBorder(),
+                              backgroundColor: AppConstants.primaryColor,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    rowsPerPage: _rowsPerPage,
+                    autoRowsToHeight:
+                        getCurrentRouteOption(context) == autoRows,
+                    // Default - do nothing, autoRows - goToLast, other - goToFirst
+                    pageSyncApproach: getCurrentRouteOption(context) == dflt
+                        ? PageSyncApproach.doNothing
+                        : getCurrentRouteOption(context) == autoRows
+                            ? PageSyncApproach.goToLast
+                            : PageSyncApproach.goToFirst,
+                    minWidth: 800,
+                    fit: FlexFit.tight,
+                    border: TableBorder(
+                        top:
+                            BorderSide(color: Colors.grey.shade50, width: 0.05),
+                        bottom:
+                            BorderSide(color: Colors.grey.shade50, width: 0.05),
+                        // left: BorderSide(color: Colors.grey[300]!, width: 0.2),
+                        // right: BorderSide(color: Colors.grey[300]!, width: 0.5),
+                        // verticalInside: BorderSide(color: Colors.grey[300]!),
+                        horizontalInside: BorderSide(
+                            color: Colors.grey.shade50, width: 0.05)),
+                    onRowsPerPageChanged: (value) {
+                      // No need to wrap into setState, it will be called inside the widget
+                      // and trigger rebuild
+                      //setState(() {
+                      print('Row per page changed to $value');
+                      _rowsPerPage = value!;
+                      //});
+                    },
+                    initialFirstRowIndex: _initialRow,
+                    onPageChanged: (rowIndex) {
+                      //print(rowIndex / _rowsPerPage);
+                    },
+                    sortColumnIndex: _sortColumnIndex,
+                    sortAscending: _sortAscending,
+                    sortArrowIcon: Icons.keyboard_arrow_up,
+                    sortArrowAnimationDuration: const Duration(milliseconds: 0),
+                    onSelectAll: (select) => select != null && select
+                        ? (getCurrentRouteOption(context) != selectAllPage
+                            ? _dessertsDataSource!.selectAll()
+                            : _dessertsDataSource!.selectAllOnThePage())
+                        : (getCurrentRouteOption(context) != selectAllPage
+                            ? _dessertsDataSource!.deselectAll()
+                            : _dessertsDataSource!.deselectAllOnThePage()),
+                    controller: _controller,
+                    hidePaginator: getCurrentRouteOption(context) == custPager,
+                    columns: _columns,
+                    empty: Center(
+                        child: Container(
+                            padding: const EdgeInsets.all(20),
+                            color: Colors.grey[200],
+                            child: const Text('No data'))),
+                    loading: _Loading(),
+                    errorBuilder: (e) => _ErrorAndRetry(e.toString(),
+                        () => _dessertsDataSource!.refreshDatasource()),
+                    source: _dessertsDataSource!),
+                if (getCurrentRouteOption(context) == custPager)
+                  Positioned(bottom: 16, child: CustomPager(_controller))
+              ]),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
+            child: Card(
+              color: Colors.white,
+              child: Padding(
+                  padding: const EdgeInsets.all(50.0),
+                  child: AddRevenueSectorPage()),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -451,3 +503,36 @@ class _TitledRangeSelectorState extends State<_TitledRangeSelector> {
     ]);
   }
 }
+
+// Row(
+//                   children: [
+//                     const Text(
+//                       'Home',
+//                       style: TextStyle(
+//                           color: AppConstants.primaryColor,
+//                           fontWeight: FontWeight.w500,
+//                           fontSize: 16),
+//                     ),
+//                     const SizedBox(
+//                       width: 8.0,
+//                     ),
+//                     const Icon(
+//                       Icons.arrow_forward_ios,
+//                       color: AppConstants.primaryColor,
+//                       size: 20,
+//                     ),
+//                     const SizedBox(
+//                       width: 8.0,
+//                     ),
+//                     const Text(
+//                       'Revenuey',
+//                       style: TextStyle(
+//                           color: AppConstants.primaryColor,
+//                           fontWeight: FontWeight.w500,
+//                           fontSize: 16),
+//                     ),
+//                     const SizedBox(
+//                       width: 8.0,
+//                     ),
+//                   ],
+//                 ),

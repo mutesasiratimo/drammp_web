@@ -2,17 +2,17 @@ import 'package:entebbe_dramp_web/config/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+class UpdatePasswordPage extends StatefulWidget {
+  const UpdatePasswordPage({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<UpdatePasswordPage> createState() => _UpdatePasswordPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   bool rememberMe = false;
   bool obscurePassword = true;
-  TextEditingController emailController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   @override
@@ -58,7 +58,7 @@ class _SignInPageState extends State<SignInPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Sign In",
+                            "Update",
                             textAlign: TextAlign.start,
                             style: TextStyle(
                               color: Colors.black,
@@ -71,7 +71,7 @@ class _SignInPageState extends State<SignInPage> {
                           ),
                           RichText(
                             text: TextSpan(
-                              text: "Don't have an account? ",
+                              text: "Already have an account? ",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 16,
@@ -79,7 +79,7 @@ class _SignInPageState extends State<SignInPage> {
                               ),
                               children: [
                                 TextSpan(
-                                  text: "Register Here",
+                                  text: "Login Here",
                                   style: TextStyle(
                                     color: AppConstants.primaryColor,
                                     fontWeight: FontWeight.bold,
@@ -87,28 +87,6 @@ class _SignInPageState extends State<SignInPage> {
                                 )
                               ],
                             ),
-                          ),
-                          SizedBox(
-                            height: 30,
-                          ),
-                          TextField(
-                            controller: this.emailController,
-                            decoration: InputDecoration(
-                                prefixIcon: Icon(
-                                  Icons.email_outlined,
-                                  color: AppConstants.secondaryColor,
-                                ),
-                                hintText: "Enter your email address",
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.grey),
-                                ),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConstants.primaryColor),
-                                ),
-                                labelText: "Email",
-                                labelStyle: TextStyle(
-                                    color: AppConstants.primaryColor)),
                           ),
                           SizedBox(
                             height: 30,
@@ -154,6 +132,53 @@ class _SignInPageState extends State<SignInPage> {
                                       color: AppConstants.primaryColor),
                                 ),
                                 labelText: "Password",
+                                labelStyle: TextStyle(
+                                    color: AppConstants.primaryColor)),
+                          ),
+                          SizedBox(
+                            height: 30,
+                          ),
+                          TextField(
+                            controller: confirmPasswordController,
+                            obscureText: obscurePassword,
+                            decoration: InputDecoration(
+                                prefixIcon: IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.lock_open_outlined),
+                                  color: AppConstants.secondaryColor,
+                                ),
+                                suffixIcon: obscurePassword
+                                    ? IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            obscurePassword = !obscurePassword;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.visibility_off_outlined,
+                                          color: AppConstants.primaryColor,
+                                        ),
+                                      )
+                                    : IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            obscurePassword = !obscurePassword;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.visibility_outlined,
+                                          color: AppConstants.primaryColor,
+                                        ),
+                                      ),
+                                hintText: "Confirm new password",
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.grey),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: AppConstants.primaryColor),
+                                ),
+                                labelText: "Confirm Password",
                                 labelStyle: TextStyle(
                                     color: AppConstants.primaryColor)),
                           ),

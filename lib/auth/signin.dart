@@ -1,11 +1,14 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:entebbe_dramp_web/auth/signup.dart';
 import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:entebbe_dramp_web/config/constants.dart';
 import 'package:entebbe_dramp_web/home/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -17,8 +20,95 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends Base<SignInPage> {
   bool rememberMe = false;
   bool obscurePassword = true;
+  bool responseLoading = false;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  _login(String username, String password) async {
+    var url = Uri.parse(AppConstants.baseUrl + "user/login");
+    String _authToken = "";
+    debugPrint("++++++" + "LOGIN FUNCTION" + "+++++++");
+    // Navigator.pushNamed(context, AppRouter.home);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    FocusScopeNode currentFocus = FocusScope.of(context);
+
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    setState(() {
+      responseLoading = true;
+      // if (usePhone) {
+      //   url = Uri.parse(AppConstants.baseUrl + "user/login/mobile");
+      // }
+    });
+    var bodyString = {"username": username, "password": password};
+    debugPrint(bodyString.toString());
+    debugPrint(url.toString());
+    var body = jsonEncode(bodyString);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "Application/json",
+        },
+        body: body);
+    debugPrint("++++++" + response.body.toString() + "+++++++");
+    debugPrint("++++++" + response.statusCode.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final item = json.decode(response.body);
+      UserModel user = UserModel.fromJson(item);
+      _authToken = user.token;
+
+      if (user.issuperadmin || user.isadmin || user.isclerk) {
+        prefs.setString("authToken", _authToken);
+
+        prefs.setString("firstName", user.firstname);
+        prefs.setString("lastName", user.lastname);
+        prefs.setString("email", user.email);
+        prefs.setString("gender", user.gender);
+        prefs.setString("phone", user.phone);
+        prefs.setString("password", password);
+        prefs.setString("userid", user.userid.toString());
+        // prefs.setString("dateJoined", user.datecreated.toIso8601String());
+        prefs.setBool("isclerk", user.isclerk);
+        prefs.setBool("isadmin", user.isadmin);
+        prefs.setBool("issuperadmin", user.issuperadmin);
+
+        debugPrint('Loggend in user details $item ');
+        setState(() {
+          responseLoading = false;
+        });
+        pushAndRemoveUntil(HomePage());
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute<void>(
+        //     builder: (BuildContext context) => MultiProvider(
+        //       providers: [
+        //         ChangeNotifierProvider(
+        //           create: (context) => mc.MenuController(),
+        //         ),
+        //       ],
+        //       child: MainScreen(),
+        //     ),
+        //   ),
+        // );
+      } else {
+        showSuccessToast("You are not authorized to use this dashboard!");
+        setState(() {
+          responseLoading = false;
+        });
+      }
+    } else if (response.statusCode == 409) {
+      setState(() {
+        responseLoading = false;
+      });
+      showWarningToast("User account not activated.");
+    } else {
+      setState(() {
+        responseLoading = false;
+      });
+      showErrorToast("Authentication failure.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -205,27 +295,43 @@ class _SignInPageState extends Base<SignInPage> {
                                 height: 60,
                               ),
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        openOtpAlertBox();
-                                        // pushAndRemoveUntil(const HomePage());
-                                      },
-                                      child: const Text(
-                                        'Login',
-                                        style: TextStyle(
-                                            color: AppConstants.secondaryColor,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16),
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        shape: const StadiumBorder(),
-                                        backgroundColor:
-                                            AppConstants.primaryColor,
-                                      ),
-                                    ),
-                                  ),
+                                  responseLoading
+                                      ? SizedBox(
+                                          height: 35,
+                                          width: 35,
+                                          child: CircularProgressIndicator(),
+                                        )
+                                      : Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              emailController.text.isNotEmpty &&
+                                                      passwordController
+                                                          .text.isNotEmpty
+                                                  ? _login(emailController.text,
+                                                      passwordController.text)
+                                                  : showInfoToast(
+                                                      'Fill in the email address and password');
+                                              ;
+                                              // openOtpAlertBox();
+                                              // pushAndRemoveUntil(const HomePage());
+                                            },
+                                            child: const Text(
+                                              'Login',
+                                              style: TextStyle(
+                                                  color: AppConstants
+                                                      .secondaryColor,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 16),
+                                            ),
+                                            style: ElevatedButton.styleFrom(
+                                              shape: const StadiumBorder(),
+                                              backgroundColor:
+                                                  AppConstants.primaryColor,
+                                            ),
+                                          ),
+                                        ),
                                 ],
                               )
                             ],

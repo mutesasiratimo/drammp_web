@@ -4,7 +4,7 @@ import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:entebbe_dramp_web/config/constants.dart';
 import 'package:entebbe_dramp_web/home/appbar.dart';
 import 'package:entebbe_dramp_web/home/dashboard.dart';
-import 'package:entebbe_dramp_web/home/revenuesectors.dart';
+import 'package:entebbe_dramp_web/home/revenuesectors/revenuesectors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
@@ -52,7 +52,7 @@ class _HomePageState extends Base<HomePage> {
   Widget build(BuildContext context) {
     // final themeData = Theme.of(context);
     // final appColorScheme = Theme.of(context).extension<AppColorScheme>()!;
-    final size = MediaQuery.of(context).size;
+    // final size = MediaQuery.of(context).size;
     return Scaffold(
       body: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -256,7 +256,7 @@ class _HomePageState extends Base<HomePage> {
           Expanded(
             child: PageView(
               controller: pageController,
-              scrollBehavior: const ScrollBehavior(),
+              physics: const NeverScrollableScrollPhysics(),
               allowImplicitScrolling: false,
               children: [
                 //Page 1
