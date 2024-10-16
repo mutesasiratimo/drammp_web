@@ -185,7 +185,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
   //get sectors list
   Future<List<RevenueSectorsModel>> getSectors() async {
     List<RevenueSectorsModel> returnValue = [];
-    var url = Uri.parse("${AppConstants.baseUrl}revenuesectors");
+    var url = Uri.parse("${AppConstants.baseUrl}revenuesector");
     debugPrint(url.toString());
     String _authToken = "";
     String _username = "";
@@ -431,20 +431,11 @@ class DesertsFakeWebService {
     return Future.delayed(
         Duration(
             milliseconds: startingAt == 0
-                ? 2650
+                ? 1000
                 : startingAt < 20
-                    ? 2000
+                    ? 1000
                     : 400), () {
       var result = _dessertsX3;
-///////////////////////////////////////////////////////////////////////////////////////////////////
-      // if (caloriesFilter != null) {
-      //   result = result
-      //       .where((e) =>
-      //           e.calories >= caloriesFilter.start &&
-      //           e.calories <= caloriesFilter.end)
-      //       .toList();
-      // }
-
       result.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return DesertsFakeWebServiceResponse(
           result.length, result.skip(startingAt).take(count).toList());

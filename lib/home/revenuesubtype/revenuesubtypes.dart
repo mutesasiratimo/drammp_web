@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:entebbe_dramp_web/home/revenuesectors/addrevenuesector.dart';
 import 'package:entebbe_dramp_web/config/base.dart';
+import 'package:entebbe_dramp_web/home/revenuesubtype/addrevenuesubtype.dart';
 // import 'package:entebbe_dramp_web/home/appbar.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
@@ -17,14 +18,14 @@ import '../../config/nav_helper.dart';
 import '../../models/revenuesector.dart';
 import '../appbar.dart';
 
-class SectroSubtypePage extends StatefulWidget {
-  const SectroSubtypePage({super.key});
+class SectorSubtypePage extends StatefulWidget {
+  const SectorSubtypePage({super.key});
 
   @override
-  State<SectroSubtypePage> createState() => _SectroSubtypePageState();
+  State<SectorSubtypePage> createState() => _SectorSubtypePageState();
 }
 
-class _SectroSubtypePageState extends Base<SectroSubtypePage> {
+class _SectorSubtypePageState extends Base<SectorSubtypePage> {
   List<RevenueSectorsModel> revenueSector = [];
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
@@ -71,15 +72,12 @@ class _SectroSubtypePageState extends Base<SectroSubtypePage> {
         columnName = "Name";
         break;
       case 2:
-        columnName = "Code";
+        columnName = "Sector";
         break;
       case 3:
-        columnName = "Parent Sector";
-        break;
-      case 4:
         columnName = "Status";
         break;
-      case 5:
+      case 4:
         columnName = "";
         break;
     }
@@ -107,11 +105,7 @@ class _SectroSubtypePageState extends Base<SectroSubtypePage> {
         onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
-        label: const Text('Description'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text('Sub-types'),
+        label: const Text('Sector'),
         onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
@@ -137,7 +131,7 @@ class _SectroSubtypePageState extends Base<SectroSubtypePage> {
     //TO DO: FOR PRODUCTS COLUMN, SHOW "3 Proudcts" AS CLICKABLE LINK, WITH POPUP TO SHOW SUBTYPES.
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Revenue Sectors",
+        title: "Sector Categories",
         backgroundColor: Colors.white,
         actions: [
           accountToggle(context),
@@ -173,7 +167,7 @@ class _SectroSubtypePageState extends Base<SectroSubtypePage> {
                           child: ElevatedButton(
                             onPressed: () {
                               revenuePageController.jumpToPage(1);
-                              showInfoToast("Navigate");
+                              // showInfoToast("Navigate");
                               // push(const AddRevenueSectorPage());
                             },
                             child: Row(
@@ -271,7 +265,7 @@ class _SectroSubtypePageState extends Base<SectroSubtypePage> {
               color: Colors.white,
               child: Padding(
                   padding: const EdgeInsets.all(50.0),
-                  child: AddRevenueSectorPage()),
+                  child: AddSectorSubtypePage()),
             ),
           ),
         ],
@@ -353,7 +347,7 @@ class _ErrorAndRetry extends StatelessWidget {
   Widget build(BuildContext context) => Center(
         child: Container(
             padding: const EdgeInsets.all(10),
-            height: 70,
+            height: 100,
             color: Colors.red,
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

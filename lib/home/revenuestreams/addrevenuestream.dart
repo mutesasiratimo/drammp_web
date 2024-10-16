@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../config/constants.dart';
 
-class AddRevenueSectorPage extends StatefulWidget {
-  const AddRevenueSectorPage({super.key});
+class AddRevenueStreamPage extends StatefulWidget {
+  const AddRevenueStreamPage({super.key});
 
   @override
-  State<AddRevenueSectorPage> createState() => _AddRevenueSectorPageState();
+  State<AddRevenueStreamPage> createState() => _AddRevenueStreamPageState();
 }
 
-class _AddRevenueSectorPageState extends State<AddRevenueSectorPage> {
+class _AddRevenueStreamPageState extends State<AddRevenueStreamPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -5,6 +5,8 @@ import 'package:entebbe_dramp_web/config/constants.dart';
 import 'package:entebbe_dramp_web/home/appbar.dart';
 import 'package:entebbe_dramp_web/home/dashboard.dart';
 import 'package:entebbe_dramp_web/home/revenuesectors/revenuesectors.dart';
+import 'package:entebbe_dramp_web/home/revenuestreams/revenuestreams.dart';
+import 'package:entebbe_dramp_web/home/revenuesubtype/revenuesubtypes.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
@@ -128,6 +130,18 @@ class _HomePageState extends Base<HomePage> {
                 //   style: TextStyle(color: Colors.white),
                 // ),
                 tooltipContent: "Revenue Streams",
+              ),
+              SideMenuItem(
+                title: 'Sector Categories',
+                onTap: (index, _) {
+                  sideMenu.changePage(index);
+                },
+                icon: const Icon(Icons.folder_copy_outlined),
+                // badgeContent: const Text(
+                //   '3',
+                //   style: TextStyle(color: Colors.white),
+                // ),
+                tooltipContent: "Categories of revenue sectors",
               ),
               SideMenuItem(
                 title: 'Revenue Sectors',
@@ -262,39 +276,12 @@ class _HomePageState extends Base<HomePage> {
                 //Page 1
                 const DashboardPage(),
                 //Page 2
-                Container(
-                  color: Colors.purple.shade50,
-                  // padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomAppBar(
-                                title: "Revenue Streams",
-                                backgroundColor: Colors.white,
-                                actions: [
-                                  accountToggle(context),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(""),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                //Page 3
-                RevenuesectorsPage(),
+                const RevenueStreamsPage(),
+                // Page 3
+                const SectorSubtypePage(),
                 //Page 4
+                const RevenuesectorsPage(),
+                //Page 5
                 Container(
                   color: Colors.purple.shade50,
                   // padding: const EdgeInsets.all(16.0),
@@ -325,7 +312,7 @@ class _HomePageState extends Base<HomePage> {
                     ),
                   ),
                 ),
-                //Page 5
+                //Page 6
                 Container(
                   color: Colors.purple.shade50,
                   // padding: const EdgeInsets.all(16.0),
@@ -356,7 +343,7 @@ class _HomePageState extends Base<HomePage> {
                     ),
                   ),
                 ),
-                //Page 6
+                //Page 7
                 Container(
                   color: Colors.purple.shade50,
                   // padding: const EdgeInsets.all(16.0),
@@ -387,7 +374,7 @@ class _HomePageState extends Base<HomePage> {
                     ),
                   ),
                 ),
-                //Page 7
+                //Page 8
                 Container(
                   color: Colors.purple.shade50,
                   // padding: const EdgeInsets.all(16.0),
@@ -418,7 +405,7 @@ class _HomePageState extends Base<HomePage> {
                     ),
                   ),
                 ),
-                //Page 8
+                //Page 9
                 Container(
                   color: Colors.purple.shade50,
                   // padding: const EdgeInsets.all(16.0),
@@ -449,7 +436,7 @@ class _HomePageState extends Base<HomePage> {
                     ),
                   ),
                 ),
-                //Page 9
+                //Page 10
                 Container(
                   color: Colors.purple.shade50,
                   // padding: const EdgeInsets.all(16.0),
@@ -480,7 +467,7 @@ class _HomePageState extends Base<HomePage> {
                     ),
                   ),
                 ),
-                //Page 10
+                //Page 11
                 Container(
                   color: Colors.purple.shade50,
                   child: SingleChildScrollView(

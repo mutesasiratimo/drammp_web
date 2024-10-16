@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:entebbe_dramp_web/models/revenuesector.dart';
 import 'package:flutter/material.dart';
 import '../../config/constants.dart';
 
@@ -9,6 +12,61 @@ class AddSectorSubtypePage extends StatefulWidget {
 }
 
 class _AddSectorSubtypePageState extends State<AddSectorSubtypePage> {
+  List<RevenueSectorsModel> sectorList = <RevenueSectorsModel>[];
+  String selectedSector = "Select Sector";
+
+  //get sectors list
+  Future<List<RevenueSectorsModel>> getSectors() async {
+    List<RevenueSectorsModel> returnValue = [];
+    var url = Uri.parse("${AppConstants.baseUrl}revenuesectors");
+    debugPrint(url.toString());
+    // String _ausword = "";
+
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    // _username = prefs.getString("email")!;
+    // _password = prefs.getString("password")!;
+
+    // await AppFunctions.authenticate(_username, _password);
+    // _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        // 'Authorization': 'Bearer $_authToken',
+      },
+    );
+    debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
+      List<RevenueSectorsModel> sectorsmodel = (items as List)
+          .map((data) => RevenueSectorsModel.fromJson(data))
+          .toList();
+
+      // List<RevenueSectorsModel> sectorsmodel = usersobj;
+      // List<UserItem> usersmodel = usersobj.items;
+
+      returnValue = sectorsmodel;
+      debugPrint(sectorsmodel.toString());
+      setState(() {
+        sectorList = sectorsmodel;
+        // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
+      });
+    } else {
+      returnValue = [];
+      // showSnackBar("Network Failure: Failed to retrieve transactions");
+    }
+    return returnValue;
+  }
+
+  @override
+  void initState() {
+    getSectors();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +78,7 @@ class _AddSectorSubtypePageState extends State<AddSectorSubtypePage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                "Add New Sector Subtype",
+                "Add New Sector Category",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
@@ -103,20 +161,59 @@ class _AddSectorSubtypePageState extends State<AddSectorSubtypePage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  subtitle: TextFormField(
-                    minLines: 3,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                  subtitle: Expanded(
+                    child: DropdownButtonFormField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Color(0xffB9B9B9), width: 1.0),
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                        hintText: '',
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      isExpanded: true,
+                      hint: Row(
+                        children: [
+                          new Text(
+                            selectedSector,
+                            style: const TextStyle(
+                                // color: Colors.grey,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ],
                       ),
-                      hintText: '',
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                      items: sectorList.map((item) {
+                        return DropdownMenuItem(
+                          child: Row(
+                            children: [
+                              new Text(
+                                item.name,
+                                style: const TextStyle(
+                                    // color: Colors.grey,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                          value: item,
+                        );
+                      }).toList(),
+                      onChanged: (newVal) {
+                        List itemsList = sectorList.map((item) {
+                          if (item == newVal) {
+                            setState(() {
+                              selectedSector = item.name;
+                              debugPrint(selectedSector);
+                            });
+                          }
+                        }).toList();
+                      },
                     ),
                   ),
                 ),

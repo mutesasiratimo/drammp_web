@@ -17,14 +17,14 @@ import '../../config/nav_helper.dart';
 import '../../models/revenuesector.dart';
 import '../appbar.dart';
 
-class RevenuesectorsPage extends StatefulWidget {
-  const RevenuesectorsPage({super.key});
+class RevenueStreamsPage extends StatefulWidget {
+  const RevenueStreamsPage({super.key});
 
   @override
-  State<RevenuesectorsPage> createState() => _RevenuesectorsPageState();
+  State<RevenueStreamsPage> createState() => _RevenueStreamsPageState();
 }
 
-class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
+class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   List<RevenueSectorsModel> revenueSector = [];
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;

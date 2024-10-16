@@ -313,7 +313,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
               DataCell(Text(dessert.name)),
               DataCell(Text('${dessert.description}')),
               DataCell(Text("Sub-types")),
-              DataCell((dessert.status == "2")
+              DataCell((dessert.status == "1")
                   ? SizedBox(
                       height: 40,
                       child: Chip(
@@ -331,7 +331,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
                             "Active",
                           )),
                     )
-                  : (dessert.status == "1")
+                  : (dessert.status == "2")
                       ? SizedBox(
                           height: 40,
                           child: Chip(
@@ -431,19 +431,11 @@ class DesertsFakeWebService {
     return Future.delayed(
         Duration(
             milliseconds: startingAt == 0
-                ? 2650
+                ? 1000
                 : startingAt < 20
-                    ? 2000
+                    ? 800
                     : 400), () {
       var result = _dessertsX3;
-///////////////////////////////////////////////////////////////////////////////////////////////////
-      // if (caloriesFilter != null) {
-      //   result = result
-      //       .where((e) =>
-      //           e.calories >= caloriesFilter.start &&
-      //           e.calories <= caloriesFilter.end)
-      //       .toList();
-      // }
 
       result.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return DesertsFakeWebServiceResponse(

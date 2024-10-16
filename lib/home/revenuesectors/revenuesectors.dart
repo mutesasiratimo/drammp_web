@@ -136,6 +136,7 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
     if (_dataSourceLoading) return const SizedBox();
     //TO DO: FOR PRODUCTS COLUMN, SHOW "3 Proudcts" AS CLICKABLE LINK, WITH POPUP TO SHOW SUBTYPES.
     return Scaffold(
+      backgroundColor: Colors.purple.shade50,
       appBar: CustomAppBar(
         title: "Revenue Sectors",
         backgroundColor: Colors.white,
@@ -149,6 +150,7 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
         allowImplicitScrolling: false,
         children: [
           Container(
+            color: Colors.purple.shade50,
             margin: EdgeInsets.all(16.0),
             padding: EdgeInsets.all(8.0),
             child: Card(
@@ -265,6 +267,7 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
             ),
           ),
           Container(
+            color: Colors.purple.shade50,
             margin: EdgeInsets.all(16.0),
             padding: EdgeInsets.all(16.0),
             child: Card(
