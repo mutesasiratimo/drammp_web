@@ -1,9 +1,8 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_local_variable
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:entebbe_dramp_web/config/constants.dart';
-import 'package:entebbe_dramp_web/models/revenuesector.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:data_table_2/data_table_2.dart';

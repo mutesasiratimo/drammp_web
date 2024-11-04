@@ -36,6 +36,7 @@ dependencies:
   faker: ^2.2.0
   flutter_multi_select_items: ^0.4.3
   dynamic_tabbar: ^1.0.8
+  flutter_stepindicator: ^0.1.7
 
 dev_dependencies:
   flutter_test:
