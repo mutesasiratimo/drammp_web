@@ -2397,7 +2397,7 @@ class _AddNonIndividualRevenueStreamPageState
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'Personal Information (Associciate)',
+                'Personal Information (Associiate)',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
