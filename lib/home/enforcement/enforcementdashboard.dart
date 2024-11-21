@@ -4,15 +4,15 @@ import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import '../../config/base.dart';
 import '../appbar.dart';
 
-class FinanceDashboardPage extends StatefulWidget {
-  const FinanceDashboardPage({super.key});
+class EnforcementDashboardPage extends StatefulWidget {
+  const EnforcementDashboardPage({super.key});
 
   @override
-  State<FinanceDashboardPage> createState() => _FinanceDashboardPageState();
+  State<EnforcementDashboardPage> createState() =>
+      _EnforcementDashboardPageState();
 }
 
-class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
-  String selectedInterval = "Today";
+class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -25,7 +25,7 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
               children: [
                 Expanded(
                   child: CustomAppBar(
-                    title: "Finance and Monetary Evaluation",
+                    title: "Enforcement and Collections",
                     backgroundColor: Colors.white,
                     actions: [
                       _accountToggle(context),
@@ -51,139 +51,6 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                           sizes: "col-lg-8 col-md-12 col-sm-12",
                           child: SizedBox(
                             height: size.height * .8,
-                            child: Container(
-                              padding: EdgeInsets.all(24.0),
-                              margin: EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(16.0)),
-                                gradient: LinearGradient(
-                                    colors: [
-                                      const Color.fromRGBO(54, 41, 183, 72),
-                                      const Color.fromRGBO(54, 41, 183, 100),
-                                    ],
-                                    begin: const FractionalOffset(0.0, 0.0),
-                                    end: const FractionalOffset(1.0, 0.0),
-                                    stops: [0.0, 1.0],
-                                    tileMode: TileMode.clamp),
-                              ),
-                              child: Column(children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: Text(
-                                      "Subscription Overview",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ))
-                                  ],
-                                ),
-                                SizedBox(height: 8.0),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    FilterChip(
-                                      backgroundColor:
-                                          Colors.deepPurpleAccent.shade200,
-                                      label: Text(
-                                        "Annual",
-                                        style: TextStyle(
-                                            color: selectedInterval == "Annual"
-                                                ? Colors.black
-                                                : Colors.white),
-                                      ),
-                                      selected: selectedInterval == "Annual",
-                                      onSelected: (bool value) {
-                                        setState(() {
-                                          selectedInterval = "Annual";
-                                        });
-                                      },
-                                    ),
-                                    FilterChip(
-                                      backgroundColor:
-                                          Colors.deepPurpleAccent.shade200,
-                                      label: Text(
-                                        "Quarterly",
-                                        style: TextStyle(
-                                            color:
-                                                selectedInterval == "Quarterly"
-                                                    ? Colors.black
-                                                    : Colors.white),
-                                      ),
-                                      selected: selectedInterval == "Quarterly",
-                                      onSelected: (bool value) {
-                                        setState(() {
-                                          selectedInterval = "Quarterly";
-                                        });
-                                      },
-                                    ),
-                                    FilterChip(
-                                      backgroundColor:
-                                          Colors.deepPurpleAccent.shade200,
-                                      label: Text(
-                                        "Monthly",
-                                        style: TextStyle(
-                                            color: selectedInterval == "Monthly"
-                                                ? Colors.black
-                                                : Colors.white),
-                                      ),
-                                      selected: selectedInterval == "Monthly",
-                                      onSelected: (bool value) {
-                                        setState(() {
-                                          selectedInterval = "Monthly";
-                                        });
-                                      },
-                                    ),
-                                    FilterChip(
-                                      backgroundColor:
-                                          Colors.deepPurpleAccent.shade200,
-                                      label: Text(
-                                        "Weekly",
-                                        style: TextStyle(
-                                            color: selectedInterval == "Weekly"
-                                                ? Colors.black
-                                                : Colors.white),
-                                      ),
-                                      selected: selectedInterval == "Weekly",
-                                      onSelected: (bool value) {
-                                        setState(() {
-                                          selectedInterval = "Weekly";
-                                        });
-                                      },
-                                    ),
-                                    FilterChip(
-                                      backgroundColor:
-                                          Colors.deepPurpleAccent.shade200,
-                                      showCheckmark: true,
-                                      label: Text(
-                                        "Today",
-                                        style: TextStyle(
-                                            color: selectedInterval == "Today"
-                                                ? Colors.black
-                                                : Colors.white),
-                                      ),
-                                      selected: selectedInterval == "Today",
-                                      onSelected: (bool value) {
-                                        setState(() {
-                                          selectedInterval = "Today";
-                                        });
-                                      },
-                                    ),
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Icons.refresh,
-                                          color: Colors.white,
-                                          size: 24,
-                                        ))
-                                  ],
-                                )
-                              ]),
-                            ),
                           ),
                         ),
                         BootstrapCol(

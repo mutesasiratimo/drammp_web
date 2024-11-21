@@ -4,6 +4,8 @@ import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:entebbe_dramp_web/config/constants.dart';
 import 'package:entebbe_dramp_web/home/appbar.dart';
 import 'package:entebbe_dramp_web/home/dashboard.dart';
+import 'package:entebbe_dramp_web/home/enforcement/enforcementdashboard.dart';
+import 'package:entebbe_dramp_web/home/finance/financedashboard.dart';
 import 'package:entebbe_dramp_web/home/revenuesectors/revenuesectors.dart';
 import 'package:entebbe_dramp_web/home/revenuestreams/revenuestreams.dart';
 import 'package:entebbe_dramp_web/home/revenuesubtype/revenuesubtypes.dart';
@@ -68,9 +70,9 @@ class _HomePageState extends Base<HomePage> {
               displayMode: SideMenuDisplayMode.auto,
               showHamburger: true,
               backgroundColor: Colors.white,
-              hoverColor: Colors.purple.shade100,
-              selectedHoverColor: Colors.purple.shade100,
-              selectedColor: Colors.purple.shade200,
+              hoverColor: Colors.indigo.shade100,
+              selectedHoverColor: Colors.indigo.shade100,
+              selectedColor: Colors.indigo.shade200,
               selectedTitleTextStyle: const TextStyle(color: Colors.black),
               selectedIconColor: AppConstants.primaryColor,
               // decoration: BoxDecoration(
@@ -406,67 +408,9 @@ class _HomePageState extends Base<HomePage> {
                   ),
                 ),
                 //Page 9
-                Container(
-                  color: Colors.purple.shade50,
-                  // padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomAppBar(
-                                title: "Finance and Monetary Evaluation",
-                                backgroundColor: Colors.white,
-                                actions: [
-                                  accountToggle(context),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(""),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                FinanceDashboardPage(),
                 //Page 10
-                Container(
-                  color: Colors.purple.shade50,
-                  // padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomAppBar(
-                                title: "Collections and Enforcement",
-                                backgroundColor: Colors.white,
-                                actions: [
-                                  accountToggle(context),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(""),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                EnforcementDashboardPage(),
                 //Page 11
                 Container(
                   color: Colors.purple.shade50,

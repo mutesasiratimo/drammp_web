@@ -5,16 +5,17 @@ import 'dart:convert';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:entebbe_dramp_web/home/revenuestreams/transport/addindividualrevenuestream.dart';
-// import 'package:entebbe_dramp_web/home/appbar.dart';
 import 'package:flutter/material.dart';
 import '../../config/constants.dart';
 import '../../config/custom_pager.dart';
-import '../../models/revenuesectorcategories.dart';
+import '../../models/revenuesectorcategoriesfiltered.dart';
 import 'data_sources.dart';
 import '../../config/nav_helper.dart';
 import '../../models/revenuesector.dart';
 import '../appbar.dart';
 import 'package:http/http.dart' as http;
+
+import 'transport/addnonindividualrevenuestream.dart';
 
 class RevenueStreamsPage extends StatefulWidget {
   const RevenueStreamsPage({super.key});
@@ -33,13 +34,15 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   PageController revenueStreamPageController = PageController();
   String selectedOwnership = "";
   String selectedSector = "";
+  String selectedSectorId = "";
   String selectedCategory = "";
+  String selectedCategoryId = "";
   bool _dataSourceLoading = false;
   int _initialRow = 0;
   List<String> ownerType = ["Individual", "Non-Individual"];
   List<RevenueSectorsModel> sectorList = <RevenueSectorsModel>[];
-  List<RevenueSectorCategoriesModel> categoryList =
-      <RevenueSectorCategoriesModel>[];
+  List<RevenueSectorCategoriesFilteredModel> categoryList =
+      <RevenueSectorCategoriesFilteredModel>[];
 
   //get sectors list
   Future<List<RevenueSectorsModel>> getSectors() async {
@@ -88,9 +91,11 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   }
 
   //get sector categories list
-  Future<List<RevenueSectorCategoriesModel>> getCategories() async {
-    List<RevenueSectorCategoriesModel> returnValue = [];
-    var url = Uri.parse("${AppConstants.baseUrl}sectorsubtypes");
+  Future<List<RevenueSectorCategoriesFilteredModel>> getCategories(
+      String sectorId) async {
+    List<RevenueSectorCategoriesFilteredModel> returnValue = [];
+    var url =
+        Uri.parse("${AppConstants.baseUrl}sectorsubtypes/sector/$sectorId");
     debugPrint(url.toString());
     // String _ausword = "";
 
@@ -109,12 +114,15 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
         // 'Authorization': 'Bearer $_authToken',
       },
     );
-    debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
+    debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
+        response.body.toString() +
+        "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
-      List<RevenueSectorCategoriesModel> categoriesmodel = (items as List)
-          .map((data) => RevenueSectorCategoriesModel.fromJson(data))
+      List<RevenueSectorCategoriesFilteredModel> categoriesmodel = (items
+              as List)
+          .map((data) => RevenueSectorCategoriesFilteredModel.fromJson(data))
           .toList();
 
       // List<RevenueSectorsModel> sectorsmodel = usersobj;
@@ -136,7 +144,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   @override
   void initState() {
     getSectors();
-    getCategories();
+    // getCategories("c55ffa94-9f38-11ef-bf99-42010a800002");
     super.initState();
   }
 
@@ -236,260 +244,317 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(32.0))),
           contentPadding: EdgeInsets.only(top: 10.0),
-          content: Container(
-            width: MediaQuery.of(context).size.width * 0.3,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    "Select to proceed.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  ListTile(
-                    title: Text(
-                      'Select Ownership',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return Container(
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 20,
                       ),
-                    ),
-                    subtitle: Expanded(
-                      child: DropdownButtonFormField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Color(0xffB9B9B9), width: 1.0),
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                          ),
-                          hintText: '',
+                      Text(
+                        "Select to proceed. ${categoryList.length}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w400,
                         ),
-                        isExpanded: true,
-                        hint: Row(
-                          children: [
-                            new Text(
-                              selectedOwnership,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: ownerType.map((item) {
-                          return DropdownMenuItem(
-                            child: Row(
-                              children: [
-                                new Text(
-                                  item,
-                                  style: const TextStyle(
-                                      // color: Colors.grey,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                            value: item,
-                          );
-                        }).toList(),
-                        onChanged: (newVal) {
-                          List itemsList = ownerType.map((item) {
-                            if (item == newVal) {
-                              setState(() {
-                                selectedOwnership = item;
-                                debugPrint(selectedOwnership);
-                              });
-                            }
-                          }).toList();
-                        },
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  ListTile(
-                    title: Text(
-                      'Select Sector',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                    subtitle: Expanded(
-                      child: DropdownButtonFormField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Color(0xffB9B9B9), width: 1.0),
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                          ),
-                          hintText: '',
-                        ),
-                        isExpanded: true,
-                        hint: Row(
-                          children: [
-                            new Text(
-                              selectedSector,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: sectorList.map((item) {
-                          return DropdownMenuItem(
-                            child: Row(
-                              children: [
-                                new Text(
-                                  item.name,
-                                  style: const TextStyle(
-                                      // color: Colors.grey,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                            value: item,
-                          );
-                        }).toList(),
-                        onChanged: (newVal) {
-                          List itemsList = sectorList.map((item) {
-                            if (item == newVal) {
-                              setState(() {
-                                selectedSector = item.name;
-                                debugPrint(selectedSector);
-                              });
-                            }
-                          }).toList();
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  ListTile(
-                    title: Text(
-                      'Select Category',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    subtitle: Expanded(
-                      child: DropdownButtonFormField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Color(0xffB9B9B9), width: 1.0),
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                          ),
-                          hintText: '',
-                        ),
-                        isExpanded: true,
-                        hint: Row(
-                          children: [
-                            new Text(
-                              selectedCategory,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: categoryList.map((item) {
-                          return DropdownMenuItem(
-                            child: Row(
-                              children: [
-                                new Text(
-                                  item.typename,
-                                  style: const TextStyle(
-                                      // color: Colors.grey,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                            value: item,
-                          );
-                        }).toList(),
-                        onChanged: (newVal) {
-                          List itemsList = categoryList.map((item) {
-                            if (item == newVal) {
-                              setState(() {
-                                selectedCategory = item.typename;
-                                debugPrint(selectedCategory);
-                              });
-                            }
-                          }).toList();
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    // width: 200,
-                    // color: Colors.grey[200],
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        revenueStreamPageController.jumpToPage(1);
-                      },
-                      child: Center(
-                        child: const Text(
-                          'Proceed',
+                      ListTile(
+                        title: Text(
+                          'Select Ownership',
                           style: TextStyle(
-                              color: AppConstants.secondaryColor,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: DropdownButtonFormField(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color(0xffB9B9B9), width: 1.0),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4)),
+                            ),
+                            hintText: '',
+                          ),
+                          isExpanded: true,
+                          hint: Row(
+                            children: [
+                              new Text(
+                                selectedOwnership,
+                                style: const TextStyle(
+                                    // color: Colors.grey,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          items: ownerType.map((item) {
+                            return DropdownMenuItem(
+                              child: Row(
+                                children: [
+                                  new Text(
+                                    item,
+                                    style: const TextStyle(
+                                        // color: Colors.grey,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              value: item,
+                            );
+                          }).toList(),
+                          onChanged: (newVal) {
+                            List itemsList = ownerType.map((item) {
+                              if (item == newVal) {
+                                setState(() {
+                                  selectedOwnership = item;
+                                  debugPrint(selectedOwnership);
+                                });
+                              }
+                            }).toList();
+                          },
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        shape: const StadiumBorder(),
-                        backgroundColor: AppConstants.primaryColor,
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
+                      ListTile(
+                        title: Text(
+                          'Select Sector',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: DropdownButtonFormField(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color(0xffB9B9B9), width: 1.0),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4)),
+                            ),
+                            hintText: '',
+                          ),
+                          isExpanded: true,
+                          hint: Row(
+                            children: [
+                              new Text(
+                                selectedSector,
+                                style: const TextStyle(
+                                    // color: Colors.grey,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          items: sectorList.map((item) {
+                            return DropdownMenuItem(
+                              child: Row(
+                                children: [
+                                  new Text(
+                                    item.name,
+                                    style: const TextStyle(
+                                        // color: Colors.grey,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              value: item,
+                            );
+                          }).toList(),
+                          onChanged: (newVal) {
+                            List itemsList = sectorList.map((item) {
+                              if (item == newVal) {
+                                setState(() async {
+                                  selectedSector = item.name;
+                                  selectedSectorId = item.id;
+                                  debugPrint(selectedSector);
+                                  selectedCategory = "";
+                                  categoryList = [];
+                                  var url = Uri.parse(
+                                      "${AppConstants.baseUrl}sectorsubtypes/sector/$selectedSectorId");
+                                  debugPrint(url.toString());
+                                  // String _ausword = "";
+
+                                  // final SharedPreferences prefs = await SharedPreferences.getInstance();
+                                  //Get username and password from shared prefs
+                                  // _username = prefs.getString("email")!;
+                                  // _password = prefs.getString("password")!;
+
+                                  // await AppFunctions.authenticate(_username, _password);
+                                  // _authToken = prefs.getString("authToken")!;
+
+                                  var response = await http.get(
+                                    url,
+                                    headers: {
+                                      "Content-Type": "Application/json",
+                                      // 'Authorization': 'Bearer $_authToken',
+                                    },
+                                  );
+                                  debugPrint(
+                                      "++++++RESPONSE SECTORS CATEGORIES" +
+                                          response.body.toString() +
+                                          "+++++++");
+                                  if (response.statusCode == 200) {
+                                    final items = json.decode(response.body);
+                                    // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
+                                    List<RevenueSectorCategoriesFilteredModel>
+                                        categoriesmodel = (items as List)
+                                            .map((data) =>
+                                                RevenueSectorCategoriesFilteredModel
+                                                    .fromJson(data))
+                                            .toList();
+
+                                    debugPrint(categoriesmodel.toString());
+                                    setState(() {
+                                      categoryList = categoriesmodel;
+                                      selectedCategory =
+                                          categoryList.first.typename;
+                                      selectedCategoryId =
+                                          categoryList.first.id;
+                                    });
+                                  }
+                                });
+                              }
+                            }).toList();
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ListTile(
+                        title: Text(
+                          'Select Category',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: DropdownButtonFormField(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color(0xffB9B9B9), width: 1.0),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4)),
+                            ),
+                            hintText: '',
+                          ),
+                          isExpanded: true,
+                          hint: Row(
+                            children: [
+                              new Text(
+                                selectedCategory,
+                                style: const TextStyle(
+                                    // color: Colors.grey,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          items: categoryList.map((item) {
+                            return DropdownMenuItem(
+                              child: Row(
+                                children: [
+                                  new Text(
+                                    item.typename,
+                                    style: const TextStyle(
+                                        // color: Colors.grey,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              value: item,
+                            );
+                          }).toList(),
+                          onChanged: (newVal) {
+                            List itemsList = categoryList.map((item) {
+                              if (item == newVal) {
+                                setState(() {
+                                  selectedCategory = item.typename;
+                                  debugPrint(selectedCategory);
+                                });
+                              }
+                            }).toList();
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        // width: 200,
+                        // color: Colors.grey[200],
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (selectedOwnership == "Individual") {
+                              Navigator.of(context).pop();
+                              revenueStreamPageController.jumpToPage(1);
+                            } else if (selectedOwnership == "Non-Individual") {
+                              Navigator.of(context).pop();
+                              revenueStreamPageController.jumpToPage(2);
+                            } else {
+                              showInfoToast("Please select ownership type.");
+                            }
+                          },
+                          child: Center(
+                            child: const Text(
+                              'Proceed',
+                              style: TextStyle(
+                                  color: AppConstants.secondaryColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16),
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            shape: const StadiumBorder(),
+                            backgroundColor: AppConstants.primaryColor,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         );
       },
@@ -636,6 +701,19 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
               child: Padding(
                   padding: const EdgeInsets.all(18.0),
                   child: AddIndividualRevenueStreamPage(
+                    ownerType: selectedOwnership,
+                    category: selectedCategory,
+                  )),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(6.0),
+            child: Card(
+              color: Colors.white,
+              child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: AddNonIndividualRevenueStreamPage(
                     ownerType: selectedOwnership,
                     category: selectedCategory,
                   )),

@@ -94,12 +94,27 @@ class _DashboardPageState extends Base<DashboardPage> {
                 children: <BootstrapCol>[
                   BootstrapCol(
                     sizes: 'col-lg-6 col-md-8 col-sm-18',
-                    child: Text(
-                      "Good $salutation, Admin.",
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 4),
+                        Text(
+                          "Good $salutation, Admin.",
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          textAlign: TextAlign.start,
+                          DateFormat.yMMMEd().format(today),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   BootstrapCol(
@@ -137,21 +152,21 @@ class _DashboardPageState extends Base<DashboardPage> {
                   ),
                 ],
               ),
-              BootstrapRow(
-                children: <BootstrapCol>[
-                  BootstrapCol(
-                    sizes: 'col-lg-6 col-md-12 col-sm-12',
-                    child: Text(
-                      textAlign: TextAlign.start,
-                      DateFormat.yMMMEd().format(today),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              // BootstrapRow(
+              //   children: <BootstrapCol>[
+              //     BootstrapCol(
+              //       sizes: 'col-lg-6 col-md-12 col-sm-12',
+              //       child: Text(
+              //         textAlign: TextAlign.start,
+              //         DateFormat.yMMMEd().format(today),
+              //         style: const TextStyle(
+              //           fontSize: 18,
+              //           fontWeight: FontWeight.bold,
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
               //Entire row
               BootstrapRow(
                 children: <BootstrapCol>[

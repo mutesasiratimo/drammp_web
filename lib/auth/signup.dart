@@ -423,7 +423,7 @@ class _SignUpPageState extends Base<SignUpPage> {
                   SizedBox(
                     height: height * .55,
                     // width: width * .3,
-                    child: Image.asset("assets/images/loginvector.png"),
+                    child: Image.asset("assets/images/loginvectorblue.png"),
                   ),
                   const SizedBox(
                     height: 20,
@@ -495,7 +495,7 @@ class _SignUpPageState extends Base<SignUpPage> {
                     SizedBox(
                       height: 220,
                       width: 220,
-                      child: Image.asset("assets/images/otpvector.png"),
+                      child: Image.asset("assets/images/otpvectorblue.png"),
                     ),
                     SizedBox(
                       height: 20,

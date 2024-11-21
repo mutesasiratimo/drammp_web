@@ -356,7 +356,7 @@ class _SignInPageState extends Base<SignInPage> {
                       SizedBox(
                         height: height * .55,
                         // width: width * .3,
-                        child: Image.asset("assets/images/loginvector.png"),
+                        child: Image.asset("assets/images/loginvectorblue.png"),
                       ),
                       const SizedBox(
                         height: 20,
@@ -367,8 +367,9 @@ class _SignInPageState extends Base<SignInPage> {
                           Container(
                             color: Colors.white,
                             // height: 150,
-                            width: 160,
-                            child: Image.asset("assets/images/entebbelogo.png"),
+                            width: 80,
+                            child:
+                                Image.asset("assets/images/entebbemlogo.png"),
                           ),
                         ],
                       ),

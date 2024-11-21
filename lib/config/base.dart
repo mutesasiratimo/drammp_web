@@ -235,11 +235,12 @@ abstract class Base<T extends StatefulWidget> extends State<T>
       type: ToastificationType.success,
       style: ToastificationStyle.flat,
       autoCloseDuration: const Duration(seconds: 5),
-      title: Text('Success!'),
+      title: Text('Error!'),
       // you can also use RichText widget for title and description parameters
       description: RichText(
           text: TextSpan(
-              text: msg, style: TextStyle(color: Colors.red.shade900))),
+              text: msg,
+              style: TextStyle(color: Colors.red.shade900, fontSize: 18))),
       alignment: Alignment.topCenter,
       direction: TextDirection.ltr,
       animationDuration: const Duration(milliseconds: 300),
