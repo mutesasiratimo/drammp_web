@@ -33,9 +33,13 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   final PaginatorController _controller = PaginatorController();
   PageController revenueStreamPageController = PageController();
   String selectedOwnership = "";
+  String selectedInitSector = "";
   String selectedSector = "";
+  String selectedInitSectorId = "";
   String selectedSectorId = "";
+  String selectedInitCategory = "";
   String selectedCategory = "";
+  String selectedInitCategoryId = "";
   String selectedCategoryId = "";
   bool _dataSourceLoading = false;
   int _initialRow = 0;
@@ -81,6 +85,53 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
       debugPrint(sectorsmodel.toString());
       setState(() {
         sectorList = sectorsmodel;
+        selectedInitSector = sectorsmodel.first.name;
+        selectedInitCategoryId = sectorsmodel.first.id;
+        getCategoriesInit(selectedInitCategoryId);
+        // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
+      });
+    } else {
+      returnValue = [];
+      // showSnackBar("Network Failure: Failed to retrieve transactions");
+    }
+    return returnValue;
+  }
+
+  //get sector categories list
+  Future<List<RevenueSectorCategoriesFilteredModel>> getCategoriesInit(
+      String sectorId) async {
+    List<RevenueSectorCategoriesFilteredModel> returnValue = [];
+    var url =
+        Uri.parse("${AppConstants.baseUrl}sectorsubtypes/sector/$sectorId");
+    debugPrint(url.toString());
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        // 'Authorization': 'Bearer $_authToken',
+      },
+    );
+    debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
+        response.body.toString() +
+        "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
+      List<RevenueSectorCategoriesFilteredModel> categoriesmodel = (items
+              as List)
+          .map((data) => RevenueSectorCategoriesFilteredModel.fromJson(data))
+          .toList();
+
+      // List<RevenueSectorsModel> sectorsmodel = usersobj;
+      // List<UserItem> usersmodel = usersobj.items;
+
+      returnValue = categoriesmodel;
+      debugPrint(categoriesmodel.toString());
+      setState(() {
+        categoryList = categoriesmodel;
+        selectedInitCategory = categoriesmodel.first.typename;
+        selectedInitCategoryId = categoriesmodel.first.id;
         // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
       });
     } else {
@@ -152,10 +203,10 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   void didChangeDependencies() {
     // initState is to early to access route options, context is invalid at that stage
     _dessertsDataSource ??= getCurrentRouteOption(context) == noData
-        ? DessertDataSourceAsync.empty()
+        ? DessertDataSourceAsync.empty("")
         : getCurrentRouteOption(context) == asyncErrors
-            ? DessertDataSourceAsync.error()
-            : DessertDataSourceAsync();
+            ? DessertDataSourceAsync.error("")
+            : DessertDataSourceAsync(selectedInitCategoryId);
 
     if (getCurrentRouteOption(context) == goToLast) {
       _dataSourceLoading = true;
@@ -171,21 +222,24 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
     int columnIndex,
     bool ascending,
   ) {
-    var columnName = "Code";
+    var columnName = "Reg No";
     switch (columnIndex) {
       case 1:
-        columnName = "Name";
+        columnName = "Model";
         break;
       case 2:
-        columnName = "Description";
+        columnName = "Color";
         break;
       case 3:
-        columnName = "Sub-types";
+        columnName = "Reg Reference";
         break;
       case 4:
-        columnName = "Status";
+        columnName = "Type";
         break;
       case 5:
+        columnName = "Status";
+        break;
+      case 6:
         columnName = "";
         break;
     }
@@ -205,19 +259,23 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   List<DataColumn> get _columns {
     return [
       DataColumn(
-        label: const Text('Code'),
+        label: const Text('Reg No'),
         onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
-        label: const Text('Name'),
+        label: const Text('Model'),
         onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
-        label: const Text('Description'),
+        label: const Text('Color'),
         onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
-        label: const Text('Sub-types'),
+        label: const Text('Reg Reference'),
+        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
+      ),
+      DataColumn(
+        label: const Text('Type'),
         onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
       ),
       DataColumn(
@@ -506,6 +564,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                               if (item == newVal) {
                                 setState(() {
                                   selectedCategory = item.typename;
+                                  selectedCategoryId = item.id;
                                   debugPrint(selectedCategory);
                                 });
                               }
@@ -594,39 +653,180 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          // width: 200,
-                          // color: Colors.grey[200],
-                          child: ElevatedButton(
-                            onPressed: () {
-                              openSelectBox();
-                            },
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.add,
-                                  color: AppConstants.secondaryColor,
-                                  size: 20,
-                                ),
-                                const SizedBox(
-                                  width: 8.0,
-                                ),
-                                const Text(
-                                  'New',
-                                  style: TextStyle(
-                                      color: AppConstants.secondaryColor,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16),
-                                ),
-                              ],
+                        Expanded(
+                          flex: 2,
+                          child: ListTile(
+                            title: Text(
+                              'Select Sector',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            style: ElevatedButton.styleFrom(
-                              shape: const StadiumBorder(),
-                              backgroundColor: AppConstants.primaryColor,
+                            subtitle: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Color(0xffB9B9B9)),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xffB9B9B9), width: 1.0),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                hintText: '',
+                              ),
+                              isExpanded: true,
+                              hint: Row(
+                                children: [
+                                  new Text(
+                                    selectedInitSector,
+                                    style: const TextStyle(
+                                        // color: Colors.grey,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              icon: const Icon(Icons.keyboard_arrow_down),
+                              items: sectorList.map((item) {
+                                return DropdownMenuItem(
+                                  child: Row(
+                                    children: [
+                                      new Text(
+                                        item.name,
+                                        style: const TextStyle(
+                                            // color: Colors.grey,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                  value: item,
+                                );
+                              }).toList(),
+                              onChanged: (newVal) {
+                                List itemsList = sectorList.map((item) {
+                                  if (item == newVal) {
+                                    setState(() async {
+                                      selectedInitSector = item.name;
+                                      selectedInitSectorId = item.id;
+                                      debugPrint(selectedInitSector);
+                                      selectedCategory = "";
+                                      categoryList = [];
+                                      getCategoriesInit(selectedInitSectorId);
+                                    });
+                                  }
+                                }).toList();
+                              },
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: ListTile(
+                            title: Text(
+                              'Select Category',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Color(0xffB9B9B9)),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xffB9B9B9), width: 1.0),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                hintText: '',
+                              ),
+                              isExpanded: true,
+                              hint: Row(
+                                children: [
+                                  new Text(
+                                    selectedInitCategory,
+                                    style: const TextStyle(
+                                        // color: Colors.grey,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              icon: const Icon(Icons.keyboard_arrow_down),
+                              items: categoryList.map((item) {
+                                return DropdownMenuItem(
+                                  child: Row(
+                                    children: [
+                                      new Text(
+                                        item.typename,
+                                        style: const TextStyle(
+                                            // color: Colors.grey,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                  value: item,
+                                );
+                              }).toList(),
+                              onChanged: (newVal) {
+                                List itemsList = categoryList.map((item) {
+                                  if (item == newVal) {
+                                    setState(() {
+                                      selectedInitCategory = item.typename;
+                                      selectedInitCategoryId = item.id;
+                                      debugPrint(selectedCategory);
+                                    });
+                                  }
+                                }).toList();
+                              },
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            // width: 200,
+                            // color: Colors.grey[200],
+                            child: ElevatedButton(
+                              onPressed: () {
+                                openSelectBox();
+                              },
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.add,
+                                    color: AppConstants.secondaryColor,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 8.0,
+                                  ),
+                                  const Text(
+                                    'New',
+                                    style: TextStyle(
+                                        color: AppConstants.secondaryColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                shape: const StadiumBorder(),
+                                backgroundColor: AppConstants.primaryColor,
+                              ),
                             ),
                           ),
                         )
@@ -702,7 +902,10 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                   padding: const EdgeInsets.all(18.0),
                   child: AddIndividualRevenueStreamPage(
                     ownerType: selectedOwnership,
+                    sector: selectedSector,
+                    sectorId: selectedSectorId,
                     category: selectedCategory,
+                    categoryId: selectedCategoryId,
                   )),
             ),
           ),
@@ -715,7 +918,10 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                   padding: const EdgeInsets.all(18.0),
                   child: AddNonIndividualRevenueStreamPage(
                     ownerType: selectedOwnership,
+                    sector: selectedSector,
+                    sectorId: selectedSectorId,
                     category: selectedCategory,
+                    categoryId: selectedCategoryId,
                   )),
             ),
           ),

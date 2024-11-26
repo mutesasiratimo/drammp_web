@@ -2,13 +2,14 @@ import 'dart:async';
 import 'package:easy_sidemenu/easy_sidemenu.dart';
 import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:entebbe_dramp_web/config/constants.dart';
-import 'package:entebbe_dramp_web/home/appbar.dart';
 import 'package:entebbe_dramp_web/home/dashboard.dart';
 import 'package:entebbe_dramp_web/home/enforcement/enforcementdashboard.dart';
 import 'package:entebbe_dramp_web/home/finance/financedashboard.dart';
+import 'package:entebbe_dramp_web/home/mobility/mobility.dart';
 import 'package:entebbe_dramp_web/home/revenuesectors/revenuesectors.dart';
 import 'package:entebbe_dramp_web/home/revenuestreams/revenuestreams.dart';
 import 'package:entebbe_dramp_web/home/revenuesubtype/revenuesubtypes.dart';
+import 'package:entebbe_dramp_web/home/settings/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
@@ -151,52 +152,14 @@ class _HomePageState extends Base<HomePage> {
                   sideMenu.changePage(index);
                 },
                 icon: const Icon(Icons.folder_copy_outlined),
-                // badgeContent: const Text(
-                //   '3',
-                //   style: TextStyle(color: Colors.white),
-                // ),
                 tooltipContent: "Revenue generating industries",
               ),
-
-              SideMenuExpansionItem(
-                title: "Sectors",
-                icon: const Icon(Icons.kitchen),
-                children: [
-                  SideMenuItem(
-                    title: 'Transport',
-                    onTap: (index, _) {
-                      sideMenu.changePage(index);
-                    },
-                    icon: const Icon(Icons.home),
-                    // badgeContent: const Text(
-                    //   '3',
-                    //   style: TextStyle(color: Colors.white),
-                    // ),
-                    tooltipContent: "Transport Sector",
-                  ),
-                  SideMenuItem(
-                    title: 'Hospitality',
-                    onTap: (index, _) {
-                      sideMenu.changePage(index);
-                    },
-                    icon: const Icon(Icons.supervisor_account),
-                  ),
-                  SideMenuItem(
-                    title: 'Trade & Commerce',
-                    onTap: (index, _) {
-                      sideMenu.changePage(index);
-                    },
-                    icon: const Icon(Icons.home),
-                    tooltipContent: "Trade & Commerce Sector",
-                  ),
-                  SideMenuItem(
-                    title: 'Fisheries',
-                    onTap: (index, _) {
-                      sideMenu.changePage(index);
-                    },
-                    icon: const Icon(Icons.supervisor_account),
-                  )
-                ],
+              SideMenuItem(
+                title: 'Mobility Management',
+                onTap: (index, _) {
+                  sideMenu.changePage(index);
+                },
+                icon: const Icon(Icons.bus_alert),
               ),
               SideMenuItem(
                 title: 'Finance',
@@ -284,157 +247,13 @@ class _HomePageState extends Base<HomePage> {
                 //Page 4
                 const RevenuesectorsPage(),
                 //Page 5
-                Container(
-                  color: Colors.purple.shade50,
-                  // padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomAppBar(
-                                title: "Transport",
-                                backgroundColor: Colors.white,
-                                actions: [
-                                  accountToggle(context),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(""),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                const MobilityPage(),
                 //Page 6
-                Container(
-                  color: Colors.purple.shade50,
-                  // padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomAppBar(
-                                title: "Hospitality",
-                                backgroundColor: Colors.white,
-                                actions: [
-                                  accountToggle(context),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(""),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                const FinanceDashboardPage(),
                 //Page 7
-                Container(
-                  color: Colors.purple.shade50,
-                  // padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomAppBar(
-                                title: "Trade and Commerce",
-                                backgroundColor: Colors.white,
-                                actions: [
-                                  accountToggle(context),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(""),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                const EnforcementDashboardPage(),
                 //Page 8
-                Container(
-                  color: Colors.purple.shade50,
-                  // padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomAppBar(
-                                title: "Fisheries",
-                                backgroundColor: Colors.white,
-                                actions: [
-                                  accountToggle(context),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(""),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                //Page 9
-                FinanceDashboardPage(),
-                //Page 10
-                EnforcementDashboardPage(),
-                //Page 11
-                Container(
-                  color: Colors.purple.shade50,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomAppBar(
-                                title: "Configure System",
-                                backgroundColor: Colors.white,
-                                actions: [
-                                  accountToggle(context),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                const SettingsPage()
               ],
             ),
           ),

@@ -12,30 +12,22 @@ import '../../../config/functions.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 
-import '../../home.dart';
-
-class AddIndividualRevenueStreamPage extends StatefulWidget {
+class AddIndividualTransportRevenueStreamPage extends StatefulWidget {
   final String category;
   final String ownerType;
-  final String categoryId;
-  final String sector;
-  final String sectorId;
-  const AddIndividualRevenueStreamPage({
+  const AddIndividualTransportRevenueStreamPage({
     super.key,
     required this.category,
     required this.ownerType,
-    required this.categoryId,
-    required this.sector,
-    required this.sectorId,
   });
 
   @override
-  State<AddIndividualRevenueStreamPage> createState() =>
-      _AddIndividualRevenueStreamPageState();
+  State<AddIndividualTransportRevenueStreamPage> createState() =>
+      _AddIndividualTransportRevenueStreamPageState();
 }
 
-class _AddIndividualRevenueStreamPageState
-    extends Base<AddIndividualRevenueStreamPage> {
+class _AddIndividualTransportRevenueStreamPageState
+    extends Base<AddIndividualTransportRevenueStreamPage> {
   PageController addRevenueStreamPageController = PageController();
   int page = 0;
   int counter = 3;
@@ -462,8 +454,8 @@ class _AddIndividualRevenueStreamPageState
       "operatorparish": selectedDriverParish,
       "operatorvillage": selectedDriverDistrict,
       "regreferenceno": "",
-      "sectorid": widget.sectorId,
-      "sectorsubtypeid": widget.categoryId,
+      "sectorid": "",
+      "sectorsubtypeid": widget.category,
       "tarriffrequency": "",
       "tarrifamount": 0.0,
       "lastrenewaldate": "2024-11-10T08:47:49.655Z",
@@ -541,7 +533,8 @@ class _AddIndividualRevenueStreamPageState
           actions: [
             IconsButton(
               onPressed: () {
-                pushAndRemoveUntil(HomePage());
+                // pushAndRemoveUntil(
+                //     HomePage(revenuestreams: widget.revenuestreams));
               },
               text: 'DONE',
               iconData: Icons.done,

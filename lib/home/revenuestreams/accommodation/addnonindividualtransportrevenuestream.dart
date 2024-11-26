@@ -6,40 +6,32 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:lottie/lottie.dart';
+import 'package:material_dialogs/material_dialogs.dart';
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../config/constants.dart';
 import '../../../config/functions.dart';
-import 'package:material_dialogs/material_dialogs.dart';
-import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 
-import '../../home.dart';
-
-class AddIndividualRevenueStreamPage extends StatefulWidget {
+class AddNonIndividualTransportRevenueStreamPage extends StatefulWidget {
   final String category;
   final String ownerType;
-  final String categoryId;
-  final String sector;
-  final String sectorId;
-  const AddIndividualRevenueStreamPage({
+  const AddNonIndividualTransportRevenueStreamPage({
     super.key,
     required this.category,
     required this.ownerType,
-    required this.categoryId,
-    required this.sector,
-    required this.sectorId,
   });
 
   @override
-  State<AddIndividualRevenueStreamPage> createState() =>
-      _AddIndividualRevenueStreamPageState();
+  State<AddNonIndividualTransportRevenueStreamPage> createState() =>
+      _AddNonIndividualTransportRevenueStreamPageState();
 }
 
-class _AddIndividualRevenueStreamPageState
-    extends Base<AddIndividualRevenueStreamPage> {
+class _AddNonIndividualTransportRevenueStreamPageState
+    extends Base<AddNonIndividualTransportRevenueStreamPage> {
   PageController addRevenueStreamPageController = PageController();
   int page = 0;
   int counter = 3;
-  List list = [0, 1, 2];
+  List list = [0, 1, 2, 3];
   String selectedOwnership = "";
   String selectedDoesOwnerOperate = "";
   List<String> ownerType = ["Individual", "Non-Individual"];
@@ -52,6 +44,7 @@ class _AddIndividualRevenueStreamPageState
   bool responseLoading = true;
   PhoneNumber ownerNumber = PhoneNumber(isoCode: 'UG');
   PhoneNumber driverNumber = PhoneNumber(isoCode: 'UG');
+  PhoneNumber associateNumber = PhoneNumber(isoCode: 'UG');
   String selectedOwnerDistrict = "",
       selectedOwnerCounty = "",
       selectedOwnerSubcounty = "",
@@ -62,15 +55,25 @@ class _AddIndividualRevenueStreamPageState
       selectedDriverSubcounty = "",
       selectedDriverParish = "",
       selectedDriverVillage = "";
+  String selectedAssociateDistrict = "",
+      selectedAssociateCounty = "",
+      selectedAssociateSubcounty = "",
+      selectedAssociateParish = "",
+      selectedAssociateVillage = "";
   String selectedStageDistrict = "",
       selectedStageCounty = "",
       selectedStageSubcounty = "",
       selectedStageParish = "",
       selectedStageVillage = "";
-  TextEditingController ownerNinController = TextEditingController(),
-      ownerPassportNumberController = TextEditingController(),
-      ownerNameController = TextEditingController(),
+  TextEditingController ownerTinController = TextEditingController(),
+      ownerBrnController = TextEditingController(),
+      entityNameController = TextEditingController(),
       ownerEmailController = TextEditingController();
+  TextEditingController associateNinController = TextEditingController(),
+      associatePassportNumberController = TextEditingController(),
+      associateDesignationController = TextEditingController(),
+      associateNameController = TextEditingController(),
+      associateEmailController = TextEditingController();
   TextEditingController driverNinController = TextEditingController(),
       driverPassportNumberController = TextEditingController(),
       driverNameController = TextEditingController(),
@@ -338,34 +341,6 @@ class _AddIndividualRevenueStreamPageState
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // SizedBox(
-            //   width: double.maxFinite,
-            //   height: 30,
-            //   child: Padding(
-            //     padding: const EdgeInsets.symmetric(horizontal: 7),
-            //     child: FlutterStepIndicator(
-            //       height: 28,
-            //       paddingLine: const EdgeInsets.symmetric(horizontal: 0),
-            //       positiveColor: const Color(0xFF00B551),
-            //       progressColor: const Color(0xFFEA9C00),
-            //       negativeColor: const Color(0xFFD5D5D5),
-            //       padding: const EdgeInsets.all(4),
-            //       list: [
-            //         Container(child: Text("One")),
-            //         Container(child: Text("Two")),
-            //         Container(child: Text("Three")),
-            //       ],
-            //       division: counter,
-            //       onChange: (i) {},
-            //       page: page,
-            //       onClickItem: (p0) {
-            //         setState(() {
-            //           page = p0;
-            //         });
-            //       },
-            //     ),
-            //   ),
-            // ),
             widgetOption(
               title: "Showing ${page + 1} of ${list.length}",
               callRemove: () {
@@ -395,7 +370,7 @@ class _AddIndividualRevenueStreamPageState
 
   _reegisterStream() async {
     var url =
-        Uri.parse("${AppConstants.baseUrl}revenuestreamsregisternewindividual");
+        Uri.parse("${AppConstants.baseUrl}revenuestreamsregisternewentity");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     FocusScopeNode currentFocus = FocusScope.of(context);
 
@@ -423,14 +398,14 @@ class _AddIndividualRevenueStreamPageState
 
     var bodyString = {
       "id": "0",
-      "firstname": ownerNameController.text.split(" ")[0],
-      "lastname": ownerNameController.text.split(" ")[1],
       "email": ownerEmailController.text,
       "phone": ownerNumber.phoneNumber.toString().replaceAll("+", ""),
-      "nin": ownerNinController.text,
-      "modeofops": "N/A",
-      "eplatform": "N/A",
-      "purpose": "N/A",
+      "assocfirstname": associateNameController.text.split(" ")[0],
+      "assoclastname": associateNameController.text.split(" ")[1],
+      "assocemail": associateEmailController.text,
+      "assocphone": "256775665544",
+      "assocnin": associateNinController.text,
+      "assocdesignation": associateDesignationController.text,
       "districtid": selectedOwnerDistrict == "Select District /City"
           ? ""
           : selectedOwnerDistrict,
@@ -445,7 +420,6 @@ class _AddIndividualRevenueStreamPageState
           : selectedOwnerParish,
       "villageid":
           selectedOwnerVillage == "Select Village" ? "" : selectedOwnerVillage,
-      "ownerridesboda": selectedDoesOwnerOperate == "Yes" ? true : false,
       "operatorfname":
           driverNameController.text.isNotEmpty ? driverNameController.text : "",
       "operatorlname":
@@ -462,12 +436,12 @@ class _AddIndividualRevenueStreamPageState
       "operatorparish": selectedDriverParish,
       "operatorvillage": selectedDriverDistrict,
       "regreferenceno": "",
-      "sectorid": widget.sectorId,
-      "sectorsubtypeid": widget.categoryId,
+      "sectorid": "",
+      "sectorsubtypeid": "",
       "tarriffrequency": "",
-      "tarrifamount": 0.0,
-      "lastrenewaldate": "2024-11-10T08:47:49.655Z",
-      "nextrenewaldate": "2024-11-10T08:47:49.655Z",
+      "tarrifamount": 0,
+      "lastrenewaldate": "2024-11-21T20:10:44.027Z",
+      "nextrenewaldate": "2024-11-21T20:10:44.027Z",
       "revenueactivity": "",
       "vesseltype": "",
       "vesselstorage": "",
@@ -478,8 +452,8 @@ class _AddIndividualRevenueStreamPageState
       "dailyactivehours": 0,
       "companytype": "",
       "businesstype": "",
-      "businessname": "",
-      "tradingname": "",
+      "businessname": entityNameController.text,
+      "tradingname": entityNameController.text,
       "staffcountmale": 0,
       "staffcountfemale": 0,
       "bedcount": 0,
@@ -487,8 +461,9 @@ class _AddIndividualRevenueStreamPageState
       "establishmenttype": "",
       "regno": regNoController.text.replaceAll(" ", ""),
       "vin": chassisNoController.text,
-      "tin": "string",
       "color": colorController.text.isEmpty ? "" : colorController.text,
+      "tin": ownerTinController.text,
+      "brn": ownerBrnController.text,
       "ownerid": "",
       "operatorid": "",
       "logbookno": "",
@@ -505,6 +480,7 @@ class _AddIndividualRevenueStreamPageState
       "type": "${widget.category}",
       "createdby": await prefs.getString("userid") ?? "Self Registration"
     };
+
     debugPrint(bodyString.toString());
     debugPrint(url.toString());
     var body = jsonEncode(bodyString);
@@ -541,7 +517,8 @@ class _AddIndividualRevenueStreamPageState
           actions: [
             IconsButton(
               onPressed: () {
-                pushAndRemoveUntil(HomePage());
+                // pushAndRemoveUntil(
+                //     HomePage(revenuestreams: widget.revenuestreams));
               },
               text: 'DONE',
               iconData: Icons.done,
@@ -633,7 +610,7 @@ class _AddIndividualRevenueStreamPageState
                 SizedBox(
                   width: 8,
                 ),
-                page < 2
+                page < 3
                     ? ElevatedButton(
                         onPressed: callAdd,
                         style: ElevatedButton.styleFrom(
@@ -665,7 +642,7 @@ class _AddIndividualRevenueStreamPageState
                           ],
                         ),
                       )
-                    : page == 2
+                    : page == 3
                         ? ElevatedButton(
                             onPressed: () {
                               _reegisterStream();
@@ -767,6 +744,13 @@ class _AddIndividualRevenueStreamPageState
                       ],
                     ),
                   ),
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _step4(),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -785,7 +769,7 @@ class _AddIndividualRevenueStreamPageState
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'Personal Information (Owner)',
+                'Entity Information',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -796,7 +780,7 @@ class _AddIndividualRevenueStreamPageState
                 dense: true,
                 visualDensity: VisualDensity(vertical: 3),
                 title: Text(
-                  'NIN',
+                  'Business Registration No. (BRN)',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -805,7 +789,7 @@ class _AddIndividualRevenueStreamPageState
                 subtitle: Container(
                   height: 38,
                   child: TextFormField(
-                    controller: ownerNinController,
+                    controller: ownerBrnController,
                     enabled: true,
                     decoration: const InputDecoration(
                       contentPadding:
@@ -827,7 +811,7 @@ class _AddIndividualRevenueStreamPageState
               ListTile(
                 contentPadding: EdgeInsets.symmetric(vertical: 0),
                 title: Text(
-                  'Passport/Refugee Number',
+                  'Tax Identification No. (TIN)',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -836,7 +820,7 @@ class _AddIndividualRevenueStreamPageState
                 subtitle: Container(
                   height: 38,
                   child: TextFormField(
-                    controller: ownerPassportNumberController,
+                    controller: ownerTinController,
                     enabled: true,
                     decoration: const InputDecoration(
                       disabledBorder: OutlineInputBorder(
@@ -856,7 +840,7 @@ class _AddIndividualRevenueStreamPageState
               ListTile(
                 contentPadding: EdgeInsets.symmetric(vertical: 0),
                 title: Text(
-                  'Full name',
+                  'Registered Entity Name',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -865,7 +849,7 @@ class _AddIndividualRevenueStreamPageState
                 subtitle: Container(
                   height: 38,
                   child: TextFormField(
-                    controller: ownerNameController,
+                    controller: entityNameController,
                     enabled: true,
                     decoration: const InputDecoration(
                       contentPadding:
@@ -879,7 +863,7 @@ class _AddIndividualRevenueStreamPageState
                             BorderSide(color: Color(0xffB9B9B9), width: 1.0),
                         borderRadius: BorderRadius.all(Radius.circular(4)),
                       ),
-                      hintText: 'Firstname Lastname Others',
+                      hintText: '',
                     ),
                   ),
                 ),
@@ -985,7 +969,7 @@ class _AddIndividualRevenueStreamPageState
           child: Column(
             children: [
               Text(
-                'Residential Information (Owner)',
+                'Entity Location',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -2410,9 +2394,239 @@ class _AddIndividualRevenueStreamPageState
       children: [
         Expanded(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'Residence (Driver)',
+                'Personal Information (Associiate)',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.symmetric(vertical: 0),
+                dense: true,
+                visualDensity: VisualDensity(vertical: 3),
+                title: Text(
+                  'NIN',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: Container(
+                  height: 38,
+                  child: TextFormField(
+                    controller: associateNinController,
+                    enabled: true,
+                    decoration: const InputDecoration(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                      disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      hintText: '',
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.symmetric(vertical: 0),
+                title: Text(
+                  'Passport/Refugee Number',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: Container(
+                  height: 38,
+                  child: TextFormField(
+                    controller: associatePassportNumberController,
+                    enabled: true,
+                    decoration: const InputDecoration(
+                      disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      hintText: '',
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.symmetric(vertical: 0),
+                dense: true,
+                visualDensity: VisualDensity(vertical: 3),
+                title: Text(
+                  'Designation e.g Director',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: Container(
+                  height: 38,
+                  child: TextFormField(
+                    controller: associateDesignationController,
+                    enabled: true,
+                    decoration: const InputDecoration(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                      disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      hintText: '',
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.symmetric(vertical: 0),
+                title: Text(
+                  'Full name',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: Container(
+                  height: 38,
+                  child: TextFormField(
+                    controller: associateNameController,
+                    enabled: true,
+                    decoration: const InputDecoration(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                      disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      hintText: 'Firstname Lastname Others',
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.symmetric(vertical: 0),
+                title: Text(
+                  'Email address',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: Container(
+                  height: 38,
+                  child: TextFormField(
+                    controller: associateEmailController,
+                    enabled: true,
+                    decoration: const InputDecoration(
+                      disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      hintText: '',
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.symmetric(vertical: 0),
+                title: Text(
+                  'Phone number',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: Container(
+                  height: 40,
+                  child: InternationalPhoneNumberInput(
+                    onInputChanged: (PhoneNumber number) {
+                      debugPrint('On Change: ${number.phoneNumber}');
+                      associateNumber = number;
+                    },
+                    onInputValidated: (bool value) {
+                      // debugPrint('On Validate: $value');
+                    },
+                    selectorConfig: const SelectorConfig(
+                      selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                    ),
+                    // focusNode: _phoneNumberFocus,
+                    ignoreBlank: false,
+                    // autoValidateMode: AutovalidateMode.disabled,
+                    hintText: 'e.g 771000111',
+                    selectorTextStyle: const TextStyle(color: Colors.black),
+                    initialValue: ownerNumber,
+                    cursorColor: AppConstants.primaryColor,
+                    maxLength: 10,
+                    // maxLength: _phoneNumber!.contains("+256") ? 9 : 12,
+                    onFieldSubmitted: (val) {
+                      // _fieldFocusChange(context, _phoneNumberFocus, _emailFocus);
+                    },
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter the associate\'s Phone Number.';
+                      }
+                      if (value.length < 9 || value.length > 12) {
+                        return 'Please enter a valid Phone Number';
+                      }
+                      return null;
+                    },
+                    formatInput: false,
+                    keyboardType: const TextInputType.numberWithOptions(
+                        signed: true, decimal: true),
+                    inputBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+
+                    onSaved: (PhoneNumber number) {
+                      debugPrint('On Saved: $number');
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * .4,
+          width: 20,
+        ),
+        Expanded(
+          child: Column(
+            children: [
+              Text(
+                'Residence (Associate)',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -2741,27 +2955,20 @@ class _AddIndividualRevenueStreamPageState
             ],
           ),
         ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * .4,
-          width: 5,
-          child: VerticalDivider(
-            width: 1,
-            color: Colors.grey,
-          ),
-        ),
-        Expanded(
-          child: Column(
-            children: [
-              Text(
-                'Register New ${widget.ownerType} ${widget.category}?',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
+
+        // Expanded(
+        //   child: Column(
+        //     children: [
+        //       Text(
+        //         'Register New ${widget.ownerType} ${widget.category}?',
+        //         style: TextStyle(
+        //           fontSize: 14,
+        //           fontWeight: FontWeight.w600,
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }

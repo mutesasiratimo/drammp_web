@@ -11,14 +11,21 @@ import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../config/constants.dart';
 import '../../../config/functions.dart';
+import '../../home.dart';
 
 class AddNonIndividualRevenueStreamPage extends StatefulWidget {
   final String category;
   final String ownerType;
+  final String categoryId;
+  final String sector;
+  final String sectorId;
   const AddNonIndividualRevenueStreamPage({
     super.key,
     required this.category,
     required this.ownerType,
+    required this.categoryId,
+    required this.sector,
+    required this.sectorId,
   });
 
   @override
@@ -436,8 +443,8 @@ class _AddNonIndividualRevenueStreamPageState
       "operatorparish": selectedDriverParish,
       "operatorvillage": selectedDriverDistrict,
       "regreferenceno": "",
-      "sectorid": "",
-      "sectorsubtypeid": "",
+      "sectorid": widget.sectorId,
+      "sectorsubtypeid": widget.categoryId,
       "tarriffrequency": "",
       "tarrifamount": 0,
       "lastrenewaldate": "2024-11-21T20:10:44.027Z",
@@ -503,6 +510,7 @@ class _AddNonIndividualRevenueStreamPageState
       //         .replaceAll("PhoneNumber(phoneNumber: ", "")
       //         .replaceAll(", dialCode: 256, isoCode: UG)", ""));
       // ignore: use_build_context_synchronously
+
       Dialogs.materialDialog(
           dialogWidth: MediaQuery.of(context).size.width * .4,
           color: Colors.white,
@@ -517,8 +525,7 @@ class _AddNonIndividualRevenueStreamPageState
           actions: [
             IconsButton(
               onPressed: () {
-                // pushAndRemoveUntil(
-                //     HomePage(revenuestreams: widget.revenuestreams));
+                pushAndRemoveUntil(HomePage());
               },
               text: 'DONE',
               iconData: Icons.done,
@@ -539,7 +546,7 @@ class _AddNonIndividualRevenueStreamPageState
         responseLoading = false;
       });
       showWarningToast(
-          "Duplication Alert: A Vehicle already exits with this number plate!!!");
+          "Duplication Alert: A Vehicle already exits with this reg no./number plate!!!");
     } else {
       setState(() {
         responseLoading = false;

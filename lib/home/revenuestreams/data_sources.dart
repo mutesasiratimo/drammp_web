@@ -3,10 +3,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:entebbe_dramp_web/config/constants.dart';
-import 'package:entebbe_dramp_web/models/revenuesector.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../config/functions.dart';
+import '../../models/revenuestreamspaginated.dart';
 
 /// Keeps track of selected rows, feed the data into DesertsDataSource
 class RestorableDessertSelections extends RestorableProperty<Set<int>> {
@@ -59,7 +61,7 @@ class DessertDataSource extends DataTableSource {
   }
 
   final BuildContext context;
-  late List<RevenueSectorsModel> desserts;
+  late List<RevenueStreams> desserts;
   // Add row tap handlers and show snackbar
   bool hasRowTaps = false;
   // Override height values for certain rows
@@ -68,7 +70,7 @@ class DessertDataSource extends DataTableSource {
   bool hasZebraStripes = false;
 
   void sort<T>(
-      Comparable<T> Function(RevenueSectorsModel d) getField, bool ascending) {
+      Comparable<T> Function(RevenueStreams d) getField, bool ascending) {
     desserts.sort((a, b) {
       final aValue = getField(a);
       final bValue = getField(b);
@@ -119,28 +121,31 @@ class DessertDataSource extends DataTableSource {
         // }
       },
       onTap: hasRowTaps
-          ? () => _showSnackbar(context, 'Tapped on row ${dessert.name}')
+          ? () => _showSnackbar(context, 'Tapped on row ${dessert.regno}')
           : null,
       onDoubleTap: hasRowTaps
-          ? () => _showSnackbar(context, 'Double Tapped on row ${dessert.name}')
+          ? () =>
+              _showSnackbar(context, 'Double Tapped on row ${dessert.model}')
           : null,
       onLongPress: hasRowTaps
-          ? () => _showSnackbar(context, 'Long pressed on row ${dessert.name}')
+          ? () => _showSnackbar(context, 'Long pressed on row ${dessert.color}')
           : null,
       onSecondaryTap: hasRowTaps
-          ? () => _showSnackbar(context, 'Right clicked on row ${dessert.name}')
+          ? () => _showSnackbar(
+              context, 'Right clicked on row ${dessert.regreferenceno}')
           : null,
       onSecondaryTapDown: hasRowTaps
           ? (d) =>
-              _showSnackbar(context, 'Right button down on row ${dessert.name}')
+              _showSnackbar(context, 'Right button down on row ${dessert.type}')
           : null,
       // specificRowHeight:
       //     hasRowHeightOverrides && dessert.fat >= 25 ? 100 : null,
       cells: [
-        DataCell(Text(dessert.code)),
-        DataCell(Text(dessert.name)),
-        DataCell(Text('${dessert.description}')),
-        DataCell(Text("Sub-types")),
+        DataCell(Text(dessert.regno)),
+        DataCell(Text(dessert.model)),
+        DataCell(Text('${dessert.color}')),
+        DataCell(Text('${dessert.regreferenceno}')),
+        DataCell(Text('${dessert.type}')),
         DataCell((dessert.status == "1")
             ? Chip(label: Text("Active"))
             : (dessert.status == "2")
@@ -182,47 +187,41 @@ class DessertDataSource extends DataTableSource {
 /// is an extension to Flutter's DataTableSource and aimed at solving
 /// saync data fetching scenarious by paginated table (such as using Web API)
 class DessertDataSourceAsync extends AsyncDataTableSource {
-  //get sectors list
-  Future<List<RevenueSectorsModel>> getSectors() async {
-    List<RevenueSectorsModel> returnValue = [];
-    var url = Uri.parse("${AppConstants.baseUrl}revenuesector");
-    debugPrint(url.toString());
+  final String categoryId;
+  Future<List<RevenueStreams>> getStreams(String categoryId) async {
+    List<RevenueStreams> returnValue = [];
+    var url = Uri.parse(AppConstants.baseUrl +
+        "revenuestreams/category/default/e2360992-9f38-11ef-bf99-42010a800002");
     String _authToken = "";
     String _username = "";
     String _password = "";
 
-    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     //Get username and password from shared prefs
-    // _username = prefs.getString("email")!;
-    // _password = prefs.getString("password")!;
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
 
-    // await AppFunctions.authenticate(_username, _password);
-    // _authToken = prefs.getString("authToken")!;
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
 
     var response = await http.get(
       url,
       headers: {
         "Content-Type": "Application/json",
-        // 'Authorization': 'Bearer $_authToken',
+        'Authorization': 'Bearer $_authToken',
       },
     );
-    debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
+    print("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
-      // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
-      List<RevenueSectorsModel> sectorsmodel = (items as List)
-          .map((data) => RevenueSectorsModel.fromJson(data))
-          .toList();
+      RevenueStreamsPaginatedModel incidentsmodel =
+          RevenueStreamsPaginatedModel.fromJson(items);
 
-      // List<RevenueSectorsModel> sectorsmodel = usersobj;
-      // List<UserItem> usersmodel = usersobj.items;
-
-      returnValue = sectorsmodel;
-      debugPrint(sectorsmodel.toString());
+      returnValue = incidentsmodel.items;
       // setState(() {
-      _dessertsX3 = sectorsmodel;
-      // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
+      _dessertsX3 = incidentsmodel.items;
       // });
+      // Navigator.pushNamed(context, AppRouter.home);
     } else {
       returnValue = [];
       // showSnackBar("Network Failure: Failed to retrieve transactions");
@@ -230,17 +229,17 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
     return returnValue;
   }
 
-  DessertDataSourceAsync() {
-    getSectors();
+  DessertDataSourceAsync(this.categoryId) {
+    getStreams(this.categoryId);
     print('DessertDataSourceAsync created');
   }
 
-  DessertDataSourceAsync.empty() {
+  DessertDataSourceAsync.empty(this.categoryId) {
     _empty = true;
     print('DessertDataSourceAsync.empty created');
   }
 
-  DessertDataSourceAsync.error() {
+  DessertDataSourceAsync.error(this.categoryId) {
     _errorCounter = 0;
     print('DessertDataSourceAsync.error created');
   }
@@ -309,11 +308,12 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
               }
             },
             cells: [
-              DataCell(Text(dessert.code)),
-              DataCell(Text(dessert.name)),
-              DataCell(Text('${dessert.description}')),
-              DataCell(Text("Sub-types")),
-              DataCell((dessert.status == "2")
+              DataCell(Text(dessert.regno)),
+              DataCell(Text(dessert.model)),
+              DataCell(Text('${dessert.color}')),
+              DataCell(Text('${dessert.regreferenceno}')),
+              DataCell(Text('${dessert.type}')),
+              DataCell((dessert.status == "1")
                   ? SizedBox(
                       height: 40,
                       child: Chip(
@@ -331,7 +331,7 @@ class DessertDataSourceAsync extends AsyncDataTableSource {
                             "Active",
                           )),
                     )
-                  : (dessert.status == "1")
+                  : (dessert.status == "2")
                       ? SizedBox(
                           height: 40,
                           child: Chip(
@@ -395,32 +395,35 @@ class DesertsFakeWebServiceResponse {
   final int totalRecords;
 
   /// One page, e.g. 10 reocrds
-  final List<RevenueSectorsModel> data;
+  final List<RevenueStreams> data;
 }
 
 class DesertsFakeWebService {
-  int Function(RevenueSectorsModel, RevenueSectorsModel)?
-      _getComparisonFunction(String column, bool ascending) {
+  int Function(RevenueStreams, RevenueStreams)? _getComparisonFunction(
+      String column, bool ascending) {
     var coef = ascending ? 1 : -1;
     switch (column) {
-      case 'name':
-        return (RevenueSectorsModel d1, RevenueSectorsModel d2) =>
-            coef * d1.name.compareTo(d2.name);
-      case 'calories':
-        return (RevenueSectorsModel d1, RevenueSectorsModel d2) =>
-            coef * d1.name.compareTo(d2.name);
-      case 'fat':
-        return (RevenueSectorsModel d1, RevenueSectorsModel d2) =>
-            coef * d1.name.compareTo(d2.name);
-      case 'carbs':
-        return (RevenueSectorsModel d1, RevenueSectorsModel d2) =>
-            coef * d1.name.compareTo(d2.name);
-      case 'protein':
-        return (RevenueSectorsModel d1, RevenueSectorsModel d2) =>
-            coef * d1.name.compareTo(d2.name);
-      case 'sodium':
-        return (RevenueSectorsModel d1, RevenueSectorsModel d2) =>
-            coef * d1.name.compareTo(d2.name);
+      case 'Reg No':
+        return (RevenueStreams d1, RevenueStreams d2) =>
+            coef * d1.regno.compareTo(d2.regno);
+      case 'Model':
+        return (RevenueStreams d1, RevenueStreams d2) =>
+            coef * d1.model.compareTo(d2.model);
+      case 'Color':
+        return (RevenueStreams d1, RevenueStreams d2) =>
+            coef * d1.color.compareTo(d2.color);
+      case 'Reg Reference':
+        return (RevenueStreams d1, RevenueStreams d2) =>
+            coef * d1.regreferenceno.compareTo(d2.regreferenceno);
+      case 'Type':
+        return (RevenueStreams d1, RevenueStreams d2) =>
+            coef * d1.type.compareTo(d2.type);
+      case 'Status':
+        return (RevenueStreams d1, RevenueStreams d2) =>
+            coef * d1.status.compareTo(d2.status);
+      case '':
+        return (RevenueStreams d1, RevenueStreams d2) =>
+            coef * d1.regno.compareTo(d2.regno);
     }
 
     return null;
@@ -436,7 +439,7 @@ class DesertsFakeWebService {
                     ? 1000
                     : 400), () {
       var result = _dessertsX3;
-      result.sort(_getComparisonFunction(sortedBy, sortedAsc));
+      // result.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return DesertsFakeWebServiceResponse(
           result.length, result.skip(startingAt).take(count).toList());
     });
@@ -444,29 +447,7 @@ class DesertsFakeWebService {
 }
 
 int _selectedCount = 0;
-// List<RevenueSectorsModel> _dessertsX3 = [
-//   {
-//     "id": "be772ec2-8a67-11ef-9827-5183a9246581",
-//     "name": "Transport",
-//     "description": "Commercial vehicles",
-//     "datecreated": "2024-10-14T23:06:05.352181",
-//     "createdby": null,
-//     "dateupdated": null,
-//     "updatedby": null,
-//     "status": "1"
-//   },
-//   {
-//     "id": "3e32504c-8a68-11ef-9827-5183a9246581",
-//     "name": "Hospitality",
-//     "description": "Accommodation, Entertainment, Tourism and Cuisine",
-//     "datecreated": "2024-10-14T23:09:39.649218",
-//     "createdby": null,
-//     "dateupdated": null,
-//     "updatedby": null,
-//     "status": "1"
-//   }
-// ].map((data) => RevenueSectorsModel.fromJson(data)).toList();
-List<RevenueSectorsModel> _dessertsX3 = <RevenueSectorsModel>[];
+List<RevenueStreams> _dessertsX3 = <RevenueStreams>[];
 
 _showSnackbar(BuildContext context, String text, [Color? color]) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
