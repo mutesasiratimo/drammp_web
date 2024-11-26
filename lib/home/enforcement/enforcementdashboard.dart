@@ -97,15 +97,16 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                             Text(
                                               "225",
                                               style: TextStyle(
+                                                color: Colors.green.shade900,
                                                 fontSize: 20,
-                                                fontWeight: FontWeight.w600,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                             Text(
                                               "Compliant.",
                                               style: TextStyle(
                                                 fontSize: 12,
-                                                fontWeight: FontWeight.w400,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ],
@@ -147,15 +148,16 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                             Text(
                                               "322",
                                               style: TextStyle(
+                                                color: Colors.red.shade900,
                                                 fontSize: 20,
-                                                fontWeight: FontWeight.w600,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                             Text(
-                                              "Past 30 Days Overdue",
+                                              "Past 60 Days \nOverdue",
                                               style: TextStyle(
                                                 fontSize: 12,
-                                                fontWeight: FontWeight.w400,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ],
@@ -197,15 +199,16 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                             Text(
                                               "245",
                                               style: TextStyle(
+                                                color: Colors.amber.shade900,
                                                 fontSize: 20,
-                                                fontWeight: FontWeight.w600,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                             Text(
-                                              "Under 30 Days Overdue.",
+                                              "Past 30 Days \nOverdue.",
                                               style: TextStyle(
                                                 fontSize: 12,
-                                                fontWeight: FontWeight.w400,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ],
@@ -247,15 +250,16 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                             Text(
                                               "812",
                                               style: TextStyle(
+                                                color: Colors.blue.shade900,
                                                 fontSize: 20,
-                                                fontWeight: FontWeight.w600,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                             Text(
-                                              "Under 30 Days till Due.",
+                                              "Under 30 Days \nOverdue.",
                                               style: TextStyle(
                                                 fontSize: 12,
-                                                fontWeight: FontWeight.w400,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ],
@@ -273,105 +277,13 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                             BootstrapCol(
                               sizes: "col-lg-8 col-md-12 col-sm-12",
                               child: SizedBox(
-                                height: size.height * .8,
+                                height: size.height * .7,
                               ),
                             ),
                             BootstrapCol(
                               sizes: "col-lg-4 col-md-12 col-sm-12",
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: size.height * .2,
-                                    child: Container(
-                                      margin: EdgeInsets.all(16.0),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(16.0)),
-                                        gradient: LinearGradient(
-                                            colors: [
-                                              const Color.fromRGBO(
-                                                  212, 252, 121, 100),
-                                              const Color.fromRGBO(
-                                                  212, 252, 121, 72),
-                                            ],
-                                            begin: const FractionalOffset(
-                                                0.0, 0.0),
-                                            end: const FractionalOffset(
-                                                1.0, 0.0),
-                                            stops: [0.0, 1.0],
-                                            tileMode: TileMode.clamp),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: size.height * .2,
-                                    child: Container(
-                                      margin: EdgeInsets.all(16.0),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(16.0)),
-                                        gradient: LinearGradient(
-                                            colors: [
-                                              const Color.fromRGBO(
-                                                  0, 242, 252, 100),
-                                              const Color.fromRGBO(
-                                                  0, 242, 252, 72),
-                                            ],
-                                            begin: const FractionalOffset(
-                                                0.0, 0.0),
-                                            end: const FractionalOffset(
-                                                1.0, 0.0),
-                                            stops: [0.0, 1.0],
-                                            tileMode: TileMode.clamp),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: size.height * .2,
-                                    child: Container(
-                                      margin: EdgeInsets.all(16.0),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(16.0)),
-                                        gradient: LinearGradient(
-                                            colors: [
-                                              Color.fromRGBO(254, 225, 64, 100),
-                                              const Color.fromRGBO(
-                                                  254, 225, 64, 72),
-                                            ],
-                                            begin: const FractionalOffset(
-                                                0.0, 0.0),
-                                            end: const FractionalOffset(
-                                                1.0, 0.0),
-                                            stops: [0.0, 1.0],
-                                            tileMode: TileMode.clamp),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: size.height * .2,
-                                    child: Container(
-                                      margin: EdgeInsets.all(16.0),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(16.0)),
-                                        gradient: LinearGradient(
-                                            colors: [
-                                              const Color.fromRGBO(
-                                                  243, 126, 0, 100),
-                                              const Color.fromRGBO(
-                                                  243, 126, 0, 72),
-                                            ],
-                                            begin: const FractionalOffset(
-                                                0.0, 0.0),
-                                            end: const FractionalOffset(
-                                                1.0, 0.0),
-                                            stops: [0.0, 1.0],
-                                            tileMode: TileMode.clamp),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              child: SizedBox(
+                                height: size.height * .7,
                               ),
                             ),
                           ],

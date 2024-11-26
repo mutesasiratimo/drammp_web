@@ -9,6 +9,7 @@ import '../../config/base.dart';
 import '../../config/constants.dart';
 import '../../config/functions.dart';
 import '../../models/revenuestreamspaginated.dart';
+import '../../models/trips.dart';
 import '../appbar.dart';
 import 'map_page.dart';
 
@@ -24,6 +25,53 @@ class _MobilityPageState extends Base<MobilityPage> {
   int _currentSortColumn = 0;
   bool _isAscending = true;
   int _usersPage = 1;
+  List<TripModel> _history = [];
+
+  Future<List<TripModel>> getHistory() async {
+    List<TripModel> returnValue = [];
+    // String userId = "";
+    String _authToken = "";
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // userId = prefs.getString("userid")!;
+    _authToken = prefs.getString("authToken")!;
+    var url = Uri.parse(AppConstants.baseUrl + "trips/default?page=1&size=50");
+
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    // _username = prefs.getString("email")!;
+    // _password = prefs.getString("password")!;
+
+    // await AppFunctions.authenticate(_username, _password);
+    // _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    print("++++++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+
+      TripsPaginatedModel tripModel = TripsPaginatedModel.fromJson(items);
+      // List<TripModel> tripHistorysmodel =
+      //     (items as List).map((data) => TripModel.fromJson(data)).toList();
+      // var tripHistorys = tripHistorysmodel;
+      returnValue = tripModel.items.reversed.toList();
+      setState(() {
+        _history = returnValue;
+      });
+
+      // Navigator.pushNamed(context, AppRouter.home);
+    } else {
+      returnValue = [];
+      // showSnackBar("Network Failure: Failed to retrieve transactions");
+    }
+    return returnValue;
+  }
 
   Future<List<RevenueStreams>> getStreams() async {
     List<RevenueStreams> returnValue = [];
@@ -48,7 +96,7 @@ class _MobilityPageState extends Base<MobilityPage> {
         'Authorization': 'Bearer $_authToken',
       },
     );
-    print("++++++" + response.body.toString() + "+++++++");
+    // print("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       RevenueStreamsPaginatedModel incidentsmodel =
@@ -70,6 +118,7 @@ class _MobilityPageState extends Base<MobilityPage> {
   void initState() {
     super.initState();
     getStreams();
+    getHistory();
   }
 
   @override
@@ -328,9 +377,9 @@ class _MobilityPageState extends Base<MobilityPage> {
                         BootstrapRow(
                           children: <BootstrapCol>[
                             BootstrapCol(
-                              sizes: "col-lg-8 col-md-12 col-sm-12",
+                              sizes: "col-lg-7 col-md-12 col-sm-12",
                               child: SizedBox(
-                                height: size.height * .65,
+                                height: size.height * .7,
                                 child: Container(
                                   margin: EdgeInsets.all(16.0),
                                   decoration: BoxDecoration(
@@ -360,9 +409,9 @@ class _MobilityPageState extends Base<MobilityPage> {
                               ),
                             ),
                             BootstrapCol(
-                              sizes: "col-lg-4 col-md-12 col-sm-12",
+                              sizes: "col-lg-5 col-md-12 col-sm-12",
                               child: SizedBox(
-                                height: size.height * .65,
+                                height: size.height * .7,
                                 child: Container(
                                   margin: EdgeInsets.all(16.0),
                                   decoration: BoxDecoration(
@@ -389,6 +438,14 @@ class _MobilityPageState extends Base<MobilityPage> {
                                         // width: 200,
                                         height: 290,
                                         child: DataTable2(
+                                          headingRowHeight: 45,
+                                          headingRowColor:
+                                              WidgetStateColor.resolveWith(
+                                                  (states) => AppConstants
+                                                      .primaryColor),
+                                          headingTextStyle: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white),
                                           columnSpacing: 16,
                                           // minWidth: 600,
                                           sortColumnIndex: _currentSortColumn,
@@ -419,7 +476,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                                               },
                                             ),
                                             DataColumn(
-                                              label: const Text("Make/Model"),
+                                              label: const Text("Model"),
                                               onSort: (columnIndex, _) {
                                                 setState(() {
                                                   _currentSortColumn =
@@ -474,30 +531,53 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                       cells: <DataCell>[
                                                         DataCell(Text(
                                                           "${element.regno}",
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 12),
+                                                          style: const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: AppConstants
+                                                                  .primaryColor,
+                                                              fontSize: 12),
                                                         )),
                                                         DataCell(Text(
                                                           element.model
                                                               .toString(),
                                                           style:
                                                               const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
                                                                   fontSize: 12),
                                                         )),
-                                                        DataCell(Text(
-                                                          element.status
+                                                        DataCell(Badge(
+                                                          backgroundColor: element
+                                                                      .status
                                                                       .toString() ==
                                                                   "0"
-                                                              ? "Inactive"
+                                                              ? Colors.amber
+                                                                  .shade700
                                                               : element.status
                                                                           .toString() ==
                                                                       "1"
-                                                                  ? "Active"
-                                                                  : "Disabled",
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 12),
+                                                                  ? Colors.green
+                                                                      .shade600
+                                                                  : Colors.red
+                                                                      .shade600,
+                                                          label: Text(
+                                                            element.status
+                                                                        .toString() ==
+                                                                    "0"
+                                                                ? "Inactive"
+                                                                : element.status
+                                                                            .toString() ==
+                                                                        "1"
+                                                                    ? "Active"
+                                                                    : "Disabled",
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        12),
+                                                          ),
                                                         )),
                                                       ],
                                                     ),
@@ -529,7 +609,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                         BootstrapRow(
                           children: <BootstrapCol>[
                             BootstrapCol(
-                              sizes: "col-lg-7 col-md-12 col-sm-12",
+                              sizes: "col-lg-12 col-md-12 col-sm-12",
                               child: SizedBox(
                                 height: size.height * .7,
                                 child: Container(
@@ -538,36 +618,332 @@ class _MobilityPageState extends Base<MobilityPage> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(16.0)),
                                   ),
-                                  child: Text(
-                                    "Passenger Trips",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Passenger Trips",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 5),
+                                      SizedBox(
+                                        // width: 200,
+                                        height: 300,
+                                        child: DataTable2(
+                                          headingRowHeight: 45,
+                                          headingRowColor:
+                                              WidgetStateColor.resolveWith(
+                                                  (states) => AppConstants
+                                                      .primaryColor),
+                                          headingTextStyle: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white),
+                                          columnSpacing: 16,
+                                          // minWidth: 600,
+                                          sortColumnIndex: _currentSortColumn,
+                                          sortAscending: _isAscending,
+                                          columns: [
+                                            DataColumn(
+                                              label: const Text("Trip No."),
+                                              onSort: (columnIndex, _) {
+                                                setState(() {
+                                                  _currentSortColumn =
+                                                      columnIndex;
+                                                  if (_isAscending == true) {
+                                                    _isAscending = false;
+                                                    // sort the product list in Ascending, order by Price
+                                                    _history.sort(
+                                                        (userA, userB) =>
+                                                            userB.id.compareTo(
+                                                                userA.id));
+                                                  } else {
+                                                    _isAscending = true;
+                                                    // sort the product list in Descending, order by Price
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userA.regno.compareTo(
+                                                            userB.regno));
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                            DataColumn(
+                                              label: const Text("Origin"),
+                                              onSort: (columnIndex, _) {
+                                                setState(() {
+                                                  _currentSortColumn =
+                                                      columnIndex;
+                                                  if (_isAscending == true) {
+                                                    _isAscending = false;
+                                                    // sort the product list in Ascending, order by Price
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userB.ownerid.compareTo(
+                                                            userA.vin));
+                                                  } else {
+                                                    _isAscending = true;
+                                                    // sort the product list in Descending, order by Price
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userA.ownerid.compareTo(
+                                                            userB.vin));
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                            DataColumn(
+                                              label: const Text("Destination"),
+                                              onSort: (columnIndex, _) {
+                                                setState(() {
+                                                  _currentSortColumn =
+                                                      columnIndex;
+                                                  if (_isAscending == true) {
+                                                    _isAscending = false;
+                                                    // sort the product list in Ascending, order by Price
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userB.ownerid.compareTo(
+                                                            userA.vin));
+                                                  } else {
+                                                    _isAscending = true;
+                                                    // sort the product list in Descending, order by Price
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userA.ownerid.compareTo(
+                                                            userB.vin));
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                            DataColumn(
+                                              label: const Text("Start"),
+                                              onSort: (columnIndex, _) {
+                                                setState(() {
+                                                  _currentSortColumn =
+                                                      columnIndex;
+                                                  if (_isAscending == true) {
+                                                    _isAscending = false;
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userB.ownerid.compareTo(
+                                                            userA.vin));
+                                                  } else {
+                                                    _isAscending = true;
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userA.ownerid.compareTo(
+                                                            userB.vin));
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                            DataColumn(
+                                              label: const Text("Stop"),
+                                              onSort: (columnIndex, _) {
+                                                setState(() {
+                                                  _currentSortColumn =
+                                                      columnIndex;
+                                                  if (_isAscending == true) {
+                                                    _isAscending = false;
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userB.status.compareTo(
+                                                            userA.status));
+                                                  } else {
+                                                    _isAscending = true;
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userA.status.compareTo(
+                                                            userB.status));
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                            DataColumn(
+                                              label: const Text("Status"),
+                                              onSort: (columnIndex, _) {
+                                                setState(() {
+                                                  _currentSortColumn =
+                                                      columnIndex;
+                                                  if (_isAscending == true) {
+                                                    _isAscending = false;
+                                                    // sort the product list in Ascending, order by Price
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userB.status.compareTo(
+                                                            userA.status));
+                                                  } else {
+                                                    _isAscending = true;
+                                                    // sort the product list in Descending, order by Price
+                                                    _streams.sort((userA,
+                                                            userB) =>
+                                                        userA.status.compareTo(
+                                                            userB.status));
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                            DataColumn(
+                                              label: const Text("Details"),
+                                            ),
+                                          ],
+                                          rows: _history.isNotEmpty
+                                              ? _history // Loops through dataColumnText, each iteration assigning the value to element
+                                                  .map(
+                                                    (element) => DataRow2(
+                                                      cells: <DataCell>[
+                                                        DataCell(Text(
+                                                          "${element.tripnumber}",
+                                                          style: const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: AppConstants
+                                                                  .primaryColor,
+                                                              fontSize: 12),
+                                                        )),
+                                                        DataCell(Text(
+                                                          element.startaddress
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 12),
+                                                        )),
+                                                        DataCell(Text(
+                                                          element
+                                                              .destinationaddress
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 12),
+                                                        )),
+                                                        DataCell(Text(
+                                                          element.starttime
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 12),
+                                                        )),
+                                                        DataCell(Text(
+                                                          element.stoptime
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 12),
+                                                        )),
+                                                        DataCell(Badge(
+                                                          backgroundColor: element
+                                                                      .status
+                                                                      .toString() ==
+                                                                  "0"
+                                                              ? Colors.amber
+                                                                  .shade700
+                                                              : element.status
+                                                                          .toString() ==
+                                                                      "1"
+                                                                  ? Colors.green
+                                                                      .shade600
+                                                                  : Colors.red
+                                                                      .shade600,
+                                                          label: Text(
+                                                            element.status
+                                                                        .toString() ==
+                                                                    "0"
+                                                                ? "Running"
+                                                                : element.status
+                                                                            .toString() ==
+                                                                        "1"
+                                                                    ? "Complete"
+                                                                    : "Complete/Unpaid",
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12),
+                                                          ),
+                                                        )),
+                                                        DataCell(
+                                                          IconButton(
+                                                            onPressed: () {},
+                                                            icon: Icon(
+                                                              Icons
+                                                                  .more_horiz_sharp,
+                                                              color: AppConstants
+                                                                  .primaryColor,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                  .toList()
+                                              : <DataRow2>[
+                                                  const DataRow2(
+                                                    cells: <DataCell>[
+                                                      DataCell(Text("")),
+                                                      DataCell(Text("")),
+                                                      DataCell(Text("")),
+                                                      DataCell(
+                                                          Text("No Trips")),
+                                                      DataCell(Text("")),
+                                                      DataCell(Text("")),
+                                                      DataCell(Text("")),
+                                                    ],
+                                                  )
+                                                ],
+                                          // rows: List.generate(
+                                          //   demoRecentFiles.length,
+                                          //   (index) => recentFileDataRow(demoRecentFiles[index]),
+                                          // ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
-                            BootstrapCol(
-                              sizes: "col-lg-5 col-md-12 col-sm-12",
-                              child: SizedBox(
-                                height: size.height * .7,
-                                child: Container(
-                                  margin: EdgeInsets.all(16.0),
-                                  decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(16.0)),
-                                  ),
-                                  child: Text(
-                                    "Drivers",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            // BootstrapCol(
+                            //   sizes: "col-lg-5 col-md-12 col-sm-12",
+                            //   child: SizedBox(
+                            //     height: size.height * .7,
+                            //     child: Container(
+                            //       margin: EdgeInsets.all(16.0),
+                            //       decoration: BoxDecoration(
+                            //         borderRadius:
+                            //             BorderRadius.all(Radius.circular(16.0)),
+                            //       ),
+                            //       child: Text(
+                            //         "Drivers",
+                            //         style: TextStyle(
+                            //           fontSize: 16,
+                            //           fontWeight: FontWeight.w600,
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ],

@@ -187,7 +187,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                   sizes: 'col-lg-6 col-md-12 col-sm-12',
                                   child: Card(
                                     clipBehavior: Clip.antiAlias,
-                                    // color: backgroundColor,
+                                    color: Colors.white,
                                     child: Column(
                                       children: [
                                         Row(
@@ -294,7 +294,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                   sizes: 'col-lg-6 col-md-12 col-sm-12',
                                   child: Card(
                                     clipBehavior: Clip.antiAlias,
-                                    // color: backgroundColor,
+                                    color: Colors.white,
                                     child: Column(
                                       children: [
                                         Row(
@@ -412,7 +412,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                   sizes: 'col-lg-6 col-md-12 col-sm-12',
                                   child: Card(
                                     clipBehavior: Clip.antiAlias,
-                                    // color: backgroundColor,
+                                    color: Colors.white,
                                     child: Column(
                                       children: [
                                         Row(
@@ -518,7 +518,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                   sizes: 'col-lg-6 col-md-12 col-sm-12',
                                   child: Card(
                                     clipBehavior: Clip.antiAlias,
-                                    // color: backgroundColor,
+                                    color: Colors.white,
                                     child: Column(
                                       children: [
                                         Row(
@@ -635,7 +635,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                   sizes: 'col-lg-6 col-md-12 col-sm-12',
                                   child: Card(
                                     clipBehavior: Clip.antiAlias,
-                                    // color: backgroundColor,
+                                    color: Colors.white,
                                     child: Column(
                                       children: [
                                         Row(
@@ -769,7 +769,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                         ),
                         Card(
                           clipBehavior: Clip.antiAlias,
-                          // color: backgroundColor,
+                          color: Colors.white,
                           child: Column(
                             children: [
                               BootstrapRow(children: <BootstrapCol>[
@@ -957,7 +957,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                         ),
                         Card(
                           clipBehavior: Clip.antiAlias,
-                          // color: backgroundColor,
+                          color: Colors.white,
                           child: Column(
                             children: [
                               Row(

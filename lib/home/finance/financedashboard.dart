@@ -59,7 +59,7 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                     BorderRadius.all(Radius.circular(16.0)),
                                 gradient: LinearGradient(
                                     colors: [
-                                      const Color.fromRGBO(54, 41, 183, 72),
+                                      const Color.fromRGBO(54, 41, 183, 1),
                                       const Color.fromRGBO(54, 41, 183, 100),
                                     ],
                                     begin: const FractionalOffset(0.0, 0.0),

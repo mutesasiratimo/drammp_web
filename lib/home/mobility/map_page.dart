@@ -26,7 +26,7 @@ class _MapPageState extends Base<MapPage> {
   List<RevenueStreams> _streams = [];
   final Completer<GoogleMapController> _controller = Completer();
   CameraPosition? _initialLocation =
-      CameraPosition(target: LatLng(0.0568633, 32.4697474), zoom: 11);
+      CameraPosition(target: LatLng(0.0568633, 32.4697474), zoom: 12);
   List<Marker> _markers = [];
   bool showMaps = true;
 
