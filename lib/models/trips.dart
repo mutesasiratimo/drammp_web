@@ -61,7 +61,7 @@ class TripModel {
   DateTime stoptime;
   String transporttypeid;
   String paymentstatus;
-  int cost;
+  double cost;
   DateTime datecreated;
   String createdby;
   DateTime dateupdated;

@@ -39,6 +39,7 @@ dependencies:
   material_dialogs: ^1.1.5
   google_maps_flutter: ^2.10.0
   google_maps_flutter_web: ^0.5.10
+  excel: ^4.0.6
 
 dev_dependencies:
   flutter_test:

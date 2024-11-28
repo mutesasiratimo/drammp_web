@@ -2647,9 +2647,12 @@ class _AddNonIndividualRevenueStreamPageState
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Expanded(
+                subtitle: Container(
+                  height: 38,
                   child: DropdownButtonFormField(
                     decoration: InputDecoration(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Color(0xffB9B9B9)),
                         borderRadius: BorderRadius.all(Radius.circular(4)),
@@ -2665,7 +2668,7 @@ class _AddNonIndividualRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedOwnership,
+                          selectedOwnerDistrict,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -2674,7 +2677,7 @@ class _AddNonIndividualRevenueStreamPageState
                       ],
                     ),
                     icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
+                    items: districts.map((item) {
                       return DropdownMenuItem(
                         child: Row(
                           children: [
@@ -2691,14 +2694,15 @@ class _AddNonIndividualRevenueStreamPageState
                       );
                     }).toList(),
                     onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
+                      List itemsList = districts.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
+                            selectedOwnerDistrict = item;
+                            debugPrint(selectedOwnerDistrict);
                           });
                         }
                       }).toList();
+                      getCounties(selectedOwnerDistrict);
                     },
                   ),
                 ),
@@ -2711,9 +2715,12 @@ class _AddNonIndividualRevenueStreamPageState
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Expanded(
+                subtitle: Container(
+                  height: 38,
                   child: DropdownButtonFormField(
                     decoration: InputDecoration(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Color(0xffB9B9B9)),
                         borderRadius: BorderRadius.all(Radius.circular(4)),
@@ -2729,7 +2736,7 @@ class _AddNonIndividualRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedOwnership,
+                          selectedOwnerCounty,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -2738,7 +2745,7 @@ class _AddNonIndividualRevenueStreamPageState
                       ],
                     ),
                     icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
+                    items: counties.map((item) {
                       return DropdownMenuItem(
                         child: Row(
                           children: [
@@ -2755,14 +2762,15 @@ class _AddNonIndividualRevenueStreamPageState
                       );
                     }).toList(),
                     onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
+                      List itemsList = counties.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
+                            selectedOwnerCounty = item;
+                            debugPrint(selectedOwnerCounty);
                           });
                         }
                       }).toList();
+                      getSubcounties(selectedOwnerCounty);
                     },
                   ),
                 ),
@@ -2775,9 +2783,12 @@ class _AddNonIndividualRevenueStreamPageState
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Expanded(
+                subtitle: Container(
+                  height: 38,
                   child: DropdownButtonFormField(
                     decoration: InputDecoration(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Color(0xffB9B9B9)),
                         borderRadius: BorderRadius.all(Radius.circular(4)),
@@ -2793,7 +2804,7 @@ class _AddNonIndividualRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedOwnership,
+                          selectedOwnerSubcounty,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -2802,7 +2813,7 @@ class _AddNonIndividualRevenueStreamPageState
                       ],
                     ),
                     icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
+                    items: subcounties.map((item) {
                       return DropdownMenuItem(
                         child: Row(
                           children: [
@@ -2819,14 +2830,15 @@ class _AddNonIndividualRevenueStreamPageState
                       );
                     }).toList(),
                     onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
+                      List itemsList = subcounties.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
+                            selectedOwnerSubcounty = item;
+                            debugPrint(selectedOwnerSubcounty);
                           });
                         }
                       }).toList();
+                      getParishes(selectedOwnerSubcounty);
                     },
                   ),
                 ),
@@ -2839,9 +2851,12 @@ class _AddNonIndividualRevenueStreamPageState
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Expanded(
+                subtitle: Container(
+                  height: 38,
                   child: DropdownButtonFormField(
                     decoration: InputDecoration(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Color(0xffB9B9B9)),
                         borderRadius: BorderRadius.all(Radius.circular(4)),
@@ -2857,7 +2872,7 @@ class _AddNonIndividualRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedOwnership,
+                          selectedOwnerParish,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -2866,7 +2881,7 @@ class _AddNonIndividualRevenueStreamPageState
                       ],
                     ),
                     icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
+                    items: parishes.map((item) {
                       return DropdownMenuItem(
                         child: Row(
                           children: [
@@ -2883,14 +2898,15 @@ class _AddNonIndividualRevenueStreamPageState
                       );
                     }).toList(),
                     onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
+                      List itemsList = parishes.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
+                            selectedOwnerParish = item;
+                            debugPrint(selectedOwnerParish);
                           });
                         }
                       }).toList();
+                      getVillages(selectedOwnerParish);
                     },
                   ),
                 ),
@@ -2903,9 +2919,12 @@ class _AddNonIndividualRevenueStreamPageState
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Expanded(
+                subtitle: Container(
+                  height: 38,
                   child: DropdownButtonFormField(
                     decoration: InputDecoration(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Color(0xffB9B9B9)),
                         borderRadius: BorderRadius.all(Radius.circular(4)),
@@ -2921,7 +2940,7 @@ class _AddNonIndividualRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedOwnership,
+                          selectedOwnerVillage,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -2930,7 +2949,7 @@ class _AddNonIndividualRevenueStreamPageState
                       ],
                     ),
                     icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
+                    items: villages.map((item) {
                       return DropdownMenuItem(
                         child: Row(
                           children: [
@@ -2947,11 +2966,11 @@ class _AddNonIndividualRevenueStreamPageState
                       );
                     }).toList(),
                     onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
+                      List itemsList = villages.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
+                            selectedOwnerVillage = item;
+                            debugPrint(selectedOwnerVillage);
                           });
                         }
                       }).toList();

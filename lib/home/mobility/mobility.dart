@@ -62,7 +62,7 @@ class _MobilityPageState extends Base<MobilityPage> {
       // var tripHistorys = tripHistorysmodel;
       returnValue = tripModel.items.reversed.toList();
       setState(() {
-        _history = returnValue;
+        _history = tripModel.items.reversed.toList();
       });
 
       // Navigator.pushNamed(context, AppRouter.home);
@@ -625,7 +625,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "Passenger Trips",
+                                            "Passenger Trips (${_history.length})",
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
@@ -667,10 +667,11 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                   } else {
                                                     _isAscending = true;
                                                     // sort the product list in Descending, order by Price
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userA.regno.compareTo(
-                                                            userB.regno));
+                                                    _history.sort(
+                                                        (userA, userB) => userA
+                                                            .tripnumber
+                                                            .compareTo(userB
+                                                                .tripnumber));
                                                   }
                                                 });
                                               },
@@ -684,17 +685,19 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                   if (_isAscending == true) {
                                                     _isAscending = false;
                                                     // sort the product list in Ascending, order by Price
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userB.ownerid.compareTo(
-                                                            userA.vin));
+                                                    _history.sort(
+                                                        (userA, userB) => userB
+                                                            .startaddress
+                                                            .compareTo(userA
+                                                                .startaddress));
                                                   } else {
                                                     _isAscending = true;
                                                     // sort the product list in Descending, order by Price
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userA.ownerid.compareTo(
-                                                            userB.vin));
+                                                    _history.sort(
+                                                        (userA, userB) => userA
+                                                            .startaddress
+                                                            .compareTo(userB
+                                                                .startaddress));
                                                   }
                                                 });
                                               },
@@ -708,17 +711,19 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                   if (_isAscending == true) {
                                                     _isAscending = false;
                                                     // sort the product list in Ascending, order by Price
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userB.ownerid.compareTo(
-                                                            userA.vin));
+                                                    _history.sort(
+                                                        (userA, userB) => userB
+                                                            .destinationaddress
+                                                            .compareTo(userA
+                                                                .destinationaddress));
                                                   } else {
                                                     _isAscending = true;
                                                     // sort the product list in Descending, order by Price
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userA.ownerid.compareTo(
-                                                            userB.vin));
+                                                    _history.sort(
+                                                        (userA, userB) => userA
+                                                            .destinationaddress
+                                                            .compareTo(userB
+                                                                .destinationaddress));
                                                   }
                                                 });
                                               },
@@ -731,16 +736,18 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                       columnIndex;
                                                   if (_isAscending == true) {
                                                     _isAscending = false;
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userB.ownerid.compareTo(
-                                                            userA.vin));
+                                                    _history.sort(
+                                                        (userA, userB) => userB
+                                                            .starttime
+                                                            .compareTo(userA
+                                                                .starttime));
                                                   } else {
                                                     _isAscending = true;
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userA.ownerid.compareTo(
-                                                            userB.vin));
+                                                    _history.sort(
+                                                        (userA, userB) => userA
+                                                            .starttime
+                                                            .compareTo(userB
+                                                                .starttime));
                                                   }
                                                 });
                                               },
@@ -753,16 +760,40 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                       columnIndex;
                                                   if (_isAscending == true) {
                                                     _isAscending = false;
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userB.status.compareTo(
-                                                            userA.status));
+                                                    _history.sort(
+                                                        (userA, userB) => userB
+                                                            .stoptime
+                                                            .compareTo(userA
+                                                                .stoptime));
                                                   } else {
                                                     _isAscending = true;
-                                                    _streams.sort((userA,
+                                                    _history.sort(
+                                                        (userA, userB) => userA
+                                                            .stoptime
+                                                            .compareTo(userB
+                                                                .stoptime));
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                            DataColumn(
+                                              label: const Text("Fare(UGX)"),
+                                              onSort: (columnIndex, _) {
+                                                setState(() {
+                                                  _currentSortColumn =
+                                                      columnIndex;
+                                                  if (_isAscending == true) {
+                                                    _isAscending = false;
+                                                    _history.sort((userA,
                                                             userB) =>
-                                                        userA.status.compareTo(
-                                                            userB.status));
+                                                        userB.cost.compareTo(
+                                                            userA.cost));
+                                                  } else {
+                                                    _isAscending = true;
+                                                    _history.sort((userA,
+                                                            userB) =>
+                                                        userA.cost.compareTo(
+                                                            userB.cost));
                                                   }
                                                 });
                                               },
@@ -776,14 +807,14 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                   if (_isAscending == true) {
                                                     _isAscending = false;
                                                     // sort the product list in Ascending, order by Price
-                                                    _streams.sort((userA,
+                                                    _history.sort((userA,
                                                             userB) =>
                                                         userB.status.compareTo(
                                                             userA.status));
                                                   } else {
                                                     _isAscending = true;
                                                     // sort the product list in Descending, order by Price
-                                                    _streams.sort((userA,
+                                                    _history.sort((userA,
                                                             userB) =>
                                                         userA.status.compareTo(
                                                             userB.status));
@@ -851,6 +882,16 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                                           .w500,
                                                                   fontSize: 12),
                                                         )),
+                                                        DataCell(Text(
+                                                          "${element.cost.round()}",
+                                                          style: const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: AppConstants
+                                                                  .primaryColor,
+                                                              fontSize: 12),
+                                                        )),
                                                         DataCell(Badge(
                                                           backgroundColor: element
                                                                       .status
@@ -907,6 +948,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                       DataCell(Text("")),
                                                       DataCell(
                                                           Text("No Trips")),
+                                                      DataCell(Text("")),
                                                       DataCell(Text("")),
                                                       DataCell(Text("")),
                                                       DataCell(Text("")),

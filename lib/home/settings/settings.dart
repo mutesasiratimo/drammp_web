@@ -1,3 +1,9 @@
+import 'package:entebbe_dramp_web/config/constants.dart';
+import 'package:entebbe_dramp_web/home/settings/entityassociates.dart';
+import 'package:entebbe_dramp_web/home/settings/operators.dart';
+import 'package:entebbe_dramp_web/home/settings/tarrifs.dart';
+import 'package:entebbe_dramp_web/home/settings/travelcards.dart';
+import 'package:entebbe_dramp_web/home/settings/users.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 
@@ -13,6 +19,20 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends Base<SettingsPage> {
   String selectedInterval = "Today";
+  late TabController _controller;
+  int selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TabController(length: 5, vsync: this);
+    _controller.addListener(() {
+      setState(() {
+        selectedIndex = _controller.index;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -45,32 +65,48 @@ class _SettingsPageState extends Base<SettingsPage> {
                   margin: EdgeInsets.all(16.0),
                   child: Card(
                     color: Colors.white,
-                    child: BootstrapRow(
-                      children: <BootstrapCol>[
-                        BootstrapCol(
-                          sizes: "col-lg-8 col-md-12 col-sm-12",
-                          child: SizedBox(
-                            height: size.height * .8,
-                            child: Container(
-                              padding: EdgeInsets.all(24.0),
-                              margin: EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(16.0)),
+                    child: SizedBox(
+                      height: size.height * .85,
+                      child: Column(
+                        children: [
+                          TabBar(
+                            unselectedLabelColor: Colors.grey[700],
+                            labelColor: AppConstants.primaryColor,
+                            indicatorColor: AppConstants.primaryColor,
+                            tabs: [
+                              Tab(
+                                text: "System Users",
                               ),
-                              child: Column(children: [
-                                SizedBox(height: 8.0),
-                              ]),
+                              Tab(
+                                text: "Operators/Drivers",
+                              ),
+                              Tab(
+                                text: "Entity Associates",
+                              ),
+                              Tab(
+                                text: "Tarrifs",
+                              ),
+                              Tab(
+                                text: "Travel Cards",
+                              ),
+                            ],
+                            controller: _controller,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                          ),
+                          Expanded(
+                            child: TabBarView(
+                              controller: _controller,
+                              children: [
+                                UsersPage(),
+                                OperatorsPage(),
+                                AssociatesPage(),
+                                TarrifsPage(),
+                                TravelCardsPage()
+                              ],
                             ),
                           ),
-                        ),
-                        BootstrapCol(
-                          sizes: "col-lg-4 col-md-12 col-sm-12",
-                          child: Column(
-                            children: [],
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

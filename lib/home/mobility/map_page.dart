@@ -54,7 +54,7 @@ class _MapPageState extends Base<MapPage> {
         'Authorization': 'Bearer $_authToken',
       },
     );
-    print("++++++" + response.body.toString() + "+++++++");
+    // print("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       RevenueStreamsPaginatedModel incidentsmodel =

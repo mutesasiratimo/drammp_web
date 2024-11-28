@@ -479,6 +479,11 @@ class _AddIndividualRevenueStreamPageState
       "companytype": "",
       "businesstype": "",
       "businessname": "",
+      // "businessname": regNoController.text.isEmpty
+      //     ? ""
+      //     : regNoController.text.replaceAll(" ", "") +
+      //         " " +
+      //         makeModelController.text,
       "tradingname": "",
       "staffcountmale": 0,
       "staffcountfemale": 0,
