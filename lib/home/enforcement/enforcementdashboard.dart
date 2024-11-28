@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:excel/excel.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/base.dart';
 import '../../config/constants.dart';
@@ -20,12 +21,17 @@ class EnforcementDashboardPage extends StatefulWidget {
 }
 
 class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
+  var dateFormat = DateFormat("dd/MM/yyyy HH:mm");
   int rows = 10;
   Duration? executionTime;
   List<RevenueStreams> _streams = [];
   int _currentSortColumn = 0;
   bool _isAscending = true;
   int _streamsPage = 1;
+  int compliantCount = 0,
+      pastSixtyDaysCount = 0,
+      pastThirtyDaysCount = 0,
+      underThirtyDaysCount = 0;
 
   void exportToExcel() {
     final stopwatch = Stopwatch()..start();
@@ -34,26 +40,46 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
     final Sheet sheet = excel[excel.getDefaultSheet()!];
     int index = 0;
 
+    sheet
+        .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: index))
+        .value = TextCellValue("Reference Number");
+
+    sheet
+        .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: index))
+        .value = TextCellValue("Revenue Stream");
+
+    sheet
+        .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: index))
+        .value = TextCellValue("Amount Due");
+
+    sheet
+        .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: index))
+        .value = TextCellValue("Due Date");
+
+    sheet
+        .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: index))
+        .value = TextCellValue("Status");
+
     for (var stream in _streams) {
       sheet
           .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: index))
-          .value = TextCellValue(stream.regno);
+          .value = TextCellValue(stream.regreferenceno);
 
       sheet
           .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: index))
-          .value = TextCellValue(stream.model);
+          .value = TextCellValue(stream.businessname);
 
       sheet
           .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: index))
-          .value = TextCellValue(stream.color);
+          .value = TextCellValue(stream.tarrifamount.toString());
 
       sheet
           .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: index))
-          .value = TextCellValue(stream.type);
+          .value = TextCellValue(stream.nextrenewaldate.toString());
 
       sheet
           .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: index))
-          .value = TextCellValue("");
+          .value = TextCellValue(stream.status);
 
       index++;
     }
@@ -105,9 +131,45 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
     return returnValue;
   }
 
+  void getDaysOverdue() async {
+    var url = Uri.parse("${AppConstants.baseUrl}dash/stats/days_overdue");
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    // print("++++++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      setState(() {
+        compliantCount = items["compliant"];
+        underThirtyDaysCount = items["underthirtydays"];
+        pastThirtyDaysCount = items["pastthirtydays"];
+        pastSixtyDaysCount = items["pastsixtydays"];
+      });
+    } else {
+      debugPrint(response.body.toString());
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    getDaysOverdue();
     getStreams();
   }
 
@@ -193,7 +255,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "225",
+                                              "$compliantCount",
                                               style: TextStyle(
                                                 color: Colors.green.shade900,
                                                 fontSize: 20,
@@ -244,7 +306,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "322",
+                                              "$pastSixtyDaysCount",
                                               style: TextStyle(
                                                 color: Colors.red.shade900,
                                                 fontSize: 20,
@@ -295,7 +357,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "245",
+                                              "$pastThirtyDaysCount",
                                               style: TextStyle(
                                                 color: Colors.amber.shade900,
                                                 fontSize: 20,
@@ -346,7 +408,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "812",
+                                              "$underThirtyDaysCount",
                                               style: TextStyle(
                                                 color: Colors.blue.shade900,
                                                 fontSize: 20,
@@ -471,45 +533,45 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                                   if (_isAscending == true) {
                                                     _isAscending = false;
                                                     // sort the product list in Ascending, order by Price
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userB.regno.compareTo(
-                                                            userA.regno));
+                                                    _streams.sort(
+                                                        (userA, userB) => userB
+                                                            .businessname
+                                                            .compareTo(userA
+                                                                .businessname));
                                                   } else {
                                                     _isAscending = true;
                                                     // sort the product list in Descending, order by Price
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userA.regno.compareTo(
-                                                            userB.regno));
+                                                    _streams.sort(
+                                                        (userA, userB) => userA
+                                                            .businessname
+                                                            .compareTo(userB
+                                                                .businessname));
                                                   }
                                                 });
                                               },
                                             ),
-                                            DataColumn(
-                                              label: const Text("Model"),
-                                              onSort: (columnIndex, _) {
-                                                setState(() {
-                                                  _currentSortColumn =
-                                                      columnIndex;
-                                                  if (_isAscending == true) {
-                                                    _isAscending = false;
-                                                    // sort the product list in Ascending, order by Price
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userB.ownerid.compareTo(
-                                                            userA.vin));
-                                                  } else {
-                                                    _isAscending = true;
-                                                    // sort the product list in Descending, order by Price
-                                                    _streams.sort((userA,
-                                                            userB) =>
-                                                        userA.ownerid.compareTo(
-                                                            userB.vin));
-                                                  }
-                                                });
-                                              },
-                                            ),
+                                            // DataColumn(
+                                            //   label: const Text("Model"),
+                                            //   onSort: (columnIndex, _) {
+                                            //     setState(() {
+                                            //       _currentSortColumn =
+                                            //           columnIndex;
+                                            //       if (_isAscending == true) {
+                                            //         _isAscending = false;
+                                            //         _streams.sort((userA,
+                                            //                 userB) =>
+                                            //             userB.ownerid.compareTo(
+                                            //                 userA.vin));
+                                            //       } else {
+                                            //         _isAscending = true;
+                                            //         _streams.sort((userA,
+                                            //                 userB) =>
+                                            //             userA.ownerid.compareTo(
+                                            //                 userB.vin));
+                                            //       }
+                                            //     });
+                                            //   },
+                                            // ),
                                             DataColumn(
                                               label: const Text("Amount"),
                                               onSort: (columnIndex, _) {
@@ -604,7 +666,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                                                   fontSize: 12),
                                                         )),
                                                         DataCell(Text(
-                                                          "${element.regno}",
+                                                          "${element.businessname}",
                                                           style: const TextStyle(
                                                               fontWeight:
                                                                   FontWeight
@@ -613,16 +675,16 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                                                   .primaryColor,
                                                               fontSize: 12),
                                                         )),
-                                                        DataCell(Text(
-                                                          element.model
-                                                              .toString(),
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  fontSize: 12),
-                                                        )),
+                                                        // DataCell(Text(
+                                                        //   element.model
+                                                        //       .toString(),
+                                                        //   style:
+                                                        //       const TextStyle(
+                                                        //           fontWeight:
+                                                        //               FontWeight
+                                                        //                   .w600,
+                                                        //           fontSize: 12),
+                                                        // )),
                                                         DataCell(Text(
                                                           "${element.tarrifamount}",
                                                           style: const TextStyle(
@@ -634,7 +696,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                                               fontSize: 12),
                                                         )),
                                                         DataCell(Text(
-                                                          "${element.nextrenewaldate}",
+                                                          "${dateFormat.format(element.nextrenewaldate)}",
                                                           style: const TextStyle(
                                                               fontWeight:
                                                                   FontWeight
@@ -682,7 +744,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                                     cells: <DataCell>[
                                                       DataCell(Text("")),
                                                       DataCell(Text("")),
-                                                      DataCell(Text("")),
+                                                      // DataCell(Text("")),
                                                       DataCell(Text(
                                                           "No Revenue Streams")),
                                                       DataCell(Text("")),

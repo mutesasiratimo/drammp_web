@@ -45,7 +45,7 @@ class _SettingsPageState extends Base<SettingsPage> {
               children: [
                 Expanded(
                   child: CustomAppBar(
-                    title: "Settings and Configurations",
+                    title: "System Configurations",
                     backgroundColor: Colors.white,
                     actions: [
                       _accountToggle(context),

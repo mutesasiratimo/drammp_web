@@ -6,15 +6,21 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:entebbe_dramp_web/home/revenuestreams/transport/addindividualrevenuestream.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bootstrap/flutter_bootstrap.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/constants.dart';
-import '../../config/custom_pager.dart';
+import '../../config/functions.dart';
 import '../../models/revenuesectorcategoriesfiltered.dart';
+import '../../models/revenuestreamspaginated.dart';
+import 'accommodation/addindividualrensportrevenuestream.dart';
+import 'accommodation/addnonindividualtransportrevenuestream.dart';
 import 'data_sources.dart';
-import '../../config/nav_helper.dart';
 import '../../models/revenuesector.dart';
 import '../appbar.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:intl/intl.dart';
+import 'fisheries/addindividualfishrevenuestream.dart';
+import 'fisheries/addnonindividualfishrevenuestream.dart';
 import 'transport/addnonindividualrevenuestream.dart';
 
 class RevenueStreamsPage extends StatefulWidget {
@@ -25,6 +31,13 @@ class RevenueStreamsPage extends StatefulWidget {
 }
 
 class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
+  var dateFormat = DateFormat("dd/MM/yyyy HH:mm");
+  int rows = 10;
+  Duration? executionTime;
+  List<RevenueStreams> _streams = [];
+  int _currentSortColumn = 0;
+  bool _isAscending = true;
+  int _streamsPage = 1;
   List<RevenueSectorsModel> revenueSector = [];
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
@@ -101,6 +114,9 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   Future<List<RevenueSectorCategoriesFilteredModel>> getCategoriesInit(
       String sectorId) async {
     List<RevenueSectorCategoriesFilteredModel> returnValue = [];
+    setState(() {
+      categoryList = [];
+    });
     var url =
         Uri.parse("${AppConstants.baseUrl}sectorsubtypes/sector/$sectorId");
     debugPrint(url.toString());
@@ -132,6 +148,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
         categoryList = categoriesmodel;
         selectedInitCategory = categoriesmodel.first.typename;
         selectedInitCategoryId = categoriesmodel.first.id;
+        getStreams(selectedInitCategoryId);
         // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
       });
     } else {
@@ -144,6 +161,9 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   //get sector categories list
   Future<List<RevenueSectorCategoriesFilteredModel>> getCategories(
       String sectorId) async {
+    setState(() {
+      categoryList = [];
+    });
     List<RevenueSectorCategoriesFilteredModel> returnValue = [];
     var url =
         Uri.parse("${AppConstants.baseUrl}sectorsubtypes/sector/$sectorId");
@@ -192,30 +212,57 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
     return returnValue;
   }
 
+  //get revenue streams by sectorid
+  Future<List<RevenueStreams>> getStreams(String typeId) async {
+    setState(() {
+      _streams.clear();
+    });
+    List<RevenueStreams> returnValue = [];
+    var url = Uri.parse(AppConstants.baseUrl + "revenuestreams/typeid/$typeId");
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    print("++++++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      // RevenueStreamsPaginatedModel incidentsmodel =
+      //     RevenueStreamsPaginatedModel.fromJson(items);
+      List<RevenueStreams> streams =
+          (items as List).map((data) => RevenueStreams.fromJson(data)).toList();
+
+      returnValue = streams;
+      setState(() {
+        _streams = streams;
+      });
+      // Navigator.pushNamed(context, AppRouter.home);
+    } else {
+      returnValue = [];
+      // showSnackBar("Network Failure: Failed to retrieve transactions");
+    }
+    return returnValue;
+  }
+
   @override
   void initState() {
     getSectors();
     // getCategories("c55ffa94-9f38-11ef-bf99-42010a800002");
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    // initState is to early to access route options, context is invalid at that stage
-    _dessertsDataSource ??= getCurrentRouteOption(context) == noData
-        ? DessertDataSourceAsync.empty("")
-        : getCurrentRouteOption(context) == asyncErrors
-            ? DessertDataSourceAsync.error("")
-            : DessertDataSourceAsync(selectedInitCategoryId);
-
-    if (getCurrentRouteOption(context) == goToLast) {
-      _dataSourceLoading = true;
-      _dessertsDataSource!.getTotalRecords().then((count) => setState(() {
-            _initialRow = count - _rowsPerPage;
-            _dataSourceLoading = false;
-          }));
-    }
-    super.didChangeDependencies();
   }
 
   void sort(
@@ -583,10 +630,28 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                           onPressed: () {
                             if (selectedOwnership == "Individual") {
                               Navigator.of(context).pop();
-                              revenueStreamPageController.jumpToPage(1);
+                              selectedSector == "Transport"
+                                  ? revenueStreamPageController.jumpToPage(1)
+                                  : selectedSector == "Hospitality"
+                                      ? revenueStreamPageController
+                                          .jumpToPage(3)
+                                      : selectedSector == "Fisheries"
+                                          ? revenueStreamPageController
+                                              .jumpToPage(5)
+                                          : revenueStreamPageController
+                                              .jumpToPage(1);
                             } else if (selectedOwnership == "Non-Individual") {
                               Navigator.of(context).pop();
-                              revenueStreamPageController.jumpToPage(2);
+                              selectedSector == "Transport"
+                                  ? revenueStreamPageController.jumpToPage(2)
+                                  : selectedSector == "Hospitality"
+                                      ? revenueStreamPageController
+                                          .jumpToPage(4)
+                                      : selectedSector == "Fisheries"
+                                          ? revenueStreamPageController
+                                              .jumpToPage(6)
+                                          : revenueStreamPageController
+                                              .jumpToPage(2);
                             } else {
                               showInfoToast("Please select ownership type.");
                             }
@@ -638,24 +703,26 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
         physics: const NeverScrollableScrollPhysics(),
         allowImplicitScrolling: false,
         children: [
-          Container(
-            margin: EdgeInsets.all(8.0),
-            padding: EdgeInsets.all(8.0),
-            child: Card(
-              color: Colors.white,
-              child: Stack(alignment: Alignment.bottomCenter, children: [
-                AsyncPaginatedDataTable2(
-                    horizontalMargin: 20,
-                    checkboxHorizontalMargin: 12,
-                    columnSpacing: 0,
-                    wrapInCard: false,
-                    header: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Expanded(
-                          flex: 2,
+          // page 0
+          BootstrapContainer(
+            fluid: true,
+            decoration: BoxDecoration(
+              color: Colors.purple.shade50,
+            ),
+            children: [
+              Container(
+                margin: EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.0),
+                child: Card(
+                  color: Colors.white,
+                  child: Column(children: [
+                    SizedBox(height: 8),
+                    BootstrapRow(
+                      children: <BootstrapCol>[
+                        BootstrapCol(
+                          sizes: "col-lg-3 col-md-12 col-sm-12",
                           child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0.0),
                             title: Text(
                               'Select Sector',
                               style: TextStyle(
@@ -663,70 +730,75 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            subtitle: DropdownButtonFormField(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Color(0xffB9B9B9)),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(4)),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Color(0xffB9B9B9), width: 1.0),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(4)),
-                                ),
-                                hintText: '',
-                              ),
-                              isExpanded: true,
-                              hint: Row(
-                                children: [
-                                  new Text(
-                                    selectedInitSector,
-                                    style: const TextStyle(
-                                        // color: Colors.grey,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w400),
+                            subtitle: SizedBox(
+                              height: 38,
+                              child: DropdownButtonFormField(
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 8),
+                                  border: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
                                   ),
-                                ],
-                              ),
-                              icon: const Icon(Icons.keyboard_arrow_down),
-                              items: sectorList.map((item) {
-                                return DropdownMenuItem(
-                                  child: Row(
-                                    children: [
-                                      new Text(
-                                        item.name,
-                                        style: const TextStyle(
-                                            // color: Colors.grey,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
                                   ),
-                                  value: item,
-                                );
-                              }).toList(),
-                              onChanged: (newVal) {
-                                List itemsList = sectorList.map((item) {
-                                  if (item == newVal) {
-                                    setState(() async {
-                                      selectedInitSector = item.name;
-                                      selectedInitSectorId = item.id;
-                                      debugPrint(selectedInitSector);
-                                      selectedCategory = "";
-                                      categoryList = [];
-                                      getCategoriesInit(selectedInitSectorId);
-                                    });
-                                  }
-                                }).toList();
-                              },
+                                  hintText: '',
+                                ),
+                                isExpanded: true,
+                                hint: Row(
+                                  children: [
+                                    new Text(
+                                      selectedInitSector,
+                                      style: const TextStyle(
+                                          // color: Colors.grey,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
+                                ),
+                                icon: const Icon(Icons.keyboard_arrow_down),
+                                items: sectorList.map((item) {
+                                  return DropdownMenuItem(
+                                    child: Row(
+                                      children: [
+                                        new Text(
+                                          item.name,
+                                          style: const TextStyle(
+                                              // color: Colors.grey,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                    value: item,
+                                  );
+                                }).toList(),
+                                onChanged: (newVal) {
+                                  List itemsList = sectorList.map((item) {
+                                    if (item == newVal) {
+                                      setState(() async {
+                                        selectedInitSector = item.name;
+                                        selectedInitSectorId = item.id;
+                                        debugPrint(selectedInitSector);
+                                        selectedCategory = "";
+                                        categoryList = [];
+                                        getCategoriesInit(selectedInitSectorId);
+                                      });
+                                    }
+                                  }).toList();
+                                },
+                              ),
                             ),
                           ),
                         ),
-                        Expanded(
-                          flex: 2,
+                        BootstrapCol(
+                          sizes: "col-lg-3 col-md-12 col-sm-12",
                           child: ListTile(
                             title: Text(
                               'Select Category',
@@ -735,93 +807,94 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            subtitle: DropdownButtonFormField(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Color(0xffB9B9B9)),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(4)),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Color(0xffB9B9B9), width: 1.0),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(4)),
-                                ),
-                                hintText: '',
-                              ),
-                              isExpanded: true,
-                              hint: Row(
-                                children: [
-                                  new Text(
-                                    selectedInitCategory,
-                                    style: const TextStyle(
-                                        // color: Colors.grey,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w400),
+                            subtitle: SizedBox(
+                              height: 38,
+                              child: DropdownButtonFormField(
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 8),
+                                  border: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
                                   ),
-                                ],
-                              ),
-                              icon: const Icon(Icons.keyboard_arrow_down),
-                              items: categoryList.map((item) {
-                                return DropdownMenuItem(
-                                  child: Row(
-                                    children: [
-                                      new Text(
-                                        item.typename,
-                                        style: const TextStyle(
-                                            // color: Colors.grey,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
                                   ),
-                                  value: item,
-                                );
-                              }).toList(),
-                              onChanged: (newVal) {
-                                List itemsList = categoryList.map((item) {
-                                  if (item == newVal) {
-                                    setState(() {
-                                      selectedInitCategory = item.typename;
-                                      selectedInitCategoryId = item.id;
-                                      debugPrint(selectedCategory);
-                                    });
-                                  }
-                                }).toList();
-                              },
+                                  hintText: '',
+                                ),
+                                isExpanded: true,
+                                hint: Row(
+                                  children: [
+                                    new Text(
+                                      selectedInitCategory,
+                                      style: const TextStyle(
+                                          // color: Colors.grey,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
+                                ),
+                                icon: const Icon(Icons.keyboard_arrow_down),
+                                items: categoryList.map((item) {
+                                  return DropdownMenuItem(
+                                    child: Row(
+                                      children: [
+                                        new Text(
+                                          item.typename,
+                                          style: const TextStyle(
+                                              // color: Colors.grey,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                    value: item,
+                                  );
+                                }).toList(),
+                                onChanged: (newVal) {
+                                  List itemsList = categoryList.map((item) {
+                                    if (item == newVal) {
+                                      setState(() {
+                                        selectedInitCategory = item.typename;
+                                        selectedInitCategoryId = item.id;
+                                        getStreams(selectedInitCategoryId);
+                                        debugPrint(selectedCategory);
+                                      });
+                                    }
+                                  }).toList();
+                                },
+                              ),
                             ),
                           ),
                         ),
-                        Expanded(
-                          flex: 1,
+                        BootstrapCol(
+                          sizes: "col-lg-3 col-md-0 col-sm-0",
+                          child: Container(),
+                        ),
+                        BootstrapCol(
+                          sizes: "col-lg-3 col-md-12 col-sm-12",
                           child: Container(
-                            padding: const EdgeInsets.all(20),
-                            // width: 200,
-                            // color: Colors.grey[200],
-                            child: ElevatedButton(
+                            padding: const EdgeInsets.only(top: 32.0),
+                            child: TextButton.icon(
                               onPressed: () {
                                 openSelectBox();
                               },
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.add,
+                              icon: const Icon(
+                                Icons.add,
+                                color: AppConstants.secondaryColor,
+                                size: 20,
+                              ),
+                              label: const Text(
+                                'New Stream',
+                                style: TextStyle(
                                     color: AppConstants.secondaryColor,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(
-                                    width: 8.0,
-                                  ),
-                                  const Text(
-                                    'New',
-                                    style: TextStyle(
-                                        color: AppConstants.secondaryColor,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16),
-                                  ),
-                                ],
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16),
                               ),
                               style: ElevatedButton.styleFrom(
                                 shape: const StadiumBorder(),
@@ -829,77 +902,238 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                               ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
-                    rowsPerPage: _rowsPerPage,
-                    autoRowsToHeight:
-                        getCurrentRouteOption(context) == autoRows,
-                    // Default - do nothing, autoRows - goToLast, other - goToFirst
-                    pageSyncApproach: getCurrentRouteOption(context) == dflt
-                        ? PageSyncApproach.doNothing
-                        : getCurrentRouteOption(context) == autoRows
-                            ? PageSyncApproach.goToLast
-                            : PageSyncApproach.goToFirst,
-                    minWidth: 800,
-                    fit: FlexFit.tight,
-                    border: TableBorder(
-                        top:
-                            BorderSide(color: Colors.grey.shade50, width: 0.05),
-                        bottom:
-                            BorderSide(color: Colors.grey.shade50, width: 0.05),
-                        // left: BorderSide(color: Colors.grey[300]!, width: 0.2),
-                        // right: BorderSide(color: Colors.grey[300]!, width: 0.5),
-                        // verticalInside: BorderSide(color: Colors.grey[300]!),
-                        horizontalInside: BorderSide(
-                            color: Colors.grey.shade50, width: 0.05)),
-                    onRowsPerPageChanged: (value) {
-                      // No need to wrap into setState, it will be called inside the widget
-                      // and trigger rebuild
-                      //setState(() {
-                      print('Row per page changed to $value');
-                      _rowsPerPage = value!;
-                      //});
-                    },
-                    initialFirstRowIndex: _initialRow,
-                    onPageChanged: (rowIndex) {
-                      //print(rowIndex / _rowsPerPage);
-                    },
-                    sortColumnIndex: _sortColumnIndex,
-                    sortAscending: _sortAscending,
-                    sortArrowIcon: Icons.keyboard_arrow_up,
-                    sortArrowAnimationDuration: const Duration(milliseconds: 0),
-                    onSelectAll: (select) => select != null && select
-                        ? (getCurrentRouteOption(context) != selectAllPage
-                            ? _dessertsDataSource!.selectAll()
-                            : _dessertsDataSource!.selectAllOnThePage())
-                        : (getCurrentRouteOption(context) != selectAllPage
-                            ? _dessertsDataSource!.deselectAll()
-                            : _dessertsDataSource!.deselectAllOnThePage()),
-                    controller: _controller,
-                    hidePaginator: getCurrentRouteOption(context) == custPager,
-                    columns: _columns,
-                    empty: Center(
-                        child: Container(
-                            padding: const EdgeInsets.all(20),
-                            color: Colors.grey[200],
-                            child: const Text('No data'))),
-                    loading: _Loading(),
-                    errorBuilder: (e) => _ErrorAndRetry(e.toString(),
-                        () => _dessertsDataSource!.refreshDatasource()),
-                    source: _dessertsDataSource!),
-                if (getCurrentRouteOption(context) == custPager)
-                  Positioned(bottom: 16, child: CustomPager(_controller))
-              ]),
-            ),
+                    SizedBox(height: 16.0),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * .75,
+                      child: Container(
+                        // width: 200,
+                        height: 290,
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: DataTable2(
+                          headingRowHeight: 35,
+                          headingRowColor: WidgetStateColor.resolveWith(
+                              (states) => AppConstants.primaryColor),
+                          headingTextStyle: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                          columnSpacing: 16,
+                          // minWidth: 600,
+                          sortColumnIndex: _currentSortColumn,
+                          sortAscending: _isAscending,
+                          columns: [
+                            DataColumn(
+                              label: const Text("CRAIN"),
+                              onSort: (columnIndex, _) {
+                                setState(() {
+                                  _currentSortColumn = columnIndex;
+                                  if (_isAscending == true) {
+                                    _isAscending = false;
+                                    // sort the product list in Ascending, order by Price
+                                    _streams.sort((userA, userB) => userB
+                                        .regreferenceno
+                                        .compareTo(userA.regreferenceno));
+                                  } else {
+                                    _isAscending = true;
+                                    // sort the product list in Descending, order by Price
+                                    _streams.sort((userA, userB) => userA
+                                        .regreferenceno
+                                        .compareTo(userB.regreferenceno));
+                                  }
+                                });
+                              },
+                            ),
+                            DataColumn(
+                              label: const Text("Name"),
+                              onSort: (columnIndex, _) {
+                                setState(() {
+                                  _currentSortColumn = columnIndex;
+                                  if (_isAscending == true) {
+                                    _isAscending = false;
+                                    // sort the product list in Ascending, order by Price
+                                    _streams.sort((userA, userB) => userB
+                                        .businessname
+                                        .compareTo(userA.businessname));
+                                  } else {
+                                    _isAscending = true;
+                                    // sort the product list in Descending, order by Price
+                                    _streams.sort((userA, userB) => userA
+                                        .businessname
+                                        .compareTo(userB.businessname));
+                                  }
+                                });
+                              },
+                            ),
+                            // DataColumn(
+                            //   label: const Text("Model"),
+                            //   onSort: (columnIndex, _) {
+                            //     setState(() {
+                            //       _currentSortColumn = columnIndex;
+                            //       if (_isAscending == true) {
+                            //         _isAscending = false;
+                            //         _streams.sort((userA, userB) =>
+                            //             userB.ownerid.compareTo(userA.vin));
+                            //       } else {
+                            //         _isAscending = true;
+                            //         _streams.sort((userA, userB) =>
+                            //             userA.ownerid.compareTo(userB.vin));
+                            //       }
+                            //     });
+                            //   },
+                            // ),
+                            DataColumn(
+                              label: const Text("Amount"),
+                              onSort: (columnIndex, _) {
+                                setState(() {
+                                  _currentSortColumn = columnIndex;
+                                  if (_isAscending == true) {
+                                    _isAscending = false;
+                                    // sort the product list in Ascending, order by Price
+                                    _streams.sort((userA, userB) => userB
+                                        .tarrifamount
+                                        .compareTo(userA.tarrifamount));
+                                  } else {
+                                    _isAscending = true;
+                                    // sort the product list in Descending, order by Price
+                                    _streams.sort((userA, userB) => userA
+                                        .tarrifamount
+                                        .compareTo(userB.tarrifamount));
+                                  }
+                                });
+                              },
+                            ),
+                            DataColumn(
+                              label: const Text("Due Date"),
+                              onSort: (columnIndex, _) {
+                                setState(() {
+                                  _currentSortColumn = columnIndex;
+                                  if (_isAscending == true) {
+                                    _isAscending = false;
+                                    // sort the product list in Ascending, order by Price
+                                    _streams.sort((userA, userB) => userB
+                                        .nextrenewaldate
+                                        .compareTo(userA.nextrenewaldate));
+                                  } else {
+                                    _isAscending = true;
+                                    // sort the product list in Descending, order by Price
+                                    _streams.sort((userA, userB) => userA
+                                        .nextrenewaldate
+                                        .compareTo(userB.nextrenewaldate));
+                                  }
+                                });
+                              },
+                            ),
+                            DataColumn(
+                              label: const Text("Status"),
+                              onSort: (columnIndex, _) {
+                                setState(() {
+                                  _currentSortColumn = columnIndex;
+                                  if (_isAscending == true) {
+                                    _isAscending = false;
+                                    // sort the product list in Ascending, order by Price
+                                    _streams.sort((userA, userB) =>
+                                        userB.status.compareTo(userA.status));
+                                  } else {
+                                    _isAscending = true;
+                                    // sort the product list in Descending, order by Price
+                                    _streams.sort((userA, userB) =>
+                                        userA.status.compareTo(userB.status));
+                                  }
+                                });
+                              },
+                            ),
+                          ],
+                          rows: _streams.isNotEmpty
+                              ? _streams // Loops through dataColumnText, each iteration assigning the value to element
+                                  .map(
+                                    (element) => DataRow2(
+                                      cells: <DataCell>[
+                                        DataCell(Text(
+                                          "${element.regreferenceno}",
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                              fontSize: 12),
+                                        )),
+                                        DataCell(Text(
+                                          "${element.businessname}",
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppConstants.primaryColor,
+                                              fontSize: 12),
+                                        )),
+                                        // DataCell(Text(
+                                        //   element.model.toString(),
+                                        //   style: const TextStyle(
+                                        //       fontWeight: FontWeight.w600,
+                                        //       fontSize: 12),
+                                        // )),
+                                        DataCell(Text(
+                                          "${element.tarrifamount}",
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppConstants.primaryColor,
+                                              fontSize: 12),
+                                        )),
+                                        DataCell(Text(
+                                          "${dateFormat.format(element.nextrenewaldate)}",
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppConstants.primaryColor,
+                                              fontSize: 12),
+                                        )),
+                                        DataCell(Badge(
+                                          backgroundColor: element.status
+                                                      .toString() ==
+                                                  "0"
+                                              ? Colors.amber.shade700
+                                              : element.status.toString() == "1"
+                                                  ? Colors.green.shade600
+                                                  : Colors.red.shade600,
+                                          label: Text(
+                                            element.status.toString() == "0"
+                                                ? "Inactive"
+                                                : element.status.toString() ==
+                                                        "1"
+                                                    ? "Active"
+                                                    : "Disabled",
+                                            style:
+                                                const TextStyle(fontSize: 12),
+                                          ),
+                                        )),
+                                      ],
+                                    ),
+                                  )
+                                  .toList()
+                              : <DataRow2>[
+                                  const DataRow2(
+                                    cells: <DataCell>[
+                                      DataCell(Text("")),
+                                      DataCell(Text("")),
+                                      // DataCell(Text("")),
+                                      DataCell(Text("No Revenue Streams")),
+                                      DataCell(Text("")),
+                                      DataCell(Text("")),
+                                    ],
+                                  )
+                                ],
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
+            ],
           ),
+          // page 1
           Container(
             margin: EdgeInsets.all(8.0),
             padding: EdgeInsets.all(6.0),
             child: Card(
               color: Colors.white,
               child: Padding(
-                  padding: const EdgeInsets.all(18.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: AddIndividualRevenueStreamPage(
                     ownerType: selectedOwnership,
                     sector: selectedSector,
@@ -909,14 +1143,83 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                   )),
             ),
           ),
+          // page 2
           Container(
             margin: EdgeInsets.all(8.0),
             padding: EdgeInsets.all(6.0),
             child: Card(
               color: Colors.white,
               child: Padding(
-                  padding: const EdgeInsets.all(18.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: AddNonIndividualRevenueStreamPage(
+                    ownerType: selectedOwnership,
+                    sector: selectedSector,
+                    sectorId: selectedSectorId,
+                    category: selectedCategory,
+                    categoryId: selectedCategoryId,
+                  )),
+            ),
+          ),
+          // page 3 individual hospitality
+          Container(
+            margin: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(6.0),
+            child: Card(
+              color: Colors.white,
+              child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: AddIndividualHospitalityRevenueStreamPage(
+                    ownerType: selectedOwnership,
+                    sector: selectedSector,
+                    sectorId: selectedSectorId,
+                    category: selectedCategory,
+                    categoryId: selectedCategoryId,
+                  )),
+            ),
+          ),
+          // page 4 non individual hospitality
+          Container(
+            margin: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(6.0),
+            child: Card(
+              color: Colors.white,
+              child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: AddNonIndividualHospitalityRevenueStreamPage(
+                    ownerType: selectedOwnership,
+                    sector: selectedSector,
+                    sectorId: selectedSectorId,
+                    category: selectedCategory,
+                    categoryId: selectedCategoryId,
+                  )),
+            ),
+          ),
+          // page 5 individual fish
+          Container(
+            margin: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(6.0),
+            child: Card(
+              color: Colors.white,
+              child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: AddIndividualFishRevenueStreamPage(
+                    ownerType: selectedOwnership,
+                    sector: selectedSector,
+                    sectorId: selectedSectorId,
+                    category: selectedCategory,
+                    categoryId: selectedCategoryId,
+                  )),
+            ),
+          ),
+          // page 6 non individual fish
+          Container(
+            margin: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(6.0),
+            child: Card(
+              color: Colors.white,
+              child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: AddNonIndividualFishRevenueStreamPage(
                     ownerType: selectedOwnership,
                     sector: selectedSector,
                     sectorId: selectedSectorId,

@@ -12,22 +12,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../config/constants.dart';
 import '../../../config/functions.dart';
 
-class AddNonIndividualTransportRevenueStreamPage extends StatefulWidget {
+class AddNonIndividualHospitalityRevenueStreamPage extends StatefulWidget {
   final String category;
   final String ownerType;
-  const AddNonIndividualTransportRevenueStreamPage({
+  final String categoryId;
+  final String sector;
+  final String sectorId;
+  const AddNonIndividualHospitalityRevenueStreamPage({
     super.key,
     required this.category,
     required this.ownerType,
+    required this.categoryId,
+    required this.sector,
+    required this.sectorId,
   });
 
   @override
-  State<AddNonIndividualTransportRevenueStreamPage> createState() =>
-      _AddNonIndividualTransportRevenueStreamPageState();
+  State<AddNonIndividualHospitalityRevenueStreamPage> createState() =>
+      _AddNonIndividualHospitalityRevenueStreamPageState();
 }
 
-class _AddNonIndividualTransportRevenueStreamPageState
-    extends Base<AddNonIndividualTransportRevenueStreamPage> {
+class _AddNonIndividualHospitalityRevenueStreamPageState
+    extends Base<AddNonIndividualHospitalityRevenueStreamPage> {
   PageController addRevenueStreamPageController = PageController();
   int page = 0;
   int counter = 3;
@@ -42,6 +48,12 @@ class _AddNonIndividualTransportRevenueStreamPageState
   List<String> parishes = [];
   List<String> villages = [];
   bool responseLoading = true;
+  bool hasRestaurant = false,
+      hasBar = false,
+      hasConference = false,
+      hasHealthClub = false,
+      hasGym = false,
+      hasPool = false;
   PhoneNumber ownerNumber = PhoneNumber(isoCode: 'UG');
   PhoneNumber driverNumber = PhoneNumber(isoCode: 'UG');
   PhoneNumber associateNumber = PhoneNumber(isoCode: 'UG');
@@ -458,7 +470,13 @@ class _AddNonIndividualTransportRevenueStreamPageState
       "staffcountfemale": 0,
       "bedcount": 0,
       "roomcount": 0,
-      "establishmenttype": "",
+      "hasgym": hasGym,
+      "hashealthclub": hasHealthClub,
+      "haspool": hasPool,
+      "hasbar": hasBar,
+      "hasresataurant": hasRestaurant,
+      "hasconference": hasConference,
+      "establishmenttype": selectedOwnership,
       "regno": regNoController.text.replaceAll(" ", ""),
       "vin": chassisNoController.text,
       "color": colorController.text.isEmpty ? "" : colorController.text,

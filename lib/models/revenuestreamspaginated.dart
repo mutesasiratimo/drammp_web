@@ -68,6 +68,13 @@ class RevenueStreams {
   int staffcountmale;
   int staffcountfemale;
   int bedcount;
+  int roomcount;
+  bool hasbar;
+  bool hasrestaurant;
+  bool hasgym;
+  bool hashealthclub;
+  bool haspool;
+  bool hasconference;
   String establishmenttype;
   String regno;
   String vin;
@@ -116,11 +123,18 @@ class RevenueStreams {
     required this.staffcountmale,
     required this.staffcountfemale,
     required this.bedcount,
+    required this.roomcount,
+    required this.hasbar,
+    required this.hasrestaurant,
+    required this.hasgym,
+    required this.hashealthclub,
+    required this.haspool,
+    required this.hasconference,
     required this.establishmenttype,
     required this.regno,
     required this.vin,
     required this.tin,
-    required this.brn,
+    this.brn,
     required this.color,
     required this.ownerid,
     required this.operatorid,
@@ -165,6 +179,13 @@ class RevenueStreams {
         staffcountmale: json["staffcountmale"],
         staffcountfemale: json["staffcountfemale"],
         bedcount: json["bedcount"],
+        roomcount: json["roomcount"],
+        hasrestaurant: json["hasrestaurant"],
+        hasbar: json["hasbar"],
+        hasgym: json["hasgym"],
+        hashealthclub: json["hashealthclub"],
+        hasconference: json["hasconference"],
+        haspool: json["haspool"],
         establishmenttype: json["establishmenttype"],
         regno: json["regno"],
         vin: json["vin"],
@@ -214,6 +235,13 @@ class RevenueStreams {
         "staffcountmale": staffcountmale,
         "staffcountfemale": staffcountfemale,
         "bedcount": bedcount,
+        "roomcount": roomcount,
+        "hasgym": hasgym,
+        "hashealthclub": hashealthclub,
+        "haspool": haspool,
+        "hasbar": hasbar,
+        "hasresataurant": hasrestaurant,
+        "hasconference": hasconference,
         "establishmenttype": establishmenttype,
         "regno": regno,
         "vin": vin,

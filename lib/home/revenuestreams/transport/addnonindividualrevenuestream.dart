@@ -405,6 +405,7 @@ class _AddNonIndividualRevenueStreamPageState
 
     var bodyString = {
       "id": "0",
+      "ownername": entityNameController.text,
       "email": ownerEmailController.text,
       "phone": ownerNumber.phoneNumber.toString().replaceAll("+", ""),
       "assocfirstname": associateNameController.text.split(" ")[0],
@@ -459,12 +460,22 @@ class _AddNonIndividualRevenueStreamPageState
       "dailyactivehours": 0,
       "companytype": "",
       "businesstype": "",
-      "businessname": entityNameController.text,
+      "businessname": regNoController.text.isEmpty
+          ? ""
+          : regNoController.text.replaceAll(" ", "") +
+              " " +
+              makeModelController.text,
       "tradingname": entityNameController.text,
       "staffcountmale": 0,
       "staffcountfemale": 0,
       "bedcount": 0,
       "roomcount": 0,
+      "hasgym": false,
+      "hashealthclub": false,
+      "haspool": false,
+      "hasbar": false,
+      "hasresataurant": false,
+      "hasconference": false,
       "establishmenttype": "",
       "regno": regNoController.text.replaceAll(" ", ""),
       "vin": chassisNoController.text,
@@ -516,7 +527,7 @@ class _AddNonIndividualRevenueStreamPageState
           color: Colors.white,
           msgStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           msg:
-              "You have registered this Commercial Car with reference No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
+              "You have registered this ${widget.category} with City Revenue Assurance ID No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
           title: 'Success',
           titleStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           lottieBuilder: Lottie.asset('assets/cong_example.json',
@@ -1454,73 +1465,73 @@ class _AddNonIndividualRevenueStreamPageState
                   ),
                 ),
               ),
-              ListTile(
-                title: Text(
-                  'Does owner operate vehicle?',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                subtitle: Container(
-                  height: 37,
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedDoesOwnerOperate,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: doesOwnerOperate.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = doesOwnerOperate.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedDoesOwnerOperate = item;
-                            debugPrint(selectedDoesOwnerOperate);
-                          });
-                        }
-                      }).toList();
-                    },
-                  ),
-                ),
-              ),
+              // ListTile(
+              //   title: Text(
+              //     'Does owner operate vehicle?',
+              //     style: TextStyle(
+              //       fontSize: 14,
+              //       fontWeight: FontWeight.w400,
+              //     ),
+              //   ),
+              //   subtitle: Container(
+              //     height: 37,
+              //     child: DropdownButtonFormField(
+              //       decoration: InputDecoration(
+              //         contentPadding:
+              //             EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+              //         border: OutlineInputBorder(
+              //           borderSide: BorderSide(color: Color(0xffB9B9B9)),
+              //           borderRadius: BorderRadius.all(Radius.circular(4)),
+              //         ),
+              //         enabledBorder: OutlineInputBorder(
+              //           borderSide:
+              //               BorderSide(color: Color(0xffB9B9B9), width: 1.0),
+              //           borderRadius: BorderRadius.all(Radius.circular(4)),
+              //         ),
+              //         hintText: '',
+              //       ),
+              //       isExpanded: true,
+              //       hint: Row(
+              //         children: [
+              //           new Text(
+              //             selectedDoesOwnerOperate,
+              //             style: const TextStyle(
+              //                 // color: Colors.grey,
+              //                 fontSize: 18,
+              //                 fontWeight: FontWeight.w400),
+              //           ),
+              //         ],
+              //       ),
+              //       icon: const Icon(Icons.keyboard_arrow_down),
+              //       items: doesOwnerOperate.map((item) {
+              //         return DropdownMenuItem(
+              //           child: Row(
+              //             children: [
+              //               new Text(
+              //                 item,
+              //                 style: const TextStyle(
+              //                     // color: Colors.grey,
+              //                     fontSize: 18,
+              //                     fontWeight: FontWeight.w400),
+              //               ),
+              //             ],
+              //           ),
+              //           value: item,
+              //         );
+              //       }).toList(),
+              //       onChanged: (newVal) {
+              //         List itemsList = doesOwnerOperate.map((item) {
+              //           if (item == newVal) {
+              //             setState(() {
+              //               selectedDoesOwnerOperate = item;
+              //               debugPrint(selectedDoesOwnerOperate);
+              //             });
+              //           }
+              //         }).toList();
+              //       },
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 // import '../models/authtoken.dart';
@@ -25,7 +25,7 @@ class AppFunctions {
           "Content-Type": "Application/json",
         },
         body: body);
-    debugPrint("++++++" + response.body.toString() + "+++++++");
+    // debugPrint("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final item = json.decode(response.body);
       UserModel auth = UserModel.fromJson(item);

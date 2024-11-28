@@ -15,10 +15,16 @@ import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 class AddIndividualFishRevenueStreamPage extends StatefulWidget {
   final String category;
   final String ownerType;
+  final String categoryId;
+  final String sector;
+  final String sectorId;
   const AddIndividualFishRevenueStreamPage({
     super.key,
     required this.category,
     required this.ownerType,
+    required this.categoryId,
+    required this.sector,
+    required this.sectorId,
   });
 
   @override

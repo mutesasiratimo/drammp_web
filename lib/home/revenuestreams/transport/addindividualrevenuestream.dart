@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,6 +38,7 @@ class AddIndividualRevenueStreamPage extends StatefulWidget {
 class _AddIndividualRevenueStreamPageState
     extends Base<AddIndividualRevenueStreamPage> {
   PageController addRevenueStreamPageController = PageController();
+  var dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
   int page = 0;
   int counter = 3;
   List list = [0, 1, 2];
@@ -70,11 +72,13 @@ class _AddIndividualRevenueStreamPageState
   TextEditingController ownerNinController = TextEditingController(),
       ownerPassportNumberController = TextEditingController(),
       ownerNameController = TextEditingController(),
-      ownerEmailController = TextEditingController();
+      ownerEmailController = TextEditingController(),
+      ownerPhoneController = TextEditingController();
   TextEditingController driverNinController = TextEditingController(),
       driverPassportNumberController = TextEditingController(),
       driverNameController = TextEditingController(),
       driverEmailController = TextEditingController(),
+      driverPhoneController = TextEditingController(),
       stageNameController = TextEditingController(),
       regNoController = TextEditingController(),
       makeModelController = TextEditingController(),
@@ -393,6 +397,22 @@ class _AddIndividualRevenueStreamPageState
     );
   }
 
+  populateOperatorFieldsFromOwner() {
+    setState(() {
+      driverNameController.text = ownerNameController.text;
+      driverEmailController.text = ownerEmailController.text;
+      driverNinController.text = ownerNinController.text;
+      driverPassportNumberController.text = ownerPassportNumberController.text;
+      selectedDriverDistrict = selectedOwnerDistrict;
+      selectedDriverCounty = selectedOwnerCounty;
+      selectedDriverSubcounty = selectedOwnerSubcounty;
+      selectedDriverParish = selectedOwnerParish;
+      selectedDriverVillage = selectedOwnerVillage;
+      driverPhoneController.text = ownerPhoneController.text;
+      driverNumber = ownerNumber;
+    });
+  }
+
   _reegisterStream() async {
     var url =
         Uri.parse("${AppConstants.baseUrl}revenuestreamsregisternewindividual");
@@ -466,8 +486,8 @@ class _AddIndividualRevenueStreamPageState
       "sectorsubtypeid": widget.categoryId,
       "tarriffrequency": "",
       "tarrifamount": 0.0,
-      "lastrenewaldate": "2024-11-10T08:47:49.655Z",
-      "nextrenewaldate": "2024-11-10T08:47:49.655Z",
+      "lastrenewaldate": dateFormat.format(DateTime.now()),
+      "nextrenewaldate": dateFormat.format(DateTime.now()),
       "revenueactivity": "",
       "vesseltype": "",
       "vesselstorage": "",
@@ -478,17 +498,23 @@ class _AddIndividualRevenueStreamPageState
       "dailyactivehours": 0,
       "companytype": "",
       "businesstype": "",
-      "businessname": "",
-      // "businessname": regNoController.text.isEmpty
-      //     ? ""
-      //     : regNoController.text.replaceAll(" ", "") +
-      //         " " +
-      //         makeModelController.text,
+      // "businessname": "",
+      "businessname": regNoController.text.isEmpty
+          ? ""
+          : regNoController.text.replaceAll(" ", "") +
+              " " +
+              makeModelController.text,
       "tradingname": "",
       "staffcountmale": 0,
       "staffcountfemale": 0,
       "bedcount": 0,
       "roomcount": 0,
+      "hasgym": false,
+      "hashealthclub": false,
+      "haspool": false,
+      "hasbar": false,
+      "hasresataurant": false,
+      "hasconference": false,
       "establishmenttype": "",
       "regno": regNoController.text.replaceAll(" ", ""),
       "vin": chassisNoController.text,
@@ -537,7 +563,7 @@ class _AddIndividualRevenueStreamPageState
           color: Colors.white,
           msgStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           msg:
-              "You have registered this Commercial Car with reference No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
+              "You have registered this ${widget.category} with City Revenue Assurance ID No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
           title: 'Success',
           titleStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           lottieBuilder: Lottie.asset('assets/cong_example.json',
@@ -942,6 +968,7 @@ class _AddIndividualRevenueStreamPageState
                     ),
                     // focusNode: _phoneNumberFocus,
                     ignoreBlank: false,
+                    textFieldController: ownerPhoneController,
                     // autoValidateMode: AutovalidateMode.disabled,
                     hintText: 'e.g 771000111',
                     selectorTextStyle: const TextStyle(color: Colors.black),
@@ -1531,6 +1558,9 @@ class _AddIndividualRevenueStreamPageState
                           });
                         }
                       }).toList();
+                      if (selectedDoesOwnerOperate == "Yes") {
+                        populateOperatorFieldsFromOwner();
+                      }
                     },
                   ),
                 ),
@@ -1692,6 +1722,7 @@ class _AddIndividualRevenueStreamPageState
                     ),
                     // focusNode: _phoneNumberFocus,
                     ignoreBlank: false,
+                    textFieldController: driverPhoneController,
                     // autoValidateMode: AutovalidateMode.disabled,
                     hintText: 'e.g 771000111',
                     selectorTextStyle: const TextStyle(color: Colors.black),

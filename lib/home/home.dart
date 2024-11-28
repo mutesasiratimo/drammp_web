@@ -201,7 +201,7 @@ class _HomePageState extends Base<HomePage> {
                 },
               ),
               SideMenuItem(
-                title: 'Settings',
+                title: 'Configure System',
                 onTap: (index, _) {
                   sideMenu.changePage(index);
                 },
