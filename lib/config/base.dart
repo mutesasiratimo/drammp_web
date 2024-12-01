@@ -1,12 +1,13 @@
 import 'dart:async';
 // import 'dart:convert';
 import 'dart:io';
-import 'package:entebbe_dramp_web/auth/signin.dart';
 // import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
+
+import '../src/views/auth/signin.dart';
 
 // import 'constants.dart';
 // import 'functions.dart';
@@ -401,36 +402,6 @@ abstract class Base<T extends StatefulWidget> extends State<T>
         );
       },
     );
-  }
-
-// called on register tapped in homeview
-  Future<void> gesture1(String? tex) async {
-    if (tex == 'Register a User') {
-      debugPrint(tex);
-    } else if (tex == 'Register a boda boda') {
-      debugPrint(tex);
-    } else if (tex == 'Register taxis') {
-      debugPrint(tex);
-    } else if (tex == 'Register commercial vehicles') {
-      debugPrint(tex);
-    } else {
-      showSnackBar('No Input');
-    }
-  }
-
-// called on see all tapped in homeview
-  Future<void> gesture2(String? texx) async {
-    if (texx == 'Register a User') {
-      debugPrint(texx);
-    } else if (texx == 'Register a boda boda') {
-      debugPrint(texx);
-    } else if (texx == 'Register taxis') {
-      debugPrint(texx);
-    } else if (texx == 'Register commercial vehicles') {
-      debugPrint(texx);
-    } else {
-      showSnackBar('No Input');
-    }
   }
 
   //Logout Function
