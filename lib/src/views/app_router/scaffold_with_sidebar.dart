@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum SidebarItem {
   dashboard(value: 'Dashboard', iconData: Icons.home),
@@ -93,6 +94,15 @@ class ScaffoldWithSideBar extends ConsumerWidget {
   }
 
   Widget _accountToggle(BuildContext context) {
+    //Logout Function
+    clearPrefs() async {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      preferences.clear();
+      context.goNamed(
+        "signin",
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(0.0),
       margin: const EdgeInsets.only(right: 12.0),
@@ -125,8 +135,10 @@ class ScaffoldWithSideBar extends ConsumerWidget {
               ),
             ),
           ),
-          const PopupMenuItem(
-            // onTap: ,
+          PopupMenuItem(
+            onTap: () {
+              clearPrefs();
+            },
             child: Row(
               children: [
                 Icon(Icons.logout),

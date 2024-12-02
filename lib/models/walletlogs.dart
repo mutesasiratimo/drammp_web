@@ -15,7 +15,7 @@ class WalletLogsModel {
   String id;
   UserModel userid;
   String userwalletid;
-  int amount;
+  double amount;
   String type;
   String description;
   DateTime datecreated;

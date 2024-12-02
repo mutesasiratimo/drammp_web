@@ -1,13 +1,15 @@
 // ignore_for_file: unused_field
 
 import 'dart:async';
+import 'dart:convert';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../config/base.dart';
 import '../../../../config/constants.dart';
-import '../../../../config/custom_pager.dart';
-import '../../../../config/nav_helper.dart';
-import '../../../../models/revenuesector.dart';
+import '../../../../config/functions.dart';
+import 'package:http/http.dart' as http;
+import '../../../../models/revenuesectorcategories.dart';
 import 'addrevenuesubtype.dart';
 import 'data_sources.dart';
 
@@ -19,112 +21,84 @@ class SectorSubtypePage extends StatefulWidget {
 }
 
 class _SectorSubtypePageState extends Base<SectorSubtypePage> {
-  List<RevenueSectorsModel> revenueSector = [];
-  int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
+  List<RevenueSectorCategoriesModel> sectorCategories = [];
   bool _sortAscending = true;
   int? _sortColumnIndex;
   DessertDataSourceAsync? _dessertsDataSource;
   final PaginatorController _controller = PaginatorController();
-  PageController revenuePageController = PageController();
+  PageController sectorPageController = PageController();
+  int _rowsPerPage = 10;
+  int _currentSortColumn = 0;
+  bool _isAscending = true;
+  int revenueSectorsPage = 1;
+  List<int> rowCountList = [10, 20, 30, 40, 50, 100];
 
   bool _dataSourceLoading = false;
   int _initialRow = 0;
 
+  //get sectors list
+  Future<List<RevenueSectorCategoriesModel>> getSectorCategories() async {
+    List<RevenueSectorCategoriesModel> returnValue = [];
+    var url = Uri.parse("${AppConstants.baseUrl}sectorsubtypes");
+    debugPrint(url.toString());
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      // RevenueSectorCategoriesModel sectorrsobj = RevenueSectorCategoriesModel.fromJson(items);
+      List<RevenueSectorCategoriesModel> sectorsmodel = (items as List)
+          .map((data) => RevenueSectorCategoriesModel.fromJson(data))
+          .toList();
+
+      // List<RevenueSectorCategoriesModel> sectorsmodel = usersobj;
+      // List<UserItem> usersmodel = usersobj.items;
+
+      returnValue = sectorsmodel;
+      debugPrint(sectorsmodel.toString());
+      setState(() {
+        sectorCategories = sectorsmodel;
+      });
+    } else {
+      returnValue = [];
+      // showSnackBar("Network Failure: Failed to retrieve transactions");
+    }
+    return returnValue;
+  }
+
   @override
   void initState() {
-    // getSectors();
+    getSectorCategories();
     super.initState();
   }
 
   @override
-  void didChangeDependencies() {
-    // initState is to early to access route options, context is invalid at that stage
-    _dessertsDataSource ??= getCurrentRouteOption(context) == noData
-        ? DessertDataSourceAsync.empty()
-        : getCurrentRouteOption(context) == asyncErrors
-            ? DessertDataSourceAsync.error()
-            : DessertDataSourceAsync();
-
-    if (getCurrentRouteOption(context) == goToLast) {
-      _dataSourceLoading = true;
-      _dessertsDataSource!.getTotalRecords().then((count) => setState(() {
-            _initialRow = count - _rowsPerPage;
-            _dataSourceLoading = false;
-          }));
-    }
-    super.didChangeDependencies();
-  }
-
-  void sort(
-    int columnIndex,
-    bool ascending,
-  ) {
-    var columnName = "Code";
-    switch (columnIndex) {
-      case 1:
-        columnName = "Name";
-        break;
-      case 2:
-        columnName = "Sector";
-        break;
-      case 3:
-        columnName = "Status";
-        break;
-      case 4:
-        columnName = "";
-        break;
-    }
-    _dessertsDataSource!.sort(columnName, ascending);
-    setState(() {
-      _sortColumnIndex = columnIndex;
-      _sortAscending = ascending;
-    });
-  }
-
-  @override
   void dispose() {
-    _dessertsDataSource!.dispose();
     super.dispose();
   }
 
-  List<DataColumn> get _columns {
-    return [
-      DataColumn(
-        label: const Text('Code'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text('Name'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text('Sector'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text('Status'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text(''),
-        // numeric: true,
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-    ];
-  }
-
-  // Use global key to avoid rebuilding state of _TitledRangeSelector
-  // upon AsyncPaginatedDataTable2 refreshes, e.g. upon page switches
-  final GlobalKey _rangeSelectorKey = GlobalKey();
-
   @override
   Widget build(BuildContext context) {
-    // Last ppage example uses extra API call to get the number of items in datasource
-    if (_dataSourceLoading) return const SizedBox();
-    //TO DO: FOR PRODUCTS COLUMN, SHOW "3 Proudcts" AS CLICKABLE LINK, WITH POPUP TO SHOW SUBTYPES.
     return Scaffold(
       body: PageView(
-        controller: revenuePageController,
+        controller: sectorPageController,
         // physics: const NeverScrollableScrollPhysics(),
         allowImplicitScrolling: false,
         children: [
@@ -133,114 +107,256 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
             padding: EdgeInsets.all(8.0),
             child: Card(
               color: Colors.white,
-              child: Stack(alignment: Alignment.bottomCenter, children: [
-                AsyncPaginatedDataTable2(
-                    horizontalMargin: 20,
-                    checkboxHorizontalMargin: 12,
-                    columnSpacing: 0,
-                    wrapInCard: false,
-                    header: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          // width: 200,
-                          // color: Colors.grey[200],
-                          child: ElevatedButton(
-                            onPressed: () {
-                              revenuePageController.jumpToPage(1);
-                              // showInfoToast("Navigate");
-                              // push(const AddRevenueSectorPage());
-                            },
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.add,
-                                  color: AppConstants.secondaryColor,
-                                  size: 20,
-                                ),
-                                const SizedBox(
-                                  width: 8.0,
-                                ),
-                                const Text(
-                                  'New',
-                                  style: TextStyle(
-                                      color: AppConstants.secondaryColor,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16),
-                                ),
-                              ],
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              shape: const StadiumBorder(),
-                              backgroundColor: AppConstants.primaryColor,
-                            ),
-                          ),
-                        )
-                      ],
+              child: Column(children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
                     ),
-                    rowsPerPage: _rowsPerPage,
-                    autoRowsToHeight:
-                        getCurrentRouteOption(context) == autoRows,
-                    // Default - do nothing, autoRows - goToLast, other - goToFirst
-                    pageSyncApproach: getCurrentRouteOption(context) == dflt
-                        ? PageSyncApproach.doNothing
-                        : getCurrentRouteOption(context) == autoRows
-                            ? PageSyncApproach.goToLast
-                            : PageSyncApproach.goToFirst,
-                    minWidth: 800,
-                    fit: FlexFit.tight,
-                    border: TableBorder(
-                        top:
-                            BorderSide(color: Colors.grey.shade50, width: 0.05),
-                        bottom:
-                            BorderSide(color: Colors.grey.shade50, width: 0.05),
-                        // left: BorderSide(color: Colors.grey[300]!, width: 0.2),
-                        // right: BorderSide(color: Colors.grey[300]!, width: 0.5),
-                        // verticalInside: BorderSide(color: Colors.grey[300]!),
-                        horizontalInside: BorderSide(
-                            color: Colors.grey.shade50, width: 0.05)),
-                    onRowsPerPageChanged: (value) {
-                      // No need to wrap into setState, it will be called inside the widget
-                      // and trigger rebuild
-                      //setState(() {
-                      print('Row per page changed to $value');
-                      _rowsPerPage = value!;
-                      //});
-                    },
-                    initialFirstRowIndex: _initialRow,
-                    onPageChanged: (rowIndex) {
-                      //print(rowIndex / _rowsPerPage);
-                    },
-                    sortColumnIndex: _sortColumnIndex,
-                    sortAscending: _sortAscending,
-                    sortArrowIcon: Icons.keyboard_arrow_up,
-                    sortArrowAnimationDuration: const Duration(milliseconds: 0),
-                    onSelectAll: (select) => select != null && select
-                        ? (getCurrentRouteOption(context) != selectAllPage
-                            ? _dessertsDataSource!.selectAll()
-                            : _dessertsDataSource!.selectAllOnThePage())
-                        : (getCurrentRouteOption(context) != selectAllPage
-                            ? _dessertsDataSource!.deselectAll()
-                            : _dessertsDataSource!.deselectAllOnThePage()),
-                    controller: _controller,
-                    hidePaginator: getCurrentRouteOption(context) == custPager,
-                    columns: _columns,
-                    empty: Center(
-                        child: Container(
-                            padding: const EdgeInsets.all(20),
-                            color: Colors.grey[200],
-                            child: const Text('No data'))),
-                    loading: _Loading(),
-                    errorBuilder: (e) => _ErrorAndRetry(e.toString(),
-                        () => _dessertsDataSource!.refreshDatasource()),
-                    source: _dessertsDataSource!),
-                if (getCurrentRouteOption(context) == custPager)
-                  Positioned(bottom: 16, child: CustomPager(_controller))
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      // width: 200,
+                      // color: Colors.grey[200],
+                      child: ElevatedButton(
+                        onPressed: () {
+                          sectorPageController.jumpToPage(1);
+                          // showInfoToast("Navigate");
+                          // push(const AddRevenueSectorPage());
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.add,
+                              color: AppConstants.secondaryColor,
+                              size: 20,
+                            ),
+                            const SizedBox(
+                              width: 8.0,
+                            ),
+                            const Text(
+                              'New',
+                              style: TextStyle(
+                                  color: AppConstants.secondaryColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16),
+                            ),
+                          ],
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          backgroundColor: AppConstants.primaryColor,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(height: 8.0),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * .55,
+                  child: Container(
+                    // width: 200,
+                    height: 290,
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: DataTable2(
+                      headingRowHeight: 35,
+                      headingRowColor: WidgetStateColor.resolveWith(
+                          (states) => AppConstants.primaryColor),
+                      headingTextStyle: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                      columnSpacing: 16,
+                      // minWidth: 600,
+                      sortColumnIndex: _currentSortColumn,
+                      sortAscending: _isAscending,
+                      columns: [
+                        DataColumn(
+                          label: const Text("Code"),
+                          onSort: (columnIndex, _) {
+                            setState(() {
+                              _currentSortColumn = columnIndex;
+                              if (_isAscending == true) {
+                                _isAscending = false;
+                                // sort the product list in Ascending, order by Price
+                                sectorCategories.sort((userA, userB) =>
+                                    userB.typecode.compareTo(userA.typecode));
+                              } else {
+                                _isAscending = true;
+                                // sort the product list in Descending, order by Price
+                                sectorCategories.sort((userA, userB) =>
+                                    userA.typecode.compareTo(userB.typecode));
+                              }
+                            });
+                          },
+                        ),
+                        DataColumn(
+                          label: const Text("Name"),
+                          onSort: (columnIndex, _) {
+                            setState(() {
+                              _currentSortColumn = columnIndex;
+                              if (_isAscending == true) {
+                                _isAscending = false;
+                                // sort the product list in Ascending, order by Price
+                                sectorCategories.sort((userA, userB) =>
+                                    userB.typename.compareTo(userA.typename));
+                              } else {
+                                _isAscending = true;
+                                // sort the product list in Descending, order by Price
+                                sectorCategories.sort((userA, userB) =>
+                                    userA.typename.compareTo(userB.typename));
+                              }
+                            });
+                          },
+                        ),
+                        DataColumn(
+                          label: const Text("Sector"),
+                          onSort: (columnIndex, _) {
+                            setState(() {
+                              _currentSortColumn = columnIndex;
+                              if (_isAscending == true) {
+                                _isAscending = false;
+                                sectorCategories.sort((userA, userB) => userB
+                                    .sectorid.name
+                                    .compareTo(userA.sectorid.name));
+                              } else {
+                                _isAscending = true;
+                                sectorCategories.sort((userA, userB) => userA
+                                    .sectorid.name
+                                    .compareTo(userB.sectorid.name));
+                              }
+                            });
+                          },
+                        ),
+                        DataColumn(
+                          label: const Text("Status"),
+                          onSort: (columnIndex, _) {
+                            setState(() {
+                              _currentSortColumn = columnIndex;
+                              if (_isAscending == true) {
+                                _isAscending = false;
+                                // sort the product list in Ascending, order by Price
+                                sectorCategories.sort((userA, userB) =>
+                                    userB.status.compareTo(userA.status));
+                              } else {
+                                _isAscending = true;
+                                // sort the product list in Descending, order by Price
+                                sectorCategories.sort((userA, userB) =>
+                                    userA.status.compareTo(userB.status));
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                      rows: sectorCategories.isNotEmpty
+                          ? sectorCategories // Loops through dataColumnText, each iteration assigning the value to element
+                              .map(
+                                (element) => DataRow2(
+                                  cells: <DataCell>[
+                                    DataCell(Text(
+                                      "${element.typecode}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 12),
+                                    )),
+                                    DataCell(Text(
+                                      "${element.typename}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppConstants.primaryColor,
+                                          fontSize: 12),
+                                    )),
+                                    DataCell(Text(
+                                      element.sectorid.name.toString(),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12),
+                                    )),
+                                    DataCell(Badge(
+                                      backgroundColor:
+                                          element.status.toString() == "0"
+                                              ? Colors.amber.shade700
+                                              : element.status.toString() == "1"
+                                                  ? Colors.green.shade600
+                                                  : Colors.red.shade600,
+                                      label: Text(
+                                        element.status.toString() == "0"
+                                            ? "Inactive"
+                                            : element.status.toString() == "1"
+                                                ? "Active"
+                                                : "Disabled",
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    )),
+                                  ],
+                                ),
+                              )
+                              .toList()
+                          : <DataRow2>[
+                              const DataRow2(
+                                cells: <DataCell>[
+                                  DataCell(Text("")),
+                                  DataCell(Text("No Revenue Sectors")),
+                                  DataCell(Text("")),
+                                  DataCell(Text("")),
+                                ],
+                              )
+                            ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 80,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text("Rows per Page"),
+                      SizedBox(width: 8),
+                      SizedBox(
+                        width: 50,
+                        child: DropdownButton(
+                          underline: SizedBox(),
+                          // isExpanded: true,
+                          hint: new Text(
+                            _rowsPerPage.toString(),
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                          ),
+                          // icon: const Icon(Icons.keyboard_arrow_down),
+                          items: rowCountList.map((item) {
+                            return DropdownMenuItem(
+                              child: Text(
+                                item.toString(),
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              value: item,
+                            );
+                          }).toList(),
+                          onChanged: (newVal) {
+                            setState(() {
+                              _rowsPerPage = newVal ?? 10;
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text("1 - ${sectorCategories.length} of $_rowsPerPage"),
+                      SizedBox(width: 8),
+                      IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.arrow_back_ios, size: 14)),
+                      SizedBox(width: 8),
+                      IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.arrow_forward_ios, size: 14)),
+                    ],
+                  ),
+                )
               ]),
             ),
           ),

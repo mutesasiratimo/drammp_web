@@ -409,21 +409,21 @@ abstract class Base<T extends StatefulWidget> extends State<T>
     preferences = await SharedPreferences.getInstance();
     preferences.clear();
     pushAndRemoveUntil(const SignInPage());
+  }
 
-    // Check Internet Connection Async method with Snackbar message.
-    Future<bool> isConnected() async {
-      try {
-        final result = await InternetAddress.lookup('google.com');
-        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-          return true;
-        }
-      } on SocketException catch (_) {
-        showSnackBar("No Internet Connection");
-        return false;
+  // Check Internet Connection Async method with Snackbar message.
+  Future<bool> isConnected() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
       }
+    } on SocketException catch (_) {
       showSnackBar("No Internet Connection");
       return false;
     }
+    showSnackBar("No Internet Connection");
+    return false;
   }
 
   BoxDecoration customDecoration() {

@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../config/base.dart';
-import 'views/admin_panel/home_page.dart';
-import 'views/auth/signin.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -20,7 +18,7 @@ class MyApp extends StatelessWidget {
             toolbarHeight: 50,
             backgroundColor: Colors.white,
           )),
-      home: const SessionCheck(),
+      // home: const SessionCheck(),
     );
   }
 }
@@ -37,11 +35,13 @@ class _SessionCheckState extends Base<SessionCheck> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString("userid") != null) {
       setState(() {
-        pushAndRemoveUntil(const HomePage());
+        context.goNamed("root", pathParameters: {});
+        // pushAndRemoveUntil(const HomePage());
       });
     } else {
       setState(() {
-        pushAndRemoveUntil(const SignInPage());
+        context.goNamed("signin", pathParameters: {});
+        // pushAndRemoveUntil(const SignInPage());
       });
     }
   }

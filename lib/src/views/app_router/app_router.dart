@@ -3,11 +3,16 @@ import 'package:entebbe_dramp_web/src/views/app_router/scaffold_with_sidebar.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../admin_panel/dashboard.dart';
 import '../admin_panel/enforcement/enforcementdashboard.dart';
 import '../admin_panel/finance/financedashboard.dart';
 import '../admin_panel/mobility/mobility.dart';
 import '../admin_panel/revenuesectors/revenuesectors.dart';
+import '../admin_panel/revenuestreams/accommodation/addindividualrensportrevenuestream.dart';
+import '../admin_panel/revenuestreams/accommodation/addnonindividualtransportrevenuestream.dart';
+import '../admin_panel/revenuestreams/fisheries/addindividualfishrevenuestream.dart';
+import '../admin_panel/revenuestreams/fisheries/addnonindividualfishrevenuestream.dart';
 import '../admin_panel/revenuestreams/revenuestreams.dart';
 import '../admin_panel/revenuestreams/transport/addnonindividualrevenuestream.dart';
 import '../admin_panel/revenuestreams/transport/test.dart';
@@ -15,10 +20,33 @@ import '../admin_panel/revenuesubtype/revenuesubtypes.dart';
 import '../admin_panel/settings/settings.dart';
 import '../auth/signin.dart';
 
+String? userId;
+
+void checkLoggedin() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  userId = prefs.getString("userid")!;
+  debugPrint("+=+=+=+=+=+=+=+ $userId");
+}
+
 final goRouterProvider = Provider<GoRouter>((ref) {
+  checkLoggedin();
   return GoRouter(
     initialLocation: '/sign-in',
+    // initialLocation: (userId != "") ? '/' : '/sign-in',
+
     routes: [
+      GoRoute(
+          name: 'signin',
+          path: '/sign-in',
+          pageBuilder: (context, state) {
+            return const MaterialPage(child: SignInPage());
+          }),
+      GoRoute(
+          name: 'signup',
+          path: '/sign-up',
+          pageBuilder: (context, state) {
+            return const MaterialPage(child: SignInPage());
+          }),
       StatefulShellRoute.indexedStack(
           builder: (BuildContext context, GoRouterState state,
               StatefulNavigationShell navigationShell) {
@@ -91,22 +119,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   }),
             ]),
             StatefulShellBranch(routes: [
-              GoRoute(
-                  name: 'signin',
-                  path: '/sign-in',
-                  pageBuilder: (context, state) {
-                    return const MaterialPage(child: SignInPage());
-                  }),
-            ]),
-            StatefulShellBranch(routes: [
-              GoRoute(
-                  name: 'signup',
-                  path: '/sign-up',
-                  pageBuilder: (context, state) {
-                    return const MaterialPage(child: SignInPage());
-                  }),
-            ]),
-            StatefulShellBranch(routes: [
               // ADD DUMMY LINK BEFORE PARAMETERIZED LINK,
               GoRoute(
                 name: 'test',
@@ -142,6 +154,97 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path:
                     '/addstream-nit/:ownerType/:category/:categoryId/:sector/:sectorId',
                 builder: (context, state) => AddNonIndividualRevenueStreamPage(
+                  category: "${state.pathParameters['category']}",
+                  ownerType: "${state.pathParameters['ownerType']}",
+                  categoryId: "${state.pathParameters['categoryId']}",
+                  sector: "${state.pathParameters['sector']}",
+                  sectorId: "${state.pathParameters['sectorId']}",
+                ),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              // ADD DUMMY LINK BEFORE PARAMETERIZED LINK,
+              GoRoute(
+                name: 'test3',
+                path: '/test3',
+                builder: (context, state) => TestPage(
+                  testVar: "yes",
+                ),
+              ),
+              GoRoute(
+                name: 'addindividualstreamhospitality',
+                path:
+                    '/addstream-ih/:ownerType/:category/:categoryId/:sector/:sectorId',
+                builder: (context, state) =>
+                    AddIndividualHospitalityRevenueStreamPage(
+                  category: "${state.pathParameters['category']}",
+                  ownerType: "${state.pathParameters['ownerType']}",
+                  categoryId: "${state.pathParameters['categoryId']}",
+                  sector: "${state.pathParameters['sector']}",
+                  sectorId: "${state.pathParameters['sectorId']}",
+                ),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              // ADD DUMMY LINK BEFORE PARAMETERIZED LINK,
+              GoRoute(
+                name: 'test4',
+                path: '/test4',
+                builder: (context, state) => TestPage(
+                  testVar: "no",
+                ),
+              ),
+              GoRoute(
+                name: 'addnonindividualstreamhospitality',
+                path:
+                    '/addstream-nih/:ownerType/:category/:categoryId/:sector/:sectorId',
+                builder: (context, state) =>
+                    AddNonIndividualHospitalityRevenueStreamPage(
+                  category: "${state.pathParameters['category']}",
+                  ownerType: "${state.pathParameters['ownerType']}",
+                  categoryId: "${state.pathParameters['categoryId']}",
+                  sector: "${state.pathParameters['sector']}",
+                  sectorId: "${state.pathParameters['sectorId']}",
+                ),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              // ADD DUMMY LINK BEFORE PARAMETERIZED LINK,
+              GoRoute(
+                name: 'test5',
+                path: '/test5',
+                builder: (context, state) => TestPage(
+                  testVar: "yes",
+                ),
+              ),
+              GoRoute(
+                name: 'addindividualstreamfisheries',
+                path:
+                    '/addstream-if/:ownerType/:category/:categoryId/:sector/:sectorId',
+                builder: (context, state) => AddIndividualFishRevenueStreamPage(
+                  category: "${state.pathParameters['category']}",
+                  ownerType: "${state.pathParameters['ownerType']}",
+                  categoryId: "${state.pathParameters['categoryId']}",
+                  sector: "${state.pathParameters['sector']}",
+                  sectorId: "${state.pathParameters['sectorId']}",
+                ),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              // ADD DUMMY LINK BEFORE PARAMETERIZED LINK,
+              GoRoute(
+                name: 'test6',
+                path: '/test6',
+                builder: (context, state) => TestPage(
+                  testVar: "no",
+                ),
+              ),
+              GoRoute(
+                name: 'addnonindividualstreamfisheries',
+                path:
+                    '/addstream-nif/:ownerType/:category/:categoryId/:sector/:sectorId',
+                builder: (context, state) =>
+                    AddNonIndividualFishRevenueStreamPage(
                   category: "${state.pathParameters['category']}",
                   ownerType: "${state.pathParameters['ownerType']}",
                   categoryId: "${state.pathParameters['categoryId']}",

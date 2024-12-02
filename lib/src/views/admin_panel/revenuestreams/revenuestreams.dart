@@ -35,6 +35,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   var dateFormat = DateFormat("dd/MM/yyyy HH:mm");
   int rows = 10;
   Duration? executionTime;
+  List<int> rowCountList = [10, 20, 30, 40, 50, 100];
   List<RevenueStreams> _streams = [];
   int _currentSortColumn = 0;
   bool _isAscending = true;
@@ -944,9 +945,6 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Last ppage example uses extra API call to get the number of items in datasource
-    if (_dataSourceLoading) return const SizedBox();
-    //TO DO: FOR PRODUCTS COLUMN, SHOW "3 Proudcts" AS CLICKABLE LINK, WITH POPUP TO SHOW SUBTYPES.
     return Scaffold(
       body: PageView(
         controller: revenueStreamPageController,
@@ -1157,7 +1155,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                     ),
                     SizedBox(height: 16.0),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * .75,
+                      height: MediaQuery.of(context).size.height * .55,
                       child: Container(
                         // width: 200,
                         height: 290,
@@ -1372,6 +1370,58 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                         ),
                       ),
                     ),
+                    SizedBox(
+                      height: 80,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text("Rows per Page"),
+                          SizedBox(width: 8),
+                          SizedBox(
+                            width: 50,
+                            child: DropdownButton(
+                              underline: SizedBox(),
+                              // isExpanded: true,
+                              hint: new Text(
+                                _rowsPerPage.toString(),
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              // icon: const Icon(Icons.keyboard_arrow_down),
+                              items: rowCountList.map((item) {
+                                return DropdownMenuItem(
+                                  child: Text(
+                                    item.toString(),
+                                    style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                  value: item,
+                                );
+                              }).toList(),
+                              onChanged: (newVal) {
+                                setState(() {
+                                  _rowsPerPage = newVal ?? 10;
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Text("1 - ${_streams.length} of $_rowsPerPage"),
+                          SizedBox(width: 8),
+                          IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.arrow_back_ios, size: 14)),
+                          SizedBox(width: 8),
+                          IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.arrow_forward_ios, size: 14)),
+                        ],
+                      ),
+                    )
                   ]),
                 ),
               ),
