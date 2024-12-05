@@ -43,6 +43,9 @@ dependencies:
   google_maps_flutter_web: ^0.5.10
   excel: ^4.0.6
   ndialog: ^4.3.1
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+  flutter_local_notifications: ^18.0.1
 
 dev_dependencies:
   flutter_test:

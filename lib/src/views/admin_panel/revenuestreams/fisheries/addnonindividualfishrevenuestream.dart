@@ -1,8 +1,10 @@
 // ignore_for_file: unused_local_variable
 
 import 'dart:convert';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
@@ -89,6 +91,51 @@ class _AddNonIndividualFishRevenueStreamPageState
       makeModelController = TextEditingController(),
       colorController = TextEditingController(),
       chassisNoController = TextEditingController();
+  var dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+  double tarrifAmount = 0.0;
+  String tarrifFrequency = "";
+  int tarrifFrequencyDays = 0;
+  String lastRenewalDateStr = "2024-11-01T00:00:00.027Z";
+  String nexttRenewalDateStr = "2024-11-01T00:00:00.027Z";
+
+  void getCategoryTarrif(String sectorCategoryId) async {
+    var url = Uri.parse(
+        "${AppConstants.baseUrl}charges/categoryid/$sectorCategoryId");
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+    // debugPrint("++++++++++++++++++++ DAYS OVERDUE ++++++++++++++++++++==");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    debugPrint("++++++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      DateTime lastrenewaldate = DateTime.parse(lastRenewalDateStr);
+      DateTime nextrenewaldate = lastrenewaldate.add(Duration(days: 30));
+      setState(() {
+        tarrifAmount = items[0]["amount"];
+        tarrifFrequency = items[0]["frequency"];
+        tarrifFrequencyDays = items[0]["frequencydays"];
+        nexttRenewalDateStr = dateFormat.format(nextrenewaldate);
+        // pastSixtyDaysCount = items[0]["pastsixtydays"];
+      });
+    } else {
+      debugPrint(response.body.toString());
+    }
+  }
 
   Future<List<String>> getKlaDivisions() async {
     print("++++++++++++++++GETTING KLA DIVISIONS ++++++++++");
@@ -409,7 +456,7 @@ class _AddNonIndividualFishRevenueStreamPageState
       "assocfirstname": associateNameController.text.split(" ")[0],
       "assoclastname": associateNameController.text.split(" ")[1],
       "assocemail": associateEmailController.text,
-      "assocphone": "256775665544",
+      "assocphone": associateNumber.phoneNumber,
       "assocnin": associateNinController.text,
       "assocdesignation": associateDesignationController.text,
       "districtid": selectedOwnerDistrict == "Select District /City"
@@ -442,12 +489,12 @@ class _AddNonIndividualFishRevenueStreamPageState
       "operatorparish": selectedDriverParish,
       "operatorvillage": selectedDriverDistrict,
       "regreferenceno": "",
-      "sectorid": "",
-      "sectorsubtypeid": "",
-      "tarriffrequency": "",
-      "tarrifamount": 0,
-      "lastrenewaldate": "2024-11-21T20:10:44.027Z",
-      "nextrenewaldate": "2024-11-21T20:10:44.027Z",
+      "sectorid": widget.sectorId,
+      "sectorsubtypeid": widget.categoryId,
+      "tarriffrequency": tarrifFrequency,
+      "tarrifamount": tarrifAmount,
+      "lastrenewaldate": lastRenewalDateStr,
+      "nextrenewaldate": nexttRenewalDateStr,
       "revenueactivity": "",
       "vesseltype": "",
       "vesselstorage": "",
@@ -514,7 +561,7 @@ class _AddNonIndividualFishRevenueStreamPageState
           color: Colors.white,
           msgStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           msg:
-              "You have registered this Commercial Car with reference No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
+              "You have registered this ${widget.category} with reference No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
           title: 'Success',
           titleStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           lottieBuilder: Lottie.asset('assets/cong_example.json',
@@ -523,6 +570,7 @@ class _AddNonIndividualFishRevenueStreamPageState
           actions: [
             IconsButton(
               onPressed: () {
+                context.goNamed("revenuestreams", pathParameters: {});
                 // pushAndRemoveUntil(
                 //     HomePage(revenuestreams: widget.revenuestreams));
               },
@@ -701,67 +749,74 @@ class _AddNonIndividualFishRevenueStreamPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+      backgroundColor: Colors.purple.shade50,
+      body: Container(
+        margin: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(8.0),
+        child: Card(
+          color: Colors.white,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "Register ${widget.ownerType} ${widget.category}",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Register ${widget.ownerType} ${widget.category}",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * .65,
+                  height: MediaQuery.of(context).size.height * .67,
+                  child: PageView(
+                    controller: addRevenueStreamPageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    allowImplicitScrolling: false,
+                    children: [
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _step1(),
+                          ],
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _step2(),
+                          ],
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _step3(),
+                          ],
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _step4(),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                _stepper(),
               ],
             ),
-            SizedBox(
-              height: 8,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * .65,
-              height: MediaQuery.of(context).size.height * .63,
-              child: PageView(
-                controller: addRevenueStreamPageController,
-                physics: const NeverScrollableScrollPhysics(),
-                allowImplicitScrolling: false,
-                children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _step1(),
-                      ],
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _step2(),
-                      ],
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _step3(),
-                      ],
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _step4(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            _stepper(),
-          ],
+          ),
         ),
       ),
     );
@@ -2632,330 +2687,10 @@ class _AddNonIndividualFishRevenueStreamPageState
           child: Column(
             children: [
               Text(
-                'Residence (Associate)',
+                '',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  'Select District',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Expanded(
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedOwnership,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
-                          });
-                        }
-                      }).toList();
-                    },
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  'Select County/Muncipality',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Expanded(
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedOwnership,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
-                          });
-                        }
-                      }).toList();
-                    },
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  'Select Subcounty/Town Council',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Expanded(
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedOwnership,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
-                          });
-                        }
-                      }).toList();
-                    },
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  'Select Parish/Ward',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Expanded(
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedOwnership,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
-                          });
-                        }
-                      }).toList();
-                    },
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  'Select Village',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Expanded(
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedOwnership,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: ownerType.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = ownerType.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedOwnership = item;
-                            debugPrint(selectedOwnership);
-                          });
-                        }
-                      }).toList();
-                    },
-                  ),
                 ),
               ),
             ],

@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable
 
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -14,13 +15,13 @@ import '../../../../../config/functions.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 
-class AddIndividualFishRevenueStreamPage extends StatefulWidget {
+class AddIndividualHospitalityRevenueStreamPage extends StatefulWidget {
   final String category;
   final String ownerType;
   final String categoryId;
   final String sector;
   final String sectorId;
-  const AddIndividualFishRevenueStreamPage({
+  const AddIndividualHospitalityRevenueStreamPage({
     super.key,
     required this.category,
     required this.ownerType,
@@ -30,19 +31,25 @@ class AddIndividualFishRevenueStreamPage extends StatefulWidget {
   });
 
   @override
-  State<AddIndividualFishRevenueStreamPage> createState() =>
-      _AddIndividualFishRevenueStreamPageState();
+  State<AddIndividualHospitalityRevenueStreamPage> createState() =>
+      _AddIndividualHospitalityRevenueStreamPageState();
 }
 
-class _AddIndividualFishRevenueStreamPageState
-    extends Base<AddIndividualFishRevenueStreamPage> {
+class _AddIndividualHospitalityRevenueStreamPageState
+    extends Base<AddIndividualHospitalityRevenueStreamPage> {
   PageController addRevenueStreamPageController = PageController();
+  var dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
   int page = 0;
   int counter = 3;
   List list = [0, 1, 2];
   String selectedOwnership = "";
   String selectedDoesOwnerOperate = "";
-  List<String> ownerType = ["Individual", "Non-Individual"];
+  List<String> ownerType = [
+    "Limited Liability Company (LLC)",
+    "Sole Proprietorship",
+    "Partnership",
+    "Corporation"
+  ];
   List<String> doesOwnerOperate = ["No", "Yes"];
   List<String> districts = [];
   List<String> counties = [];
@@ -50,6 +57,12 @@ class _AddIndividualFishRevenueStreamPageState
   List<String> parishes = [];
   List<String> villages = [];
   bool responseLoading = true;
+  bool hasRestaurant = false,
+      hasBar = false,
+      hasConference = false,
+      hasHealthClub = false,
+      hasGym = false,
+      hasPool = false;
   PhoneNumber ownerNumber = PhoneNumber(isoCode: 'UG');
   PhoneNumber driverNumber = PhoneNumber(isoCode: 'UG');
   String selectedOwnerDistrict = "",
@@ -57,30 +70,24 @@ class _AddIndividualFishRevenueStreamPageState
       selectedOwnerSubcounty = "",
       selectedOwnerParish = "",
       selectedOwnerVillage = "";
-  String selectedDriverDistrict = "",
-      selectedDriverCounty = "",
-      selectedDriverSubcounty = "",
-      selectedDriverParish = "",
-      selectedDriverVillage = "";
-  String selectedStageDistrict = "",
-      selectedStageCounty = "",
-      selectedStageSubcounty = "",
-      selectedStageParish = "",
-      selectedStageVillage = "";
+  String selectedEstablishmentDistrict = "",
+      selectedEstablishmentCounty = "",
+      selectedEstablishmentSubcounty = "",
+      selectedEstablishmentParish = "",
+      selectedEstablishmentVillage = "";
   TextEditingController ownerNinController = TextEditingController(),
       ownerPassportNumberController = TextEditingController(),
       ownerNameController = TextEditingController(),
       ownerEmailController = TextEditingController();
-  TextEditingController driverNinController = TextEditingController(),
-      driverPassportNumberController = TextEditingController(),
-      driverNameController = TextEditingController(),
-      driverEmailController = TextEditingController(),
+  TextEditingController roomCountController = TextEditingController(),
+      bedCountController = TextEditingController(),
+      femaleStaffCountController = TextEditingController(),
+      maleStaffCountController = TextEditingController(),
       stageNameController = TextEditingController(),
-      regNoController = TextEditingController(),
-      makeModelController = TextEditingController(),
-      colorController = TextEditingController(),
-      chassisNoController = TextEditingController();
-  var dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+      facilityNameController = TextEditingController(),
+      businessNameController = TextEditingController(),
+      brnController = TextEditingController(),
+      tinController = TextEditingController();
   double tarrifAmount = 0.0;
   String tarrifFrequency = "";
   int tarrifFrequencyDays = 0;
@@ -438,6 +445,20 @@ class _AddIndividualFishRevenueStreamPageState
     );
   }
 
+  populateOperatorFieldsFromOwner() {
+    setState(() {
+      // femaleStaffCountController.text = ownerNameController.text;
+      // maleStaffCountController.text = ownerEmailController.text;
+      // roomCountController.text = ownerNinController.text;
+      // bedCountController.text = ownerPassportNumberController.text;
+      // selectedEstablishmentDistrict = selectedOwnerDistrict;
+      // selectedEstablishmentCounty = selectedOwnerCounty;
+      // selectedEstablishmentSubcounty = selectedOwnerSubcounty;
+      // selectedEstablishmentParish = selectedOwnerParish;
+      // selectedEstablishmentVillage = selectedOwnerVillage;
+    });
+  }
+
   _reegisterStream() async {
     var url =
         Uri.parse("${AppConstants.baseUrl}revenuestreamsregisternewindividual");
@@ -490,22 +511,17 @@ class _AddIndividualFishRevenueStreamPageState
           : selectedOwnerParish,
       "villageid":
           selectedOwnerVillage == "Select Village" ? "" : selectedOwnerVillage,
-      "ownerridesboda": selectedDoesOwnerOperate == "Yes" ? true : false,
-      "operatorfname":
-          driverNameController.text.isNotEmpty ? driverNameController.text : "",
-      "operatorlname":
-          driverNameController.text.isNotEmpty ? driverNameController.text : "",
-      "operatornin":
-          driverNinController.text.isNotEmpty ? driverNinController.text : "",
-      "operatormobile": driverNumber.phoneNumber.toString().replaceAll("+", ""),
-      "operatoremail": driverEmailController.text.isNotEmpty
-          ? driverEmailController.text
-          : "",
-      "operatordistrict": selectedDriverDistrict,
-      "operatorcounty": selectedDriverCounty,
-      "operatorsubcounty": selectedDriverSubcounty,
-      "operatorparish": selectedDriverParish,
-      "operatorvillage": selectedDriverDistrict,
+      "ownerridesboda": false,
+      "operatorfname": "",
+      "operatorlname": "",
+      "operatornin": "",
+      "operatormobile": "",
+      "operatoremail": "",
+      "operatordistrict": "",
+      "operatorcounty": "",
+      "operatorsubcounty": "",
+      "operatorparish": "",
+      "operatorvillage": "",
       "regreferenceno": "",
       "sectorid": widget.sectorId,
       "sectorsubtypeid": widget.categoryId,
@@ -523,25 +539,38 @@ class _AddIndividualFishRevenueStreamPageState
       "dailyactivehours": 0,
       "companytype": "",
       "businesstype": "",
-      "businessname": "",
-      "tradingname": "",
-      "staffcountmale": 0,
-      "staffcountfemale": 0,
-      "bedcount": 0,
-      "roomcount": 0,
-      "establishmenttype": "",
-      "regno": regNoController.text.replaceAll(" ", ""),
-      "vin": chassisNoController.text,
-      "tin": "string",
-      "color": colorController.text.isEmpty ? "" : colorController.text,
+      // "businessname": "",
+      "businessname": businessNameController.text.isEmpty
+          ? ""
+          : businessNameController.text,
+      "tradingname": facilityNameController.text.isEmpty
+          ? ""
+          : facilityNameController.text,
+      "staffcountmale": maleStaffCountController.text,
+      "staffcountfemale": femaleStaffCountController.text,
+      "bedcount": bedCountController.text,
+      "roomcount": roomCountController.text,
+      "hasgym": hasGym,
+      "hashealthclub": hasHealthClub,
+      "haspool": hasPool,
+      "hasbar": hasBar,
+      "hasrestaurant": hasRestaurant,
+      "hasconference": hasConference,
+      "establishmenttype": selectedOwnership,
+      "regno": "",
+      "tin": tinController.text,
+      "vin": "",
+      "color": "",
       "ownerid": "",
       "operatorid": "",
       "logbookno": "",
       "permitno": "",
       "engineno": "",
       "enginehp": 0,
-      "model": makeModelController.text,
-      "divisionid": selectedDriverCounty.isEmpty ? "" : selectedDriverCounty,
+      "model": "",
+      "divisionid": selectedEstablishmentCounty.isEmpty
+          ? ""
+          : selectedEstablishmentCounty,
       "stageid":
           stageNameController.text.isEmpty ? "" : stageNameController.text,
       "address": "",
@@ -577,7 +606,7 @@ class _AddIndividualFishRevenueStreamPageState
           color: Colors.white,
           msgStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           msg:
-              "You have registered this ${widget.category} with reference No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
+              "You have registered this ${widget.category} with City Revenue Assurance ID No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
           title: 'Success',
           titleStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           lottieBuilder: Lottie.asset('assets/cong_example.json',
@@ -587,8 +616,6 @@ class _AddIndividualFishRevenueStreamPageState
             IconsButton(
               onPressed: () {
                 context.goNamed("revenuestreams", pathParameters: {});
-                // pushAndRemoveUntil(
-                //     HomePage(revenuestreams: widget.revenuestreams));
               },
               text: 'DONE',
               iconData: Icons.done,
@@ -792,7 +819,7 @@ class _AddIndividualFishRevenueStreamPageState
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * .65,
-                  height: MediaQuery.of(context).size.height * .67,
+                  height: MediaQuery.of(context).size.height * .63,
                   child: PageView(
                     controller: addRevenueStreamPageController,
                     physics: const NeverScrollableScrollPhysics(),
@@ -1030,10 +1057,6 @@ class _AddIndividualFishRevenueStreamPageState
         SizedBox(
           height: MediaQuery.of(context).size.height * .4,
           width: 30,
-          // child: VerticalDivider(
-          //   width: 2,
-          //   color: Colors.grey,
-          // ),
         ),
         Expanded(
           child: Column(
@@ -1399,7 +1422,7 @@ class _AddIndividualFishRevenueStreamPageState
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'Vehicle Information',
+                'Establishment Information',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -1407,7 +1430,7 @@ class _AddIndividualFishRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Reg No/Number Plate',
+                  'Establishment Trading Name',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -1416,7 +1439,7 @@ class _AddIndividualFishRevenueStreamPageState
                 subtitle: Container(
                   height: 37,
                   child: TextFormField(
-                    controller: regNoController,
+                    controller: facilityNameController,
                     enabled: true,
                     decoration: const InputDecoration(
                       disabledBorder: OutlineInputBorder(
@@ -1428,14 +1451,14 @@ class _AddIndividualFishRevenueStreamPageState
                             BorderSide(color: Color(0xffB9B9B9), width: 1.0),
                         borderRadius: BorderRadius.all(Radius.circular(4)),
                       ),
-                      hintText: 'e.g UAA 001A',
+                      hintText: 'e.g Victoria Hotel',
                     ),
                   ),
                 ),
               ),
               ListTile(
                 title: Text(
-                  'Make-Model',
+                  'Establishment Registered Name',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -1444,7 +1467,7 @@ class _AddIndividualFishRevenueStreamPageState
                 subtitle: Container(
                   height: 37,
                   child: TextFormField(
-                    controller: makeModelController,
+                    controller: businessNameController,
                     enabled: true,
                     decoration: const InputDecoration(
                       disabledBorder: OutlineInputBorder(
@@ -1456,14 +1479,14 @@ class _AddIndividualFishRevenueStreamPageState
                             BorderSide(color: Color(0xffB9B9B9), width: 1.0),
                         borderRadius: BorderRadius.all(Radius.circular(4)),
                       ),
-                      hintText: 'e.g Toyota Hiace',
+                      hintText: 'e.g Victoria Hotel Limted',
                     ),
                   ),
                 ),
               ),
               ListTile(
                 title: Text(
-                  'Color',
+                  'Business Registration Number (BRN)',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -1472,35 +1495,7 @@ class _AddIndividualFishRevenueStreamPageState
                 subtitle: Container(
                   height: 37,
                   child: TextFormField(
-                    controller: colorController,
-                    enabled: true,
-                    decoration: const InputDecoration(
-                      disabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: 'e.g White',
-                    ),
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  'Chassis Number',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                subtitle: Container(
-                  height: 37,
-                  child: TextFormField(
-                    controller: chassisNoController,
+                    controller: brnController,
                     enabled: true,
                     decoration: const InputDecoration(
                       disabledBorder: OutlineInputBorder(
@@ -1519,7 +1514,35 @@ class _AddIndividualFishRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Does owner operate vehicle?',
+                  'Tax Identifcation Number (TIN)',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                subtitle: Container(
+                  height: 37,
+                  child: TextFormField(
+                    controller: tinController,
+                    enabled: true,
+                    decoration: const InputDecoration(
+                      disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      hintText: '',
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                title: Text(
+                  'Establishment Type',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -1546,7 +1569,7 @@ class _AddIndividualFishRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedDoesOwnerOperate,
+                          selectedOwnership,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -1555,7 +1578,7 @@ class _AddIndividualFishRevenueStreamPageState
                       ],
                     ),
                     icon: const Icon(Icons.keyboard_arrow_down),
-                    items: doesOwnerOperate.map((item) {
+                    items: ownerType.map((item) {
                       return DropdownMenuItem(
                         child: Row(
                           children: [
@@ -1572,11 +1595,11 @@ class _AddIndividualFishRevenueStreamPageState
                       );
                     }).toList(),
                     onChanged: (newVal) {
-                      List itemsList = doesOwnerOperate.map((item) {
+                      List itemsList = ownerType.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedDoesOwnerOperate = item;
-                            debugPrint(selectedDoesOwnerOperate);
+                            selectedOwnership = item;
+                            debugPrint(selectedOwnership);
                           });
                         }
                       }).toList();
@@ -1590,17 +1613,13 @@ class _AddIndividualFishRevenueStreamPageState
         SizedBox(
           height: MediaQuery.of(context).size.height * .4,
           width: 30,
-          // child: VerticalDivider(
-          //   width: 2,
-          //   color: Colors.grey,
-          // ),
         ),
         Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'Personal Information (Driver)',
+                'Establishment Information (cont\'d)',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -1608,7 +1627,7 @@ class _AddIndividualFishRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'NIN',
+                  'No. of Rooms',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1617,7 +1636,8 @@ class _AddIndividualFishRevenueStreamPageState
                 subtitle: Container(
                   height: 37,
                   child: TextFormField(
-                    controller: driverNinController,
+                    keyboardType: TextInputType.number,
+                    controller: roomCountController,
                     enabled: true,
                     decoration: const InputDecoration(
                       disabledBorder: OutlineInputBorder(
@@ -1636,7 +1656,7 @@ class _AddIndividualFishRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Passport/Refugee Number',
+                  'No. of Beds',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1645,7 +1665,8 @@ class _AddIndividualFishRevenueStreamPageState
                 subtitle: Container(
                   height: 37,
                   child: TextFormField(
-                    controller: driverPassportNumberController,
+                    keyboardType: TextInputType.number,
+                    controller: bedCountController,
                     enabled: true,
                     decoration: const InputDecoration(
                       disabledBorder: OutlineInputBorder(
@@ -1664,7 +1685,7 @@ class _AddIndividualFishRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Full name',
+                  'No. of Female Staff',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1673,35 +1694,8 @@ class _AddIndividualFishRevenueStreamPageState
                 subtitle: Container(
                   height: 37,
                   child: TextFormField(
-                    controller: driverNameController,
-                    enabled: true,
-                    decoration: const InputDecoration(
-                      disabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: 'Firstname Lastname Others',
-                    ),
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  'Email address',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: Container(
-                  height: 37,
-                  child: TextFormField(
-                    controller: driverEmailController,
+                    keyboardType: TextInputType.number,
+                    controller: femaleStaffCountController,
                     enabled: true,
                     decoration: const InputDecoration(
                       disabledBorder: OutlineInputBorder(
@@ -1720,7 +1714,7 @@ class _AddIndividualFishRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Phone number',
+                  'No. of Male Staff',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1728,55 +1722,22 @@ class _AddIndividualFishRevenueStreamPageState
                 ),
                 subtitle: Container(
                   height: 37,
-                  child: InternationalPhoneNumberInput(
-                    onInputChanged: (PhoneNumber number) {
-                      debugPrint('On Change: ${number.phoneNumber}');
-                      driverNumber = number;
-                    },
-                    onInputValidated: (bool value) {
-                      // debugPrint('On Validate: $value');
-                    },
-                    selectorConfig: const SelectorConfig(
-                      selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    controller: maleStaffCountController,
+                    enabled: true,
+                    decoration: const InputDecoration(
+                      disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                      ),
+                      hintText: '',
                     ),
-                    // focusNode: _phoneNumberFocus,
-                    ignoreBlank: false,
-                    // autoValidateMode: AutovalidateMode.disabled,
-                    hintText: 'e.g 771000111',
-                    selectorTextStyle: const TextStyle(color: Colors.black),
-                    initialValue: driverNumber,
-                    cursorColor: AppConstants.primaryColor,
-                    maxLength: 10,
-                    // maxLength: _phoneNumber!.contains("+256") ? 9 : 12,
-                    onFieldSubmitted: (val) {
-                      // _fieldFocusChange(context, _phoneNumberFocus, _emailFocus);
-                    },
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter the driver\'s Phone Number.';
-                      }
-                      // if (_phoneNumber!.contains("+256") ||
-                      //     value.length < 9 ||
-                      //     value.length > 9) {
-                      //   debugPrint("UGANDA NUMBER");
-                      //   return 'Please enter a valid Phone Number';
-                      // } else
-                      if (value.length < 9 || value.length > 12) {
-                        return 'Please enter a valid Phone Number';
-                      }
-                      return null;
-                    },
-                    formatInput: false,
-                    keyboardType: const TextInputType.numberWithOptions(
-                        signed: true, decimal: true),
-                    inputBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                      borderRadius: BorderRadius.all(Radius.circular(4)),
-                    ),
-
-                    onSaved: (PhoneNumber number) {
-                      debugPrint('On Saved: $number');
-                    },
                   ),
                 ),
               ),
@@ -1794,349 +1755,129 @@ class _AddIndividualFishRevenueStreamPageState
           child: Column(
             children: [
               Text(
-                'Residence (Driver)',
+                'Establishment Facilities',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               ListTile(
-                title: Text(
-                  'Select District',
+                leading: Text(
+                  'Has Restaurant?',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Container(
-                  height: 37,
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedDriverDistrict,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: districts.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = districts.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedDriverDistrict = item;
-                            debugPrint(selectedDriverDistrict);
-                          });
-                        }
-                      }).toList();
-                      getCounties(selectedDriverDistrict);
-                    },
-                  ),
+                trailing: CupertinoSwitch(
+                  value: hasRestaurant,
+                  onChanged: (value) {
+                    setState(() {
+                      hasRestaurant = value;
+                    });
+                  },
+                  trackColor: Colors.red,
+                  activeColor: Colors.green,
                 ),
               ),
+              SizedBox(height: 8),
               ListTile(
-                title: Text(
-                  'Select County/Muncipality',
+                leading: Text(
+                  'Has Bar?',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Container(
-                  height: 37,
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedDriverCounty,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: counties.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = counties.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedDriverCounty = item;
-                            debugPrint(selectedDriverCounty);
-                          });
-                        }
-                      }).toList();
-                      getSubcounties(selectedDriverCounty);
-                    },
-                  ),
+                trailing: CupertinoSwitch(
+                  value: hasBar,
+                  onChanged: (value) {
+                    setState(() {
+                      hasBar = value;
+                    });
+                  },
+                  trackColor: Colors.red,
+                  activeColor: Colors.green,
                 ),
               ),
+              SizedBox(height: 8),
               ListTile(
-                title: Text(
-                  'Select Subcounty/Town Council',
+                leading: Text(
+                  'Has Conference Rooms?',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Container(
-                  height: 37,
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedDriverSubcounty,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: subcounties.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = subcounties.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedDriverSubcounty = item;
-                            debugPrint(selectedDriverSubcounty);
-                          });
-                        }
-                      }).toList();
-                      getParishes(selectedDriverSubcounty);
-                    },
-                  ),
+                trailing: CupertinoSwitch(
+                  value: hasConference,
+                  onChanged: (value) {
+                    setState(() {
+                      hasConference = value;
+                    });
+                  },
+                  trackColor: Colors.red,
+                  activeColor: Colors.green,
                 ),
               ),
+              SizedBox(height: 8),
               ListTile(
-                title: Text(
-                  'Select Parish/Ward',
+                leading: Text(
+                  'Has Gym?',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Container(
-                  height: 37,
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedDriverParish,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: parishes.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = parishes.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedDriverParish = item;
-                            debugPrint(selectedDriverParish);
-                          });
-                        }
-                      }).toList();
-                      getVillages(selectedDriverParish);
-                    },
-                  ),
+                trailing: CupertinoSwitch(
+                  value: hasGym,
+                  onChanged: (value) {
+                    setState(() {
+                      hasGym = value;
+                    });
+                  },
+                  trackColor: Colors.red,
+                  activeColor: Colors.green,
                 ),
               ),
+              SizedBox(height: 8),
               ListTile(
-                title: Text(
-                  'Select Village',
+                leading: Text(
+                  'Has Health Club?',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: Container(
-                  height: 37,
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                      hintText: '',
-                    ),
-                    isExpanded: true,
-                    hint: Row(
-                      children: [
-                        new Text(
-                          selectedDriverVillage,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: villages.map((item) {
-                      return DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            new Text(
-                              item,
-                              style: const TextStyle(
-                                  // color: Colors.grey,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        value: item,
-                      );
-                    }).toList(),
-                    onChanged: (newVal) {
-                      List itemsList = villages.map((item) {
-                        if (item == newVal) {
-                          setState(() {
-                            selectedDriverVillage = item;
-                            debugPrint(selectedDriverVillage);
-                          });
-                        }
-                      }).toList();
-                    },
+                trailing: CupertinoSwitch(
+                  value: hasHealthClub,
+                  onChanged: (value) {
+                    setState(() {
+                      hasHealthClub = value;
+                    });
+                  },
+                  trackColor: Colors.red,
+                  activeColor: Colors.green,
+                ),
+              ),
+              SizedBox(height: 8),
+              ListTile(
+                leading: Text(
+                  'Has Pool?',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
+                ),
+                trailing: CupertinoSwitch(
+                  value: hasPool,
+                  onChanged: (value) {
+                    setState(() {
+                      hasPool = value;
+                    });
+                  },
+                  trackColor: Colors.red,
+                  activeColor: Colors.green,
                 ),
               ),
             ],
@@ -2150,7 +1891,7 @@ class _AddIndividualFishRevenueStreamPageState
           child: Column(
             children: [
               Text(
-                'Operational Area',
+                'Establishment Location',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -2185,7 +1926,7 @@ class _AddIndividualFishRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedStageCounty,
+                          selectedEstablishmentCounty,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -2214,8 +1955,8 @@ class _AddIndividualFishRevenueStreamPageState
                       List itemsList = counties.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedStageCounty = item;
-                            debugPrint(selectedStageCounty);
+                            selectedEstablishmentCounty = item;
+                            debugPrint(selectedEstablishmentCounty);
                           });
                         }
                       }).toList();
@@ -2252,7 +1993,7 @@ class _AddIndividualFishRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedStageSubcounty,
+                          selectedEstablishmentSubcounty,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -2281,8 +2022,8 @@ class _AddIndividualFishRevenueStreamPageState
                       List itemsList = subcounties.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedStageSubcounty = item;
-                            debugPrint(selectedStageSubcounty);
+                            selectedEstablishmentSubcounty = item;
+                            debugPrint(selectedEstablishmentSubcounty);
                           });
                         }
                       }).toList();
@@ -2319,7 +2060,7 @@ class _AddIndividualFishRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedStageParish,
+                          selectedEstablishmentParish,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -2348,8 +2089,8 @@ class _AddIndividualFishRevenueStreamPageState
                       List itemsList = parishes.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedStageParish = item;
-                            debugPrint(selectedStageParish);
+                            selectedEstablishmentParish = item;
+                            debugPrint(selectedEstablishmentParish);
                           });
                         }
                       }).toList();
@@ -2386,7 +2127,7 @@ class _AddIndividualFishRevenueStreamPageState
                     hint: Row(
                       children: [
                         new Text(
-                          selectedStageVillage,
+                          selectedEstablishmentVillage,
                           style: const TextStyle(
                               // color: Colors.grey,
                               fontSize: 18,
@@ -2415,8 +2156,8 @@ class _AddIndividualFishRevenueStreamPageState
                       List itemsList = villages.map((item) {
                         if (item == newVal) {
                           setState(() {
-                            selectedStageVillage = item;
-                            debugPrint(selectedStageVillage);
+                            selectedEstablishmentVillage = item;
+                            debugPrint(selectedEstablishmentVillage);
                           });
                         }
                       }).toList();
@@ -2426,7 +2167,7 @@ class _AddIndividualFishRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Stage Name',
+                  'Maps Address',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,

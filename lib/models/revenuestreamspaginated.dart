@@ -240,7 +240,7 @@ class RevenueStreams {
         "hashealthclub": hashealthclub,
         "haspool": haspool,
         "hasbar": hasbar,
-        "hasresataurant": hasrestaurant,
+        "hasrestaurant": hasrestaurant,
         "hasconference": hasconference,
         "establishmenttype": establishmenttype,
         "regno": regno,

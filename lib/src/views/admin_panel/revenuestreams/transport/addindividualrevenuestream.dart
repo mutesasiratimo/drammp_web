@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable
 
 import 'dart:convert';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -12,8 +13,6 @@ import '../../../../../config/constants.dart';
 import '../../../../../config/functions.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
-
-import '../../home_page.dart';
 
 class AddIndividualRevenueStreamPage extends StatefulWidget {
   final String category;
@@ -85,6 +84,50 @@ class _AddIndividualRevenueStreamPageState
       colorController = TextEditingController(),
       chassisNoController = TextEditingController();
   String cat = "";
+  double tarrifAmount = 0.0;
+  String tarrifFrequency = "";
+  int tarrifFrequencyDays = 0;
+  String lastRenewalDateStr = "2024-11-01T00:00:00.027Z";
+  String nexttRenewalDateStr = "2024-11-01T00:00:00.027Z";
+
+  void getCategoryTarrif(String sectorCategoryId) async {
+    var url = Uri.parse(
+        "${AppConstants.baseUrl}charges/categoryid/$sectorCategoryId");
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+    // debugPrint("++++++++++++++++++++ DAYS OVERDUE ++++++++++++++++++++==");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    debugPrint("++++++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      DateTime lastrenewaldate = DateTime.parse(lastRenewalDateStr);
+      DateTime nextrenewaldate = lastrenewaldate.add(Duration(days: 30));
+      setState(() {
+        tarrifAmount = items[0]["amount"];
+        tarrifFrequency = items[0]["frequency"];
+        tarrifFrequencyDays = items[0]["frequencydays"];
+        nexttRenewalDateStr = dateFormat.format(nextrenewaldate);
+        // pastSixtyDaysCount = items[0]["pastsixtydays"];
+      });
+    } else {
+      debugPrint(response.body.toString());
+    }
+  }
 
   Future<List<String>> getKlaDivisions() async {
     print("++++++++++++++++GETTING KLA DIVISIONS ++++++++++");
@@ -485,10 +528,10 @@ class _AddIndividualRevenueStreamPageState
       "regreferenceno": "",
       "sectorid": widget.sectorId,
       "sectorsubtypeid": widget.categoryId,
-      "tarriffrequency": "",
-      "tarrifamount": 0.0,
-      "lastrenewaldate": dateFormat.format(DateTime.now()),
-      "nextrenewaldate": dateFormat.format(DateTime.now()),
+      "tarriffrequency": tarrifFrequency,
+      "tarrifamount": tarrifAmount,
+      "lastrenewaldate": lastRenewalDateStr,
+      "nextrenewaldate": nexttRenewalDateStr,
       "revenueactivity": "",
       "vesseltype": "",
       "vesselstorage": "",
@@ -514,7 +557,7 @@ class _AddIndividualRevenueStreamPageState
       "hashealthclub": false,
       "haspool": false,
       "hasbar": false,
-      "hasresataurant": false,
+      "hasrestaurant": false,
       "hasconference": false,
       "establishmenttype": "",
       "regno": regNoController.text.replaceAll(" ", ""),
@@ -573,7 +616,8 @@ class _AddIndividualRevenueStreamPageState
           actions: [
             IconsButton(
               onPressed: () {
-                pushAndRemoveUntil(HomePage());
+                context.goNamed("revenuestreams", pathParameters: {});
+                // pushAndRemoveUntil(HomePage());
               },
               text: 'DONE',
               iconData: Icons.done,
@@ -747,8 +791,10 @@ class _AddIndividualRevenueStreamPageState
     setState(() {
       cat = widget.category;
     });
+
     debugPrint(widget.sector + "===");
     debugPrint(cat + "++++");
+    getCategoryTarrif(widget.categoryId);
     getDistricts();
   }
 

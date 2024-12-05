@@ -13,8 +13,8 @@ import '../../../../config/constants.dart';
 import '../../../../config/functions.dart';
 import '/models/revenuesectorcategoriesfiltered.dart';
 import '/models/revenuestreamspaginated.dart';
-import 'accommodation/addindividualrensportrevenuestream.dart';
-import 'accommodation/addnonindividualtransportrevenuestream.dart';
+import 'accommodation/addindividualrensporthospitalityrevenuestream.dart';
+import 'accommodation/addnonindividualhospitalityrevenuestream.dart';
 import 'data_sources.dart';
 import '/models/revenuesector.dart';
 import 'package:http/http.dart' as http;
@@ -627,14 +627,36 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
               'sectorId': selectedSectorIdNew,
             })
           : sectorName == "Hospitality"
-              ? revenueStreamPageController.jumpToPage(3)
-              : sectorName == "Fisheries"
-                  ? revenueStreamPageController.jumpToPage(5)
-                  : revenueStreamPageController.jumpToPage(1);
+              ? context
+                  .goNamed("addindividualstreamhospitality", pathParameters: {
+                  'ownerType': selectedOwnership,
+                  'category': selectedCategoryNew,
+                  'categoryId': selectedCategoryIdNew,
+                  'sector': selectedSectorNew,
+                  'sectorId': selectedSectorIdNew,
+                })
+              : sectorName == "Property"
+                  ? context
+                      .goNamed("addindividualstreamproperty", pathParameters: {
+                      'ownerType': selectedOwnership,
+                      'category': selectedCategoryNew,
+                      'categoryId': selectedCategoryIdNew,
+                      'sector': selectedSectorNew,
+                      'sectorId': selectedSectorIdNew,
+                    })
+                  : sectorName == "Fisheries"
+                      ? context.goNamed("addindividualstreamfisheries",
+                          pathParameters: {
+                              'ownerType': selectedOwnership,
+                              'category': selectedCategoryNew,
+                              'categoryId': selectedCategoryIdNew,
+                              'sector': selectedSectorNew,
+                              'sectorId': selectedSectorIdNew,
+                            })
+                      : context.goNamed("revenuestreams");
 
       // Navigator.of(context).pop();
     } else if (ownerTypef == "Non-Individual") {
-      //
       sectorName == "Transport"
           ? context.goNamed("addnonindividualstreamtransport", pathParameters: {
               'ownerType': selectedOwnership,
@@ -644,10 +666,33 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
               'sectorId': selectedSectorIdNew,
             })
           : sectorName == "Hospitality"
-              ? revenueStreamPageController.jumpToPage(4)
-              : sectorName == "Fisheries"
-                  ? revenueStreamPageController.jumpToPage(6)
-                  : revenueStreamPageController.jumpToPage(2);
+              ? context.goNamed("addnonindividualstreamhospitality",
+                  pathParameters: {
+                      'ownerType': selectedOwnership,
+                      'category': selectedCategoryNew,
+                      'categoryId': selectedCategoryIdNew,
+                      'sector': selectedSectorNew,
+                      'sectorId': selectedSectorIdNew,
+                    })
+              : sectorName == "Property"
+                  ? context.goNamed("addnonindividualstreamproperty",
+                      pathParameters: {
+                          'ownerType': selectedOwnership,
+                          'category': selectedCategoryNew,
+                          'categoryId': selectedCategoryIdNew,
+                          'sector': selectedSectorNew,
+                          'sectorId': selectedSectorIdNew,
+                        })
+                  : sectorName == "Fisheries"
+                      ? context.goNamed("addnonindividualstreamfisheries",
+                          pathParameters: {
+                              'ownerType': selectedOwnership,
+                              'category': selectedCategoryNew,
+                              'categoryId': selectedCategoryIdNew,
+                              'sector': selectedSectorNew,
+                              'sectorId': selectedSectorIdNew,
+                            })
+                      : context.goNamed("revenuestreams");
 
       // Navigator.of(context).pop();
     } else {

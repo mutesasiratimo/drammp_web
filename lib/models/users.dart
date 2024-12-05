@@ -1,32 +1,38 @@
 // To parse this JSON data, do
 //
-//     final welcome = welcomeFromJson(jsonString);
+//     final usersPaginatedModel = usersPaginatedModelFromJson(jsonString);
 
 import 'dart:convert';
 
-Users welcomeFromJson(String str) => Users.fromJson(json.decode(str));
+UsersPaginatedModel usersPaginatedModelFromJson(String str) =>
+    UsersPaginatedModel.fromJson(json.decode(str));
 
-String welcomeToJson(Users data) => json.encode(data.toJson());
+String usersPaginatedModelToJson(UsersPaginatedModel data) =>
+    json.encode(data.toJson());
 
-class Users {
-  Users({
+class UsersPaginatedModel {
+  List<UserItems> items;
+  int total;
+  int page;
+  int size;
+  int pages;
+
+  UsersPaginatedModel({
     required this.items,
     required this.total,
     required this.page,
     required this.size,
+    required this.pages,
   });
 
-  List<UserItem> items;
-  int total;
-  int page;
-  int size;
-
-  factory Users.fromJson(Map<String, dynamic> json) => Users(
-        items:
-            List<UserItem>.from(json["items"].map((x) => UserItem.fromJson(x))),
+  factory UsersPaginatedModel.fromJson(Map<String, dynamic> json) =>
+      UsersPaginatedModel(
+        items: List<UserItems>.from(
+            json["items"].map((x) => UserItems.fromJson(x))),
         total: json["total"],
         page: json["page"],
         size: json["size"],
+        pages: json["pages"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -34,12 +40,48 @@ class Users {
         "total": total,
         "page": page,
         "size": size,
+        "pages": pages,
       };
 }
 
-class UserItem {
-  UserItem({
+class UserItems {
+  String id;
+  String? fcmid;
+  String title;
+  String firstname;
+  String lastname;
+  String? othernames;
+  String phone;
+  String? mobile;
+  String email;
+  String password;
+  String? photo;
+  String? villageid;
+  String? parishid;
+  String? subcountyid;
+  String? countyid;
+  String? districtid;
+  String? nationality;
+  dynamic tin;
+  String? nin;
+  String? passportno;
+  dynamic revenuesource;
+  String gender;
+  dynamic isoperator;
+  bool? isclerk;
+  bool? isenforcer;
+  bool? isadmin;
+  bool? issuperadmin;
+  DateTime? dateofbirth;
+  DateTime datecreated;
+  String? createdby;
+  DateTime? dateupdated;
+  String? updatedby;
+  String status;
+
+  UserItems({
     required this.id,
+    required this.fcmid,
     required this.title,
     required this.firstname,
     required this.lastname,
@@ -49,65 +91,33 @@ class UserItem {
     required this.email,
     required this.password,
     required this.photo,
-    this.villageid,
-    this.parishid,
-    this.subcountyid,
-    this.countyid,
-    this.districtid,
-    this.nationality,
-    this.tin,
-    this.nin,
-    this.passportno,
-    this.revenuesource,
+    required this.villageid,
+    required this.parishid,
+    required this.subcountyid,
+    required this.countyid,
+    required this.districtid,
+    required this.nationality,
+    required this.tin,
+    required this.nin,
+    required this.passportno,
+    required this.revenuesource,
     required this.gender,
-    this.isowner,
-    this.isoperator,
+    required this.isoperator,
     required this.isclerk,
+    required this.isenforcer,
     required this.isadmin,
     required this.issuperadmin,
     required this.dateofbirth,
     required this.datecreated,
-    this.createdby,
+    required this.createdby,
     required this.dateupdated,
     required this.updatedby,
     required this.status,
   });
 
-  String id;
-  String title;
-  String firstname;
-  String lastname;
-  dynamic othernames;
-  String phone;
-  String mobile;
-  String email;
-  String password;
-  String photo;
-  dynamic villageid;
-  dynamic parishid;
-  dynamic subcountyid;
-  dynamic countyid;
-  dynamic districtid;
-  dynamic nationality;
-  dynamic tin;
-  dynamic nin;
-  dynamic passportno;
-  dynamic revenuesource;
-  String gender;
-  dynamic isowner;
-  dynamic isoperator;
-  bool isclerk;
-  bool isadmin;
-  bool issuperadmin;
-  DateTime dateofbirth;
-  DateTime datecreated;
-  dynamic createdby;
-  dynamic dateupdated;
-  dynamic updatedby;
-  String status;
-
-  factory UserItem.fromJson(Map<String, dynamic> json) => UserItem(
+  factory UserItems.fromJson(Map<String, dynamic> json) => UserItems(
         id: json["id"],
+        fcmid: json["fcmid"],
         title: json["title"],
         firstname: json["firstname"],
         lastname: json["lastname"],
@@ -128,23 +138,26 @@ class UserItem {
         passportno: json["passportno"],
         revenuesource: json["revenuesource"],
         gender: json["gender"],
-        isowner: json["isowner"],
         isoperator: json["isoperator"],
         isclerk: json["isclerk"],
+        isenforcer: json["isenforcer"],
         isadmin: json["isadmin"],
         issuperadmin: json["issuperadmin"],
-        dateofbirth: DateTime.parse(json["dateofbirth"]),
+        dateofbirth: json["dateofbirth"] == null
+            ? null
+            : DateTime.parse(json["dateofbirth"]),
         datecreated: DateTime.parse(json["datecreated"]),
         createdby: json["createdby"],
         dateupdated: json["dateupdated"] == null
             ? null
             : DateTime.parse(json["dateupdated"]),
-        updatedby: json["updatedby"] ?? null,
+        updatedby: json["updatedby"],
         status: json["status"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
+        "fcmid": fcmid,
         "title": title,
         "firstname": firstname,
         "lastname": lastname,
@@ -165,17 +178,16 @@ class UserItem {
         "passportno": passportno,
         "revenuesource": revenuesource,
         "gender": gender,
-        "isowner": isowner,
         "isoperator": isoperator,
         "isclerk": isclerk,
+        "isenforcer": isenforcer,
         "isadmin": isadmin,
         "issuperadmin": issuperadmin,
-        "dateofbirth": dateofbirth.toIso8601String(),
+        "dateofbirth": dateofbirth?.toIso8601String(),
         "datecreated": datecreated.toIso8601String(),
         "createdby": createdby,
-        "dateupdated":
-            dateupdated == null ? null : dateupdated.toIso8601String(),
-        "updatedby": updatedby == null ? null : updatedby,
+        "dateupdated": dateupdated?.toIso8601String(),
+        "updatedby": updatedby,
         "status": status,
       };
 }

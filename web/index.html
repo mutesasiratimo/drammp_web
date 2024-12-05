@@ -1,64 +1,71 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
+    <base href="$FLUTTER_BASE_HREF" />
+    <!-- <base href="./"> -->
 
-  <base href="$FLUTTER_BASE_HREF">
-  <!-- <base href="./"> -->
+    <meta charset="UTF-8" />
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
+    <meta name="description" content="A new Flutter project." />
 
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="responsive_dashboard" />
+    <link rel="apple-touch-icon" href="icons/Icon-192.png" />
 
-  <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="responsive_dashboard">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png" />
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>Entebbe DRAMMP</title>
-  <link rel="manifest" href="manifest.json">
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV-HAZxiJPvVuwnBEL-8V6_vhtkuFAi4w"></script>
-</head>
-<body>
-  <!-- This script installs service_worker.js to provide PWA functionality to
+    <title>Entebbe DRAMMP</title>
+    <link rel="manifest" href="manifest.json" />
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV-HAZxiJPvVuwnBEL-8V6_vhtkuFAi4w"></script>
+  </head>
+  <body>
+    <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
-  
-  <script type="module">
-    // Import the functions you need from the SDKs you need
-    // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
-    // import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-analytics.js";
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
-  
-    // Your web app's Firebase configuration
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-    // const firebaseConfig = {
-    //   apiKey: "AIzaSyBpCksj7tde2A-WiKsoMJYGdOl8b2SLLDQ",
-    //   authDomain: "schools-app-a6b04.firebaseapp.com",
-    //   projectId: "schools-app-a6b04",
-    //   storageBucket: "schools-app-a6b04.appspot.com",
-    //   messagingSenderId: "1073098243312",
-    //   appId: "1:1073098243312:web:7e3badf7b4e97f52e8d635",
-    //   measurementId: "G-SJVWF1535L"
-    // };
-  
-    // Initialize Firebase
-    // const app = initializeApp(firebaseConfig);
-    // const analytics = getAnalytics(app);
-  </script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('flutter-first-frame', function () {
-        navigator.serviceWorker.register('flutter_service_worker.js?v=2372558485');
-      });
-    }
-  </script>
-  
-  <script src="main.dart.js" type="application/javascript"></script>  
-</body>
 
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+      // import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-analytics.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      // const firebaseConfig = {
+      //   apiKey: "AIzaSyBpCksj7tde2A-WiKsoMJYGdOl8b2SLLDQ",
+      //   authDomain: "schools-app-a6b04.firebaseapp.com",
+      //   projectId: "schools-app-a6b04",
+      //   storageBucket: "schools-app-a6b04.appspot.com",
+      //   messagingSenderId: "1073098243312",
+      //   appId: "1:1073098243312:web:7e3badf7b4e97f52e8d635",
+      //   measurementId: "G-SJVWF1535L"
+      // };
+
+      // Initialize Firebase
+      // const app = initializeApp(firebaseConfig);
+      // const analytics = getAnalytics(app);
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("flutter-first-frame", function () {
+          navigator.serviceWorker.register(
+            "flutter_service_worker.js?v=2372558485"
+          );
+        });
+      }
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          // navigator.serviceWorker.register("/flutter_service_worker.js");
+          navigator.serviceWorker.register("/firebase-messaging-sw.js");
+        });
+      }
+    </script>
+    <script src="main.dart.js" type="application/javascript"></script>
+  </body>
 </html>

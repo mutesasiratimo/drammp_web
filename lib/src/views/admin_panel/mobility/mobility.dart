@@ -944,7 +944,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                                             .toString() ==
                                                                         "1"
                                                                     ? "Complete"
-                                                                    : "Complete/Unpaid",
+                                                                    : "Unpaid",
                                                             style: const TextStyle(
                                                                 fontWeight:
                                                                     FontWeight

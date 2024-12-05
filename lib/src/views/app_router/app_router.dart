@@ -9,10 +9,12 @@ import '../admin_panel/enforcement/enforcementdashboard.dart';
 import '../admin_panel/finance/financedashboard.dart';
 import '../admin_panel/mobility/mobility.dart';
 import '../admin_panel/revenuesectors/revenuesectors.dart';
-import '../admin_panel/revenuestreams/accommodation/addindividualrensportrevenuestream.dart';
-import '../admin_panel/revenuestreams/accommodation/addnonindividualtransportrevenuestream.dart';
+import '../admin_panel/revenuestreams/accommodation/addindividualrensporthospitalityrevenuestream.dart';
+import '../admin_panel/revenuestreams/accommodation/addnonindividualhospitalityrevenuestream.dart';
 import '../admin_panel/revenuestreams/fisheries/addindividualfishrevenuestream.dart';
 import '../admin_panel/revenuestreams/fisheries/addnonindividualfishrevenuestream.dart';
+import '../admin_panel/revenuestreams/property/addindividualpropertyrevenuestream.dart';
+import '../admin_panel/revenuestreams/property/addnonindividualpropertyrevenuestream.dart';
 import '../admin_panel/revenuestreams/revenuestreams.dart';
 import '../admin_panel/revenuestreams/transport/addnonindividualrevenuestream.dart';
 import '../admin_panel/revenuestreams/transport/test.dart';
@@ -29,7 +31,7 @@ void checkLoggedin() async {
 }
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  checkLoggedin();
+  // checkLoggedin();
   return GoRouter(
     initialLocation: '/sign-in',
     // initialLocation: (userId != "") ? '/' : '/sign-in',
@@ -245,6 +247,52 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     '/addstream-nif/:ownerType/:category/:categoryId/:sector/:sectorId',
                 builder: (context, state) =>
                     AddNonIndividualFishRevenueStreamPage(
+                  category: "${state.pathParameters['category']}",
+                  ownerType: "${state.pathParameters['ownerType']}",
+                  categoryId: "${state.pathParameters['categoryId']}",
+                  sector: "${state.pathParameters['sector']}",
+                  sectorId: "${state.pathParameters['sectorId']}",
+                ),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              // ADD DUMMY LINK BEFORE PARAMETERIZED LINK,
+              GoRoute(
+                name: 'test7',
+                path: '/test7',
+                builder: (context, state) => TestPage(
+                  testVar: "yes",
+                ),
+              ),
+              GoRoute(
+                name: 'addindividualstreamproperty',
+                path:
+                    '/addstream-ip/:ownerType/:category/:categoryId/:sector/:sectorId',
+                builder: (context, state) =>
+                    AddIndividualPropertyRevenueStreamPage(
+                  category: "${state.pathParameters['category']}",
+                  ownerType: "${state.pathParameters['ownerType']}",
+                  categoryId: "${state.pathParameters['categoryId']}",
+                  sector: "${state.pathParameters['sector']}",
+                  sectorId: "${state.pathParameters['sectorId']}",
+                ),
+              ),
+            ]),
+            StatefulShellBranch(routes: [
+              // ADD DUMMY LINK BEFORE PARAMETERIZED LINK,
+              GoRoute(
+                name: 'test8',
+                path: '/test8',
+                builder: (context, state) => TestPage(
+                  testVar: "no",
+                ),
+              ),
+              GoRoute(
+                name: 'addnonindividualstreamproperty',
+                path:
+                    '/addstream-nip/:ownerType/:category/:categoryId/:sector/:sectorId',
+                builder: (context, state) =>
+                    AddNonIndividualPropertyRevenueStreamPage(
                   category: "${state.pathParameters['category']}",
                   ownerType: "${state.pathParameters['ownerType']}",
                   categoryId: "${state.pathParameters['categoryId']}",
