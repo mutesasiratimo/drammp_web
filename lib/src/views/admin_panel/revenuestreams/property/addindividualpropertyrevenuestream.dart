@@ -622,6 +622,7 @@ class _AddIndividualPropertyRevenueStreamPageState
             IconsButton(
               onPressed: () {
                 context.goNamed("revenuestreams", pathParameters: {});
+                Navigator.of(context).pop();
                 // pushAndRemoveUntil(HomePage());
               },
               text: 'DONE',
@@ -799,6 +800,7 @@ class _AddIndividualPropertyRevenueStreamPageState
     debugPrint(widget.sector + "===");
     debugPrint(cat + "++++");
     getDistricts();
+    getCategoryTarrif(widget.categoryId);
   }
 
   @override

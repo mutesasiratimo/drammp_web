@@ -15,7 +15,6 @@ import '/models/revenuesectorcategoriesfiltered.dart';
 import '/models/revenuestreamspaginated.dart';
 import 'accommodation/addindividualrensporthospitalityrevenuestream.dart';
 import 'accommodation/addnonindividualhospitalityrevenuestream.dart';
-import 'data_sources.dart';
 import '/models/revenuesector.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -44,7 +43,6 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   bool _sortAscending = true;
   int? _sortColumnIndex;
-  DessertDataSourceAsync? _dessertsDataSource;
   final PaginatorController _controller = PaginatorController();
   PageController revenueStreamPageController = PageController();
   String selectedSectorNew = "";
@@ -265,81 +263,10 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
     super.initState();
   }
 
-  void sort(
-    int columnIndex,
-    bool ascending,
-  ) {
-    var columnName = "Reg No";
-    switch (columnIndex) {
-      case 1:
-        columnName = "Model";
-        break;
-      case 2:
-        columnName = "Color";
-        break;
-      case 3:
-        columnName = "Reg Reference";
-        break;
-      case 4:
-        columnName = "Type";
-        break;
-      case 5:
-        columnName = "Status";
-        break;
-      case 6:
-        columnName = "";
-        break;
-    }
-    _dessertsDataSource!.sort(columnName, ascending);
-    setState(() {
-      _sortColumnIndex = columnIndex;
-      _sortAscending = ascending;
-    });
-  }
-
   @override
   void dispose() {
-    _dessertsDataSource!.dispose();
     super.dispose();
   }
-
-  List<DataColumn> get _columns {
-    return [
-      DataColumn(
-        label: const Text('Reg No'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text('Model'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text('Color'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text('Reg Reference'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text('Type'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text('Status'),
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-      DataColumn(
-        label: const Text(''),
-        // numeric: true,
-        onSort: (columnIndex, ascending) => sort(columnIndex, ascending),
-      ),
-    ];
-  }
-
-  // Use global key to avoid rebuilding state of _TitledRangeSelector
-  // upon AsyncPaginatedDataTable2 refreshes, e.g. upon page switches
-  final GlobalKey _rangeSelectorKey = GlobalKey();
 
   openSelectBoxOld() {
     return NDialog(

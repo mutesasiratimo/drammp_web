@@ -37,7 +37,7 @@ class AddIndividualRevenueStreamPage extends StatefulWidget {
 class _AddIndividualRevenueStreamPageState
     extends Base<AddIndividualRevenueStreamPage> {
   PageController addRevenueStreamPageController = PageController();
-  var dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+
   int page = 0;
   int counter = 3;
   List list = [0, 1, 2];
@@ -84,6 +84,7 @@ class _AddIndividualRevenueStreamPageState
       colorController = TextEditingController(),
       chassisNoController = TextEditingController();
   String cat = "";
+  var dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
   double tarrifAmount = 0.0;
   String tarrifFrequency = "";
   int tarrifFrequencyDays = 0;
@@ -598,7 +599,7 @@ class _AddIndividualRevenueStreamPageState
       // Automobile res = Automobile.fromJson(items);
       // _sendSmsMessage(
       //     'Your commercial car has been registered successfully with Reference No: ${items["regreferenceno"]}',
-      //     _phoneNumber!
+      //     _phoneNumber!f
       //         .replaceAll("PhoneNumber(phoneNumber: ", "")
       //         .replaceAll(", dialCode: 256, isoCode: UG)", ""));
       // ignore: use_build_context_synchronously
@@ -617,6 +618,7 @@ class _AddIndividualRevenueStreamPageState
             IconsButton(
               onPressed: () {
                 context.goNamed("revenuestreams", pathParameters: {});
+                Navigator.of(context).pop();
                 // pushAndRemoveUntil(HomePage());
               },
               text: 'DONE',

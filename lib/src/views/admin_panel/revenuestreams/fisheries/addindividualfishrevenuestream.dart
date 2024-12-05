@@ -587,6 +587,7 @@ class _AddIndividualFishRevenueStreamPageState
             IconsButton(
               onPressed: () {
                 context.goNamed("revenuestreams", pathParameters: {});
+                Navigator.of(context).pop();
                 // pushAndRemoveUntil(
                 //     HomePage(revenuestreams: widget.revenuestreams));
               },
@@ -760,6 +761,7 @@ class _AddIndividualFishRevenueStreamPageState
   void initState() {
     super.initState();
     getDistricts();
+    getCategoryTarrif(widget.categoryId);
   }
 
   @override

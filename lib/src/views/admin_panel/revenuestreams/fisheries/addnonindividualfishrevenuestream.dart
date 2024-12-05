@@ -571,6 +571,7 @@ class _AddNonIndividualFishRevenueStreamPageState
             IconsButton(
               onPressed: () {
                 context.goNamed("revenuestreams", pathParameters: {});
+                Navigator.of(context).pop();
                 // pushAndRemoveUntil(
                 //     HomePage(revenuestreams: widget.revenuestreams));
               },
@@ -744,6 +745,7 @@ class _AddNonIndividualFishRevenueStreamPageState
   void initState() {
     super.initState();
     getDistricts();
+    getCategoryTarrif(widget.categoryId);
   }
 
   @override

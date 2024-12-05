@@ -12,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../config/base.dart';
 import '../../../../../config/constants.dart';
 import '../../../../../config/functions.dart';
-import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 
 class AddIndividualHospitalityRevenueStreamPage extends StatefulWidget {
@@ -557,7 +556,9 @@ class _AddIndividualHospitalityRevenueStreamPageState
       "hasrestaurant": hasRestaurant,
       "hasconference": hasConference,
       "establishmenttype": selectedOwnership,
-      "regno": "",
+      "regno": facilityNameController.text.isEmpty
+          ? ""
+          : facilityNameController.text,
       "tin": tinController.text,
       "vin": "",
       "color": "",
@@ -594,36 +595,78 @@ class _AddIndividualHospitalityRevenueStreamPageState
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       debugPrint("++++++${items["regreferenceno"]}+++++++");
-      // Automobile res = Automobile.fromJson(items);
-      // _sendSmsMessage(
-      //     'Your commercial car has been registered successfully with Reference No: ${items["regreferenceno"]}',
-      //     _phoneNumber!
-      //         .replaceAll("PhoneNumber(phoneNumber: ", "")
-      //         .replaceAll(", dialCode: 256, isoCode: UG)", ""));
-      // ignore: use_build_context_synchronously
-      Dialogs.materialDialog(
-          dialogWidth: MediaQuery.of(context).size.width * .4,
-          color: Colors.white,
-          msgStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          msg:
-              "You have registered this ${widget.category} with City Revenue Assurance ID No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
-          title: 'Success',
-          titleStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          lottieBuilder: Lottie.asset('assets/cong_example.json',
-              fit: BoxFit.contain, repeat: true, height: 80, width: 80),
+      showDialog(
           context: context,
-          actions: [
-            IconsButton(
-              onPressed: () {
-                context.goNamed("revenuestreams", pathParameters: {});
-              },
-              text: 'DONE',
-              iconData: Icons.done,
-              color: Colors.green.shade900,
-              textStyle: TextStyle(color: Colors.white),
-              iconColor: Colors.white,
-            ),
-          ]);
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              contentPadding: EdgeInsets.only(top: 10.0),
+              content: Container(
+                width: MediaQuery.of(context).size.width * 0.6,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 180,
+                        width: 180,
+                        child: Lottie.asset('assets/cong_example.json'),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "Success",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        "You have registered this ${widget.category} with City Revenue Assurance ID No: ${items["regreferenceno"]}. \n Please note it down before proceeding!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          IconsButton(
+                            onPressed: () {
+                              context.goNamed("revenuestreams",
+                                  pathParameters: {});
+                              Navigator.of(context).pop();
+                            },
+                            text: 'DONE',
+                            iconData: Icons.done,
+                            color: Colors.green.shade900,
+                            textStyle: TextStyle(color: Colors.white),
+                            iconColor: Colors.white,
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          });
       // await showSuccessToast(
       //     "You have registered this Commercial Car with reference No: ${items["regreferenceno"]}. \n Please note it down before proceeding!");
       addRevenueStreamPageController.jumpToPage(0);
@@ -787,6 +830,7 @@ class _AddIndividualHospitalityRevenueStreamPageState
   void initState() {
     super.initState();
     getDistricts();
+    getCategoryTarrif(widget.categoryId);
   }
 
   @override

@@ -583,6 +583,7 @@ class _AddNonIndividualRevenueStreamPageState
             IconsButton(
               onPressed: () {
                 context.goNamed("revenuestreams", pathParameters: {});
+                Navigator.of(context).pop();
               },
               text: 'DONE',
               iconData: Icons.done,

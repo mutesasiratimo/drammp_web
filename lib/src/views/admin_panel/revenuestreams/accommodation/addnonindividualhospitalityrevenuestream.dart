@@ -457,7 +457,7 @@ class _AddNonIndividualHospitalityRevenueStreamPageState
     );
   }
 
-  _reegisterStream() async {
+  _registerStream() async {
     var url =
         Uri.parse("${AppConstants.baseUrl}revenuestreamsregisternewentity");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -612,6 +612,7 @@ class _AddNonIndividualHospitalityRevenueStreamPageState
             IconsButton(
               onPressed: () {
                 context.goNamed("revenuestreams", pathParameters: {});
+                Navigator.of(context).pop();
                 // pushAndRemoveUntil(
                 //     HomePage(revenuestreams: widget.revenuestreams));
               },
@@ -740,7 +741,7 @@ class _AddNonIndividualHospitalityRevenueStreamPageState
                     : page == 3
                         ? ElevatedButton(
                             onPressed: () {
-                              _reegisterStream();
+                              _registerStream();
                             },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -785,6 +786,7 @@ class _AddNonIndividualHospitalityRevenueStreamPageState
   void initState() {
     super.initState();
     getDistricts();
+    getCategoryTarrif(widget.categoryId);
   }
 
   @override
