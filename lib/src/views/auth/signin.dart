@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -24,6 +26,31 @@ class _SignInPageState extends Base<SignInPage> {
   bool responseLoading = false;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // messageListener();
+  }
+
+  void messageListener() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      if (message.notification != null) {
+        print(
+            'Message also contained a notification: ${message.notification!.body}');
+        // showDialog(
+        //     context: context,
+        //     builder: ((BuildContext context) {
+        //       return DynamicDialog(
+        //           title: message.notification!.title,
+        //           body: message.notification!.body);
+        //     }));
+      }
+    });
+  }
 
   _login(String username, String password) async {
     var url = Uri.parse(AppConstants.baseUrl + "user/login");

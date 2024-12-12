@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../main.dart';
 import '../admin_panel/dashboard.dart';
 import '../admin_panel/enforcement/enforcementdashboard.dart';
 import '../admin_panel/finance/financedashboard.dart';
@@ -23,18 +24,20 @@ import '../admin_panel/settings/settings.dart';
 import '../auth/signin.dart';
 
 String? userId;
+String defaultRoute = '/sign-in';
 
 void checkLoggedin() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  userId = prefs.getString("userid")!;
+  userId = prefs.getString("userid") ?? "";
   debugPrint("+=+=+=+=+=+=+=+ $userId");
 }
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  // checkLoggedin();
+  checkLoggedin();
   return GoRouter(
-    initialLocation: '/sign-in',
-    // initialLocation: (userId != "") ? '/' : '/sign-in',
+    navigatorKey: navigatorKey,
+    initialLocation: defaultRoute,
+    // initialLocation: (userId == "") ? '/sign-in' : '/',
 
     routes: [
       GoRoute(
