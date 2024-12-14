@@ -33,25 +33,6 @@ class _SignInPageState extends Base<SignInPage> {
     // messageListener();
   }
 
-  void messageListener() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
-
-      if (message.notification != null) {
-        print(
-            'Message also contained a notification: ${message.notification!.body}');
-        // showDialog(
-        //     context: context,
-        //     builder: ((BuildContext context) {
-        //       return DynamicDialog(
-        //           title: message.notification!.title,
-        //           body: message.notification!.body);
-        //     }));
-      }
-    });
-  }
-
   _login(String username, String password) async {
     var url = Uri.parse(AppConstants.baseUrl + "user/login");
     String _authToken = "";
@@ -70,8 +51,8 @@ class _SignInPageState extends Base<SignInPage> {
       // }
     });
     var bodyString = {"username": username, "password": password};
-    debugPrint(bodyString.toString());
-    debugPrint(url.toString());
+    // debugPrint(bodyString.toString());
+    // debugPrint(url.toString());
     var body = jsonEncode(bodyString);
 
     var response = await http.post(url,
@@ -79,8 +60,8 @@ class _SignInPageState extends Base<SignInPage> {
           "Content-Type": "Application/json",
         },
         body: body);
-    debugPrint("++++++" + response.body.toString() + "+++++++");
-    debugPrint("++++++" + response.statusCode.toString() + "+++++++");
+    // debugPrint("++++++" + response.body.toString() + "+++++++");
+    // debugPrint("++++++" + response.statusCode.toString() + "+++++++");
     if (response.statusCode == 200) {
       final item = json.decode(response.body);
       UserModel user = UserModel.fromJson(item);

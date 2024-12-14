@@ -36,8 +36,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   checkLoggedin();
   return GoRouter(
     navigatorKey: navigatorKey,
-    initialLocation: defaultRoute,
-    // initialLocation: (userId == "") ? '/sign-in' : '/',
+    // initialLocation: defaultRoute,
+    initialLocation: (userId == "") ? '/sign-in' : '/',
 
     routes: [
       GoRoute(

@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:data_table_2/data_table_2.dart';
+import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:http/http.dart' as http;
 import 'package:entebbe_dramp_web/models/users.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:intl/intl.dart';
+import 'package:ndialog/ndialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../config/constants.dart';
 import '../../../../config/functions.dart';
@@ -16,7 +18,7 @@ class UsersPage extends StatefulWidget {
   State<UsersPage> createState() => _UsersPageState();
 }
 
-class _UsersPageState extends State<UsersPage> {
+class _UsersPageState extends Base<UsersPage> {
   List<UserItems> _users = [];
   int _pageNumber = 1;
   int rowCount = 10;
@@ -264,7 +266,9 @@ class _UsersPageState extends State<UsersPage> {
                                     )),
                                     DataCell(
                                       IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          _showUserDetails(element);
+                                        },
                                         icon: Icon(
                                           Icons.more_horiz_sharp,
                                           color: AppConstants.primaryColor,
@@ -296,6 +300,419 @@ class _UsersPageState extends State<UsersPage> {
           ),
         ],
       ),
+    );
+  }
+
+// setState(() {
+//       iscitizen = widget.user.iscitizen!;
+
+//       numbers = {
+//         'Citizen': widget.user.iscitizen!,
+//         'Clerk': widget.user.isclerk!,
+//         'Engineer':
+//             widget.user.isengineer == null ? false : widget.user.isengineer!,
+//         'Admin': widget.user.isadmin!,
+//       };
+//     });
+
+  //SHOW DIALOG FOR USER DETAILS
+  _showUserDetails(UserItems user) async {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext ctxt) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "User Details",
+                style: TextStyle(
+                  fontFamily: "Montserrat",
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                  onPressed: () {
+                    // getUsers();
+                    // Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.red,
+                  ))
+            ],
+          ),
+          content:
+              StatefulBuilder(// You need this, notice the parameters below:
+                  builder: (BuildContext context, StateSetter setState) {
+            return SingleChildScrollView(
+              child: UsersDetailsPage(user: user),
+            );
+          }),
+          actions: <Widget>[],
+        );
+      },
+    );
+  }
+}
+
+class UsersDetailsPage extends StatefulWidget {
+  final UserItems user;
+  const UsersDetailsPage({Key? key, required this.user}) : super(key: key);
+
+  @override
+  State<UsersDetailsPage> createState() => _UsersDetailsPageState();
+}
+
+class _UsersDetailsPageState extends Base<UsersDetailsPage> {
+  bool isclerk = true,
+      isenforcer = false,
+      isadmin = false,
+      issuperadmin = false;
+  Map<String, bool> accessRights = {
+    'Clerk': false,
+    'Enforcer': false,
+    'Admin': false,
+  };
+
+  var holder_1 = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      isclerk = widget.user.isclerk!;
+
+      accessRights = {
+        'Clerk': widget.user.isclerk!,
+        'Enforcer': widget.user.isenforcer!,
+        'Admin': widget.user.isadmin!,
+      };
+    });
+  }
+
+  Future<void> _changeUserRights(
+    String id,
+    bool isclerk,
+    bool isenforcer,
+    bool isadmin,
+  ) async {
+    String _authToken = "";
+    String userId = "";
+    // setState(() {
+    //   context.loaderOverlay.show();
+    // });
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString("userid")!;
+    _authToken = prefs.getString("authToken")!;
+    var url = Uri.parse(AppConstants.baseUrl + "users/updateuserrights");
+
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    String _username = prefs.getString("email")!;
+    String _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+    print("++++++" + "Approve FUNCTION" + "+++++++");
+    // Navigator.pushNamed(context, AppRouter.home);
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var bodyString = {
+      "id": id,
+      "isclerk": isclerk,
+      "isenforcer": isenforcer,
+      "isadmin": isadmin,
+      "issuperadmin": issuperadmin,
+      "updatedby": userId
+    };
+    //  {
+    //   "id": id,
+    //   "iscitizen": iscitizen,
+    //   "isclerk": isclerk,
+    //   "isengineer": isengineer,
+    //   "isadmin": isadmin
+    // };
+
+    var body = jsonEncode(bodyString);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "Application/json",
+          'Authorization': 'Bearer $_authToken',
+        },
+        body: body);
+    print(body.toString());
+    print("++++++" + response.body.toString() + "+++++++");
+    // context.loaderOverlay.hide();
+    if (response.statusCode == 200) {
+      await NDialog(
+        dialogStyle: DialogStyle(titleDivider: true),
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle_outline,
+              color: Colors.green.shade600,
+              size: 28,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Text("Success"),
+          ],
+        ),
+        content: Text(
+          "User access rights updated!",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        actions: <Widget>[
+          Center(
+              child: MaterialButton(
+            child: const Text("Okay"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            color: Colors.green.shade600,
+          )),
+        ],
+      ).show(context);
+      // showSnackBar('Rights changed');
+
+      // setState(() {
+      //   context.loaderOverlay.hide();
+      // });
+    } else if (response.statusCode == 409) {
+      // setState(() {
+      //   context.loaderOverlay.hide();
+      // });
+      await NDialog(
+        dialogStyle: DialogStyle(titleDivider: true),
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle_outline,
+              color: Colors.red,
+              size: 28,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Text("Error"),
+          ],
+        ),
+        content: Text(
+          "Access rights not changed!",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        actions: <Widget>[
+          Center(
+              child: MaterialButton(
+            child: const Text("Okay"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            color: Colors.green.shade600,
+          )),
+        ],
+      ).show(context);
+      // showSnackBar("User rights not changed.");
+    } else {
+      // setState(() {
+      //   context.loaderOverlay.hide();
+      // });
+      showErrorToast("Authentication Failure: Invalid credentials.");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      child: Row(
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            // flex: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.user.firstname +
+                                    " " +
+                                    widget.user.lastname,
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Email Address: ",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                widget.user.email,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Phone Number: ",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "${widget.user.phone} ${widget.user.mobile}",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Status: ",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                widget.user.status == "0"
+                                    ? "Inactive"
+                                    : "Active",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: widget.user.status == "0"
+                                      ? Colors.red
+                                      : Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      // flex: 2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Category: ",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 180,
+                                width: 160,
+                                child: ListView(
+                                  children: accessRights.keys.map((String key) {
+                                    return CheckboxListTile(
+                                      title: Text(
+                                        key,
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      value: accessRights[key],
+                                      activeColor: AppConstants.primaryColor,
+                                      checkColor: Colors.white,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          accessRights[key] = value!;
+                                        });
+                                        _changeUserRights(
+                                            widget.user.id,
+                                            accessRights.values.toList()[0],
+                                            accessRights.values.toList()[1],
+                                            accessRights.values.toList()[2]);
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      height: 300,
+      width: MediaQuery.of(context).size.width * 0.5,
     );
   }
 }

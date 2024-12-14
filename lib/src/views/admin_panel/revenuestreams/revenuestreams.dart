@@ -601,7 +601,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                       'sector': selectedSectorNew,
                       'sectorId': selectedSectorIdNew,
                     })
-              : sectorName == "Property"
+              : sectorName == "Property" || sectorName == "Kitooro Taxi Park"
                   ? context.goNamed("addnonindividualstreamproperty",
                       pathParameters: {
                           'ownerType': selectedOwnership,

@@ -6,6 +6,9 @@ import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:weather/weather.dart';
+import 'package:web_socket_channel/html.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/status.dart' as status;
 import '../../../config/base.dart';
 import '../../../config/constants.dart';
 import 'home/barchart.dart';
@@ -19,6 +22,9 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends Base<DashboardPage> {
   var today = DateTime.now();
+  // IOWebSocketChannel/WebSocketChannel for Mobile
+  final homeChannel =
+      HtmlWebSocketChannel.connect(Uri.parse('wss://drammp.space/ws/'));
   String salutation = "";
   WeatherFactory wf = WeatherFactory(AppConstants.weatherApiKey);
   Weather? weather;
@@ -59,7 +65,27 @@ class _DashboardPageState extends Base<DashboardPage> {
   @override
   void initState() {
     salutation = greeting();
+    initSocket();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> initSocket() async {
+    // await homeChannel.ready;
+
+    homeChannel.stream.listen((message) {
+      // homeChannel.sink.add('received!');
+      // homeChannel.sink.close(status.goingAway);
+      debugPrint(message);
+    });
+  }
+
+  sendMessage(HtmlWebSocketChannel channel) {
+    channel.sink.add("Test Socket");
   }
 
   @override
@@ -119,7 +145,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                 children: [
                                   CachedNetworkImage(
                                     imageUrl:
-                                        'http://openweathermap.org/img/w/${snapshot.data!.weatherIcon}.png',
+                                        'https://openweathermap.org/img/w/${snapshot.data!.weatherIcon}.png',
                                   ),
                                   Text(
                                     style: const TextStyle(
@@ -153,6 +179,9 @@ class _DashboardPageState extends Base<DashboardPage> {
               //   ],
               // ),
               //Entire row
+              // ElevatedButton(
+              //     onPressed: () => sendMessage(homeChannel),
+              //     child: Text("Send Message")),
               BootstrapRow(
                 children: <BootstrapCol>[
                   BootstrapCol(
@@ -164,7 +193,13 @@ class _DashboardPageState extends Base<DashboardPage> {
                           shape: const Border(),
                           initiallyExpanded: true,
                           // tilePadding: EdgeInsets.all(2.0),
-                          title: const Text("Transport"), //header title
+                          title: const Text(
+                            "Transport",
+                            style: TextStyle(
+                              color: AppConstants.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ), //header title
                           children: [
                             BootstrapRow(
                               children: <BootstrapCol>[
@@ -205,12 +240,25 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                         color: Colors.black,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 18,
+                                                        fontSize: 14,
                                                       ),
                                                       // style: textTheme.headlineMedium!.copyWith(
                                                       //   color: textColor,
                                                       //   fontWeight: FontWeight.w600,
                                                       // ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 0),
+                                                    child: Text(
+                                                      "UGX 1.77M/1.86M",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 12,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -311,12 +359,25 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                         color: Colors.black,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 18,
+                                                        fontSize: 14,
                                                       ),
                                                       // style: textTheme.headlineMedium!.copyWith(
                                                       //   color: textColor,
                                                       //   fontWeight: FontWeight.w600,
                                                       // ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 0),
+                                                    child: Text(
+                                                      "UGX 340k/960k",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 12,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -389,7 +450,267 @@ class _DashboardPageState extends Base<DashboardPage> {
                           shape: const Border(),
                           initiallyExpanded: true,
                           // tilePadding: EdgeInsets.all(2.0),
-                          title: const Text("Hospitality"), //header title
+                          title: const Text(
+                            "Kitooro Taxi Park",
+                            style: TextStyle(
+                              color: AppConstants.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ), //header title
+                          children: [
+                            BootstrapRow(
+                              children: <BootstrapCol>[
+                                BootstrapCol(
+                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
+                                  child: Card(
+                                    clipBehavior: Clip.antiAlias,
+                                    color: Colors.white,
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.all(15),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 16.0),
+                                                    child: Text(
+                                                      "Lockups",
+                                                      // style: textTheme.labelLarge!.copyWith(
+                                                      //   color: textColor,
+                                                      // ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 0),
+                                                    child: Text(
+                                                      "152",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14,
+                                                      ),
+                                                      // style: textTheme.headlineMedium!.copyWith(
+                                                      //   color: textColor,
+                                                      //   fontWeight: FontWeight.w600,
+                                                      // ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 0),
+                                                    child: Text(
+                                                      "UGX 39M/50M",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              // margin:
+                                              //     const EdgeInsets.all(16.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              height: 80,
+                                              width: 80,
+                                              // decoration: BoxDecoration(
+                                              //   color: Colors.purple.shade100,
+                                              //   borderRadius:
+                                              //       const BorderRadius.all(
+                                              //           Radius.circular(10)),
+                                              // ),
+                                              child: const Icon(
+                                                Icons.door_front_door_outlined,
+                                                size: 50.0,
+                                                color: Colors.green,
+                                              ),
+                                              // child: Image.asset(
+                                              //   "assets/images/starhotel.png",
+                                              // ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 12.0,
+                                              left: 8.0,
+                                              right: 8.0,
+                                              top: 4.0),
+                                          child: LinearPercentIndicator(
+                                            // width: ((MediaQuery.of(context)
+                                            //             .size
+                                            //             .width) /
+                                            //         5) -
+                                            //     50,
+                                            animation: true,
+                                            lineHeight: 7.0,
+                                            animationDuration: 2000,
+                                            percent: 0.79,
+                                            trailing: const Text(
+                                              "79.0%",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            linearStrokeCap:
+                                                LinearStrokeCap.roundAll,
+                                            progressColor: Colors.amber,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                BootstrapCol(
+                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
+                                  child: Card(
+                                    clipBehavior: Clip.antiAlias,
+                                    color: Colors.white,
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.all(15),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 16.0),
+                                                    child: Text(
+                                                      "Toll Gate Fee",
+                                                      // style: textTheme.labelLarge!.copyWith(
+                                                      //   color: textColor,
+                                                      // ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 0),
+                                                    child: Text(
+                                                      "195",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14,
+                                                      ),
+                                                      // style: textTheme.headlineMedium!.copyWith(
+                                                      //   color: textColor,
+                                                      //   fontWeight: FontWeight.w600,
+                                                      // ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 0),
+                                                    child: Text(
+                                                      "UGX 195k/195k",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              // margin:
+                                              //     const EdgeInsets.all(16.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              height: 80,
+                                              width: 80,
+                                              // decoration: BoxDecoration(
+                                              //   color: Colors.purple.shade100,
+                                              //   borderRadius:
+                                              //       const BorderRadius.all(
+                                              //           Radius.circular(10)),
+                                              // ),
+                                              child: const Icon(
+                                                Icons.toll,
+                                                size: 50.0,
+                                                color: Colors.teal,
+                                              ),
+                                              // child: Image.asset(
+                                              //   "assets/images/motorcycle.png",
+                                              // ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 12.0,
+                                              left: 8.0,
+                                              right: 8.0,
+                                              top: 4.0),
+                                          child: LinearPercentIndicator(
+                                            // width: ((MediaQuery.of(context)
+                                            //             .size
+                                            //             .width) /
+                                            //         5) -
+                                            //     50,
+                                            animation: true,
+                                            lineHeight: 7.0,
+                                            animationDuration: 2000,
+                                            percent: 1.0,
+                                            trailing: const Text(
+                                              "100%",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            linearStrokeCap:
+                                                LinearStrokeCap.roundAll,
+                                            progressColor: Colors.green,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        ExpansionTile(
+                          shape: const Border(),
+                          initiallyExpanded: true,
+                          // tilePadding: EdgeInsets.all(2.0),
+                          title: const Text(
+                            "Hospitality",
+                            style: TextStyle(
+                              color: AppConstants.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ), //header title
                           children: [
                             BootstrapRow(
                               children: <BootstrapCol>[
@@ -429,12 +750,25 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                         color: Colors.black,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 18,
+                                                        fontSize: 14,
                                                       ),
                                                       // style: textTheme.headlineMedium!.copyWith(
                                                       //   color: textColor,
                                                       //   fontWeight: FontWeight.w600,
                                                       // ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 0),
+                                                    child: Text(
+                                                      "UGX 5M/6M",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 12,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -481,9 +815,9 @@ class _DashboardPageState extends Base<DashboardPage> {
                                             animation: true,
                                             lineHeight: 7.0,
                                             animationDuration: 2000,
-                                            percent: 0.79,
+                                            percent: 0.85,
                                             trailing: const Text(
-                                              "79.0%",
+                                              "85.0%",
                                               style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 12,
@@ -535,12 +869,25 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                         color: Colors.black,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        fontSize: 18,
+                                                        fontSize: 14,
                                                       ),
                                                       // style: textTheme.headlineMedium!.copyWith(
                                                       //   color: textColor,
                                                       //   fontWeight: FontWeight.w600,
                                                       // ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 0),
+                                                    child: Text(
+                                                      "UGX 4M/9M",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 12,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -586,9 +933,9 @@ class _DashboardPageState extends Base<DashboardPage> {
                                             animation: true,
                                             lineHeight: 7.0,
                                             animationDuration: 2000,
-                                            percent: 0.68,
+                                            percent: 0.45,
                                             trailing: const Text(
-                                              "68.0%",
+                                              "45.0%",
                                               style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 12,
@@ -597,142 +944,12 @@ class _DashboardPageState extends Base<DashboardPage> {
                                             ),
                                             linearStrokeCap:
                                                 LinearStrokeCap.roundAll,
-                                            progressColor: Colors.amber,
+                                            progressColor: Colors.red,
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        ExpansionTile(
-                          shape: const Border(),
-                          initiallyExpanded: true,
-                          // tilePadding: EdgeInsets.all(2.0),
-                          title: const Text("Fisheries"), //header title
-                          children: [
-                            BootstrapRow(
-                              children: <BootstrapCol>[
-                                BootstrapCol(
-                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                  child: Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    color: Colors.white,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(15),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 16.0),
-                                                    child: Text(
-                                                      "Fishermen",
-                                                      // style: textTheme.labelLarge!.copyWith(
-                                                      //   color: textColor,
-                                                      // ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "677",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 18,
-                                                      ),
-                                                      // style: textTheme.headlineMedium!.copyWith(
-                                                      //   color: textColor,
-                                                      //   fontWeight: FontWeight.w600,
-                                                      // ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin:
-                                                  const EdgeInsets.all(16.0),
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
-                                              height: 80,
-                                              width: 80,
-                                              // decoration: BoxDecoration(
-                                              //   color: Colors.purple.shade100,
-                                              //   borderRadius:
-                                              //       const BorderRadius.all(
-                                              //           Radius.circular(10)),
-                                              // ),
-                                              // child: const Icon(
-                                              //   Icons.local_taxi_outlined,
-                                              //   size: 40.0,
-                                              //   color:
-                                              //       AppConstants.primaryColor,
-                                              // ),
-                                              child: Image.asset(
-                                                "assets/images/manfishing.png",
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Divider(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12.0,
-                                              left: 8.0,
-                                              right: 8.0,
-                                              top: 4.0),
-                                          child: LinearPercentIndicator(
-                                            // width: ((MediaQuery.of(context)
-                                            //             .size
-                                            //             .width) /
-                                            //         5) -
-                                            //     50,
-                                            animation: true,
-                                            lineHeight: 7.0,
-                                            animationDuration: 2000,
-                                            percent: 0.84,
-                                            // center: const Text(
-                                            //   "84.0%",
-                                            //   style: TextStyle(
-                                            //     color: Colors.white,
-                                            //     fontSize: 12,
-                                            //     fontWeight: FontWeight.bold,
-                                            //   ),
-                                            // ),
-                                            trailing: const Text(
-                                              "84.0%",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            linearStrokeCap:
-                                                LinearStrokeCap.roundAll,
-                                            progressColor: Colors.green,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                BootstrapCol(
-                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                  child: Container(),
                                 ),
                               ],
                             ),
