@@ -1,12 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../config/base.dart';
 import '../../../../config/constants.dart';
 import '../../../../config/functions.dart';
+import '../../../../services/messageprovider.dart';
 import '/models/revenuestreamspaginated.dart';
 import '/models/trips.dart';
 import 'map_page.dart';
@@ -22,7 +25,7 @@ class _MobilityPageState extends Base<MobilityPage> {
   int carPage = 1;
   int tripsPage = 1;
   int carPageRows = 5;
-  int tripPageRows = 20;
+  int tripPageRows = 50;
   List<int> rowCountListCars = [5, 10, 20, 30, 50, 100];
   List<int> rowCountListTrips = [20, 50, 100];
   List<RevenueStreams> _streams = [];
@@ -35,6 +38,8 @@ class _MobilityPageState extends Base<MobilityPage> {
       inactiveVehicles = 0,
       totalVehicles = 0,
       passengersToday = 0;
+  late StreamSubscription streamSub;
+  late Stream stream;
 
   void getMobilityStats() async {
     var url = Uri.parse("${AppConstants.baseUrl}dash/stats/mobility");
@@ -77,7 +82,10 @@ class _MobilityPageState extends Base<MobilityPage> {
     List<TripModel> returnValue = [];
     // String userId = "";
     String _authToken = "";
-
+    // setState(() {
+    //   _history = [];
+    // });
+    print("get trips");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     // userId = prefs.getString("userid")!;
     _authToken = prefs.getString("authToken")!;
@@ -99,7 +107,7 @@ class _MobilityPageState extends Base<MobilityPage> {
         'Authorization': 'Bearer $_authToken',
       },
     );
-    print("++++++" + response.body.toString() + "+++++++");
+    // print("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
 
@@ -164,9 +172,23 @@ class _MobilityPageState extends Base<MobilityPage> {
   @override
   void initState() {
     super.initState();
+    initSocket();
     getMobilityStats();
     getStreams();
     getHistory();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> initSocket() async {
+    context.read<MessageNotifierProvider>().notifyStream.listen((value) {
+      getHistory();
+      getMobilityStats();
+      getStreams();
+    });
   }
 
   @override

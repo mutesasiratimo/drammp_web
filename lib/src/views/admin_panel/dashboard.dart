@@ -7,10 +7,11 @@ import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:weather/weather.dart';
 import 'package:web_socket_channel/html.dart';
-// import 'package:web_socket_channel/status.dart' as status;
 import '../../../config/base.dart';
 import '../../../config/constants.dart';
+import '../../../services/messageprovider.dart';
 import 'home/barchart.dart';
+import 'package:provider/provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -22,8 +23,6 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends Base<DashboardPage> {
   var today = DateTime.now();
   // IOWebSocketChannel/WebSocketChannel for Mobile
-  final homeChannel =
-      HtmlWebSocketChannel.connect(Uri.parse('wss://drammp.space/ws/'));
   String salutation = "";
   WeatherFactory wf = WeatherFactory(AppConstants.weatherApiKey);
   Weather? weather;
@@ -36,6 +35,7 @@ class _DashboardPageState extends Base<DashboardPage> {
     'Last Month',
     'This year',
   ];
+  late Sink<dynamic> myMessageSink;
 
   getWeather() async {
     weather = await wf.currentWeatherByCityName("Kampala");
@@ -65,21 +65,27 @@ class _DashboardPageState extends Base<DashboardPage> {
   void initState() {
     salutation = greeting();
     initSocket();
+    myMessageSink = context.read<MessageNotifierProvider>().notifyMessageSink;
+    // WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
   @override
   void dispose() {
+    // homeChannel.sink.close(status.goingAway);
     super.dispose();
   }
 
   Future<void> initSocket() async {
     // await homeChannel.ready;
 
-    homeChannel.stream.listen((message) {
-      // homeChannel.sink.add('received!');
-      // homeChannel.sink.close(status.goingAway);
-      debugPrint(message);
+    // homeChannel.stream.listen((message) {
+    // homeChannel.sink.add('received!');
+    // homeChannel.sink.close(status.goingAway);
+    // debugPrint(message);
+    // });
+    context.read<MessageNotifierProvider>().notifyStream.listen((value) {
+      debugPrint("Update Data");
     });
   }
 
@@ -93,6 +99,12 @@ class _DashboardPageState extends Base<DashboardPage> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          // StreamBuilder(
+          //   stream: context.read<MessageNotifierProvider>().notifyStream,
+          //   builder: (context, snapshot) {
+          //     return Text(snapshot.hasData ? '${snapshot.data}' : '');
+          //   },
+          // ),
           BootstrapContainer(
             fluid: true,
             decoration: BoxDecoration(

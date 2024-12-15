@@ -1,3 +1,4 @@
+import 'package:entebbe_dramp_web/src/views/admin_panel/settings/fares.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import '../../../../config/base.dart';
@@ -23,7 +24,7 @@ class _SettingsPageState extends Base<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _controller = TabController(length: 5, vsync: this);
+    _controller = TabController(length: 6, vsync: this);
     _controller.addListener(() {
       setState(() {
         selectedIndex = _controller.index;
@@ -69,7 +70,10 @@ class _SettingsPageState extends Base<SettingsPage> {
                                 text: "Entity Associates",
                               ),
                               Tab(
-                                text: "Tarrifs",
+                                text: "Tarrifs/Charges",
+                              ),
+                              Tab(
+                                text: "Trip Fares",
                               ),
                               Tab(
                                 text: "Travel Cards",
@@ -86,6 +90,7 @@ class _SettingsPageState extends Base<SettingsPage> {
                                 OperatorsPage(),
                                 AssociatesPage(),
                                 TarrifsPage(),
+                                FaresPage(),
                                 TravelCardsPage()
                               ],
                             ),
