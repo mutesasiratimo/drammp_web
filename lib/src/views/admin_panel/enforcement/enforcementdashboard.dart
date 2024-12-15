@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../config/base.dart';
 import '../../../../config/constants.dart';
 import '../../../../config/functions.dart';
+import '../../../../models/revenuesector.dart';
 import '/models/revenuestreamspaginated.dart';
 
 class EnforcementDashboardPage extends StatefulWidget {
@@ -26,7 +27,12 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
   List<RevenueStreams> _streams = [];
   int _currentSortColumn = 0;
   bool _isAscending = true;
+  List<int> rowCountList = [10, 50, 100];
   int _streamsPage = 1;
+  int _streamsRowCount = 10;
+  String selectedInitSector = "Select Sector";
+  String selectedInitSectorId = "";
+  List<RevenueSectorsModel> sectorList = <RevenueSectorsModel>[];
   int compliantCount = 0,
       pastSixtyDaysCount = 0,
       pastThirtyDaysCount = 0,
@@ -44,19 +50,19 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
         .value = TextCellValue("Reference Number");
 
     sheet
-        .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: index))
+        .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: index))
         .value = TextCellValue("Revenue Stream");
 
     sheet
-        .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: index))
+        .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: index))
         .value = TextCellValue("Amount Due");
 
     sheet
-        .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: index))
+        .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: index))
         .value = TextCellValue("Due Date");
 
     sheet
-        .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: index))
+        .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: index))
         .value = TextCellValue("Status");
 
     for (var stream in _streams) {
@@ -73,26 +79,27 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
           .value = TextCellValue(stream.tarrifamount.toString());
 
       sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: index))
+          .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: index))
           .value = TextCellValue(stream.nextrenewaldate.toString());
 
       sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: index))
+          .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: index))
           .value = TextCellValue(stream.status);
 
       index++;
     }
 
-    excel.save(fileName: "Enforcement ${DateTime.now()}.xlsx");
+    excel.save(
+        fileName: "$selectedInitSector Enforcement ${DateTime.now()}.xlsx");
     setState(() {
       executionTime = stopwatch.elapsed;
     });
   }
 
-  Future<List<RevenueStreams>> getStreams() async {
+  Future<List<RevenueStreams>> getStreams(String sectorId) async {
     List<RevenueStreams> returnValue = [];
     var url = Uri.parse(AppConstants.baseUrl +
-        "revenuestreams/default?page=$_streamsPage&size=50");
+        "revenuestreams/sector/default/$sectorId?page=$_streamsPage&size=$_streamsRowCount");
     String _authToken = "";
     String _username = "";
     String _password = "";
@@ -112,7 +119,10 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
         'Authorization': 'Bearer $_authToken',
       },
     );
-    // print("++++++" + response.body.toString() + "+++++++");
+    setState(() {
+      _streams = [];
+    });
+    print("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       RevenueStreamsPaginatedModel incidentsmodel =
@@ -151,7 +161,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
         'Authorization': 'Bearer $_authToken',
       },
     );
-    debugPrint("++++++" + response.body.toString() + "+++++++");
+    // debugPrint("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       setState(() {
@@ -165,11 +175,55 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
     }
   }
 
+  //get sectors list
+  Future<List<RevenueSectorsModel>> getSectors() async {
+    List<RevenueSectorsModel> returnValue = [];
+    var url = Uri.parse("${AppConstants.baseUrl}revenuesectors");
+
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    // _username = prefs.getString("email")!;
+    // _password = prefs.getString("password")!;
+
+    // await AppFunctions.authenticate(_username, _password);
+    // _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        // 'Authorization': 'Bearer $_authToken',
+      },
+    );
+    // debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
+      List<RevenueSectorsModel> sectorsmodel = (items as List)
+          .map((data) => RevenueSectorsModel.fromJson(data))
+          .toList();
+
+      returnValue = sectorsmodel;
+
+      setState(() {
+        sectorList = sectorsmodel;
+        selectedInitSector = sectorsmodel.first.name;
+        selectedInitSectorId = sectorsmodel.first.id;
+        getStreams(selectedInitSectorId);
+        // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
+      });
+    } else {
+      returnValue = [];
+      // showSnackBar("Network Failure: Failed to retrieve transactions");
+    }
+    return returnValue;
+  }
+
   @override
   void initState() {
     super.initState();
     getDaysOverdue();
-    getStreams();
+    getSectors();
   }
 
   @override
@@ -180,17 +234,6 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Row(
-            //   children: [
-            //     Text(
-            //       "Enforcement and Collections",
-            //       style: TextStyle(
-            //         fontSize: 18,
-            //         fontWeight: FontWeight.w600,
-            //       ),
-            //     )
-            //   ],
-            // ),
             BootstrapContainer(
               fluid: true,
               decoration: BoxDecoration(
@@ -204,7 +247,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                     color: Colors.white,
                     child: Column(
                       children: [
-                        SizedBox(height: 16),
+                        SizedBox(height: 8),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24.0),
                           child: Row(
@@ -220,7 +263,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 8),
+                        SizedBox(height: 16),
                         BootstrapRow(
                           children: <BootstrapCol>[
                             BootstrapCol(
@@ -447,11 +490,96 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Revenue Streams",
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
+                                          // Text(
+                                          //   "Revenue Streams",
+                                          //   style: TextStyle(
+                                          //     fontSize: 16,
+                                          //     fontWeight: FontWeight.w600,
+                                          //   ),
+                                          // ),
+                                          Container(
+                                            width: 250,
+                                            height: 35,
+                                            margin:
+                                                EdgeInsets.only(bottom: 16.0),
+                                            child: ListTile(
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      vertical: 0.0),
+                                              // title: Text(
+                                              //   'Select Sector',
+                                              //   style: TextStyle(
+                                              //     fontSize: 14,
+                                              //     fontWeight: FontWeight.w600,
+                                              //   ),
+                                              // ),
+                                              title: DropdownButtonFormField(
+                                                decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          vertical: 0,
+                                                          horizontal: 8),
+                                                  border: OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color:
+                                                            Color(0xffB9B9B9)),
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(4)),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color:
+                                                            Color(0xffB9B9B9),
+                                                        width: 1.0),
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(4)),
+                                                  ),
+                                                  hintText: 'Select Sector',
+                                                ),
+                                                isExpanded: true,
+                                                hint: new Text(
+                                                  selectedInitSector,
+                                                  style: const TextStyle(
+                                                      // color: Colors.grey,
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                                icon: const Icon(
+                                                    Icons.keyboard_arrow_down),
+                                                items: sectorList.map((item) {
+                                                  return DropdownMenuItem(
+                                                    child: new Text(
+                                                      item.name,
+                                                      style: const TextStyle(
+                                                          // color: Colors.grey,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w500),
+                                                    ),
+                                                    value: item,
+                                                  );
+                                                }).toList(),
+                                                onChanged: (newVal) {
+                                                  // ignore: unused_local_variable
+                                                  List itemsList =
+                                                      sectorList.map((item) {
+                                                    if (item == newVal) {
+                                                      setState(() async {
+                                                        selectedInitSector =
+                                                            item.name;
+                                                        selectedInitSectorId =
+                                                            item.id;
+                                                        getStreams(
+                                                            selectedInitSectorId);
+                                                      });
+                                                    }
+                                                  }).toList();
+                                                },
+                                              ),
                                             ),
                                           ),
                                           TextButton.icon(
@@ -751,6 +879,81 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                                 ],
                                         ),
                                       ),
+                                      SizedBox(
+                                        height: 40,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text("Rows per Page"),
+                                            SizedBox(width: 8),
+                                            SizedBox(
+                                              width: 50,
+                                              child: DropdownButton(
+                                                underline: SizedBox(),
+                                                // isExpanded: true,
+                                                hint: new Text(
+                                                  _streamsRowCount.toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                                // icon: const Icon(Icons.keyboard_arrow_down),
+                                                items: rowCountList.map((item) {
+                                                  return DropdownMenuItem(
+                                                    child: Text(
+                                                      item.toString(),
+                                                      style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w400),
+                                                    ),
+                                                    value: item,
+                                                  );
+                                                }).toList(),
+                                                onChanged: (newVal) {
+                                                  setState(() {
+                                                    _streamsRowCount =
+                                                        newVal ?? 10;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                                "1 - ${_streams.length} of $_streamsRowCount"),
+                                            SizedBox(width: 8),
+                                            IconButton(
+                                                onPressed: () =>
+                                                    (_streamsPage > 1)
+                                                        ? setState(() {
+                                                            _streamsPage--;
+                                                            getStreams(
+                                                                selectedInitSectorId);
+                                                          })
+                                                        : null,
+                                                icon: Icon(Icons.arrow_back_ios,
+                                                    size: 14)),
+                                            SizedBox(width: 8),
+                                            IconButton(
+                                                onPressed: () =>
+                                                    (_streams.length <=
+                                                            _streamsRowCount)
+                                                        ? setState(() {
+                                                            _streamsPage++;
+                                                            getStreams(
+                                                                selectedInitSectorId);
+                                                          })
+                                                        : null,
+                                                icon: Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size: 14)),
+                                          ],
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -758,22 +961,6 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                             ),
                           ],
                         ),
-                        // BootstrapRow(
-                        //   children: <BootstrapCol>[
-                        //     BootstrapCol(
-                        //       sizes: "col-lg-8 col-md-12 col-sm-12",
-                        //       child: SizedBox(
-                        //         height: size.height * .7,
-                        //       ),
-                        //     ),
-                        //     BootstrapCol(
-                        //       sizes: "col-lg-4 col-md-12 col-sm-12",
-                        //       child: SizedBox(
-                        //         height: size.height * .7,
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
                       ],
                     ),
                   ),

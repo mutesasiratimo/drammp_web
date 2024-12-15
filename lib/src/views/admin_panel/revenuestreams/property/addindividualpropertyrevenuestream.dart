@@ -462,9 +462,9 @@ class _AddIndividualPropertyRevenueStreamPageState
   }
 
   String generateRandomString(int len) {
-    var r = Random();
-    return String.fromCharCodes(
-        List.generate(len, (index) => r.nextInt(33) + 89));
+    Random random = new Random();
+    int randomNumber = random.nextInt(10000);
+    return "${randomNumber}";
   }
 
   _reegisterStream() async {
@@ -552,8 +552,8 @@ class _AddIndividualPropertyRevenueStreamPageState
       "dailyactivehours": 0,
       "companytype": "",
       "businesstype": "",
-      "businessname": "${widget.category} ${generateRandomString(6)}",
-      "tradingname": "",
+      "businessname": "${widget.category} ${roomNumberController.text}",
+      "tradingname": "${widget.category} ${roomNumberController.text}",
       "staffcountmale": 0,
       "staffcountfemale": 0,
       "bedcount": 0,
@@ -565,7 +565,8 @@ class _AddIndividualPropertyRevenueStreamPageState
       "hasrestaurant": false,
       "hasconference": false,
       "establishmenttype": "",
-      "regno": generateRandomString(6),
+      "regno":
+          "${widget.category} ${roomNumberController.text} ${generateRandomString(6)}",
       "vin": "",
       "tin": "string",
       "color": "",
@@ -585,8 +586,8 @@ class _AddIndividualPropertyRevenueStreamPageState
       "type": "${widget.category}",
       "createdby": await prefs.getString("userid") ?? "Self Registration"
     };
-    debugPrint(bodyString.toString());
-    debugPrint(url.toString());
+    // debugPrint(bodyString.toString());
+    // debugPrint(url.toString());
     var body = jsonEncode(bodyString);
 
     var response = await http.post(url,
@@ -595,11 +596,11 @@ class _AddIndividualPropertyRevenueStreamPageState
           'Authorization': 'Bearer $_authToken',
         },
         body: body);
-    debugPrint("++++++${response.body}+++++++");
-    debugPrint("++++++${response.statusCode}+++++++");
+    // debugPrint("++++++${response.body}+++++++");
+    // debugPrint("++++++${response.statusCode}+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
-      debugPrint("++++++${items["regreferenceno"]}+++++++");
+      // debugPrint("++++++${items["regreferenceno"]}+++++++");
       // Automobile res = Automobile.fromJson(items);
       // _sendSmsMessage(
       //     'Your commercial car has been registered successfully with Reference No: ${items["regreferenceno"]}',

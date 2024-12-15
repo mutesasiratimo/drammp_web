@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable
 
 import 'dart:convert';
+import 'dart:math';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -424,6 +425,12 @@ class _AddNonIndividualPropertyRevenueStreamPageState
     );
   }
 
+  String generateRandomString(int len) {
+    Random random = new Random();
+    int randomNumber = random.nextInt(10000);
+    return "${randomNumber}";
+  }
+
   _reegisterStream() async {
     var url =
         Uri.parse("${AppConstants.baseUrl}revenuestreamsregisternewentity");
@@ -509,12 +516,8 @@ class _AddNonIndividualPropertyRevenueStreamPageState
       "dailyactivehours": 0,
       "companytype": "",
       "businesstype": "",
-      "businessname": regNoController.text.isEmpty
-          ? ""
-          : regNoController.text.replaceAll(" ", "") +
-              " " +
-              makeModelController.text,
-      "tradingname": entityNameController.text,
+      "businessname": "${widget.category} ${roomNumberController.text}",
+      "tradingname": "${widget.category} ${roomNumberController.text}",
       "staffcountmale": 0,
       "staffcountfemale": 0,
       "bedcount": 0,
@@ -526,9 +529,10 @@ class _AddNonIndividualPropertyRevenueStreamPageState
       "hasrestaurant": false,
       "hasconference": false,
       "establishmenttype": "",
-      "regno": regNoController.text.replaceAll(" ", ""),
-      "vin": chassisNoController.text,
-      "color": colorController.text.isEmpty ? "" : colorController.text,
+      "regno":
+          "${widget.category} ${roomNumberController.text} ${generateRandomString(6)}",
+      "vin": "",
+      "color": "",
       "tin": ownerTinController.text,
       "brn": ownerBrnController.text,
       "ownerid": "",
@@ -537,7 +541,7 @@ class _AddNonIndividualPropertyRevenueStreamPageState
       "permitno": "",
       "engineno": "",
       "enginehp": 0,
-      "model": makeModelController.text,
+      "model": "",
       "divisionid": selectedDriverCounty.isEmpty ? "" : selectedDriverCounty,
       "stageid":
           stageNameController.text.isEmpty ? "" : stageNameController.text,
@@ -548,8 +552,8 @@ class _AddNonIndividualPropertyRevenueStreamPageState
       "createdby": await prefs.getString("userid") ?? "Self Registration"
     };
 
-    debugPrint(bodyString.toString());
-    debugPrint(url.toString());
+    // debugPrint(bodyString.toString());
+    // debugPrint(url.toString());
     var body = jsonEncode(bodyString);
 
     var response = await http.post(url,
@@ -558,8 +562,8 @@ class _AddNonIndividualPropertyRevenueStreamPageState
           'Authorization': 'Bearer $_authToken',
         },
         body: body);
-    debugPrint("++++++${response.body}+++++++");
-    debugPrint("++++++${response.statusCode}+++++++");
+    // debugPrint("++++++${response.body}+++++++");
+    // debugPrint("++++++${response.statusCode}+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       debugPrint("++++++${items["regreferenceno"]}+++++++");

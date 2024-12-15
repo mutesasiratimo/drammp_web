@@ -72,7 +72,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
   Future<List<RevenueSectorsModel>> getSectors() async {
     List<RevenueSectorsModel> returnValue = [];
     var url = Uri.parse("${AppConstants.baseUrl}revenuesectors");
-    debugPrint(url.toString());
+    // debugPrint(url.toString());
     // String _ausword = "";
 
     // final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -90,7 +90,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
         // 'Authorization': 'Bearer $_authToken',
       },
     );
-    debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
+    // debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
@@ -102,12 +102,12 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
       // List<UserItem> usersmodel = usersobj.items;
 
       returnValue = sectorsmodel;
-      debugPrint(sectorsmodel.toString());
+      // debugPrint(sectorsmodel.toString());
       setState(() {
         sectorList = sectorsmodel;
         selectedInitSector = sectorsmodel.first.name;
-        selectedInitCategoryId = sectorsmodel.first.id;
-        getCategoriesInit(selectedInitCategoryId);
+        selectedInitSectorId = sectorsmodel.first.id;
+        getCategoriesInit(selectedInitSectorId);
         // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
       });
     } else {
@@ -126,7 +126,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
     });
     var url =
         Uri.parse("${AppConstants.baseUrl}sectorsubtypes/sector/$sectorId");
-    debugPrint(url.toString());
+    // debugPrint(url.toString());
 
     var response = await http.get(
       url,
@@ -135,9 +135,9 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
         // 'Authorization': 'Bearer $_authToken',
       },
     );
-    debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
-        response.body.toString() +
-        "+++++++");
+    // debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
+    //     response.body.toString() +
+    //     "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
@@ -150,7 +150,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
       // List<UserItem> usersmodel = usersobj.items;
 
       returnValue = categoriesmodel;
-      debugPrint(categoriesmodel.toString());
+      // debugPrint(categoriesmodel.toString());
       setState(() {
         categoryList = categoriesmodel;
         selectedInitCategory = categoriesmodel.first.typename;
@@ -174,7 +174,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
     List<RevenueSectorCategoriesFilteredModel> returnValue = [];
     var url =
         Uri.parse("${AppConstants.baseUrl}sectorsubtypes/sector/$sectorId");
-    debugPrint(url.toString());
+    // debugPrint(url.toString());
 
     var response = await http.get(
       url,
@@ -183,9 +183,9 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
         // 'Authorization': 'Bearer $_authToken',
       },
     );
-    debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
-        response.body.toString() +
-        "+++++++");
+    // debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
+    //     response.body.toString() +
+    //     "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
@@ -198,7 +198,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
       // List<UserItem> usersmodel = usersobj.items;
 
       returnValue = categoriesmodel;
-      debugPrint(categoriesmodel.toString());
+      // debugPrint(categoriesmodel.toString());
       setState(() {
         categoryList = categoriesmodel;
         // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
@@ -236,7 +236,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
         'Authorization': 'Bearer $_authToken',
       },
     );
-    print("++++++" + response.body.toString() + "+++++++");
+    // print("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       // RevenueStreamsPaginatedModel incidentsmodel =
@@ -483,8 +483,8 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
             ElevatedButton(
               onPressed: () {
                 if (selectedOwnership == "Individual") {
-                  debugPrint(selectedCategory);
-                  debugPrint(selectedSector);
+                  // debugPrint(selectedCategory);
+                  // debugPrint(selectedSector);
                   Navigator.of(context).pop();
                   revenueStreamPageController.jumpToPage(1);
                   // selectedSector == "Transport"
@@ -538,11 +538,11 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
 
   navigateToPage(
       String ownerTypef, sectorName, sectorIdf, categoryName, categoryIdf) {
-    debugPrint(ownerTypef);
-    debugPrint(sectorName);
-    debugPrint(sectorIdf);
-    debugPrint(categoryName);
-    debugPrint(categoryIdf);
+    // debugPrint(ownerTypef);
+    // debugPrint(sectorName);
+    // debugPrint(sectorIdf);
+    // debugPrint(categoryName);
+    // debugPrint(categoryIdf);
     if (ownerTypef == "Individual") {
       //
       sectorName == "Transport"
@@ -777,7 +777,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                 });
                                 var url = Uri.parse(
                                     "${AppConstants.baseUrl}sectorsubtypes/sector/$selectedSectorIdNew");
-                                debugPrint(url.toString());
+                                // debugPrint(url.toString());
 
                                 var response = await http.get(
                                   url,
@@ -786,9 +786,9 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                     // 'Authorization': 'Bearer $_authToken',
                                   },
                                 );
-                                debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
-                                    response.body.toString() +
-                                    "+++++++");
+                                // debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
+                                //     response.body.toString() +
+                                //     "+++++++");
                                 if (response.statusCode == 200) {
                                   final items = json.decode(response.body);
                                   // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
@@ -799,7 +799,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                                   .fromJson(data))
                                           .toList();
 
-                                  debugPrint(categoriesmodel.toString());
+                                  // debugPrint(categoriesmodel.toString());
                                   setState(() {
                                     categoryListNew = categoriesmodel;
                                     // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
@@ -871,7 +871,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                 setState(() {
                                   selectedCategoryNew = item.typename;
                                   selectedCategoryIdNew = item.id;
-                                  debugPrint(selectedCategoryNew);
+                                  // debugPrint(selectedCategoryNew);
                                 });
                               }
                             }).toList();
@@ -1005,7 +1005,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                       setState(() async {
                                         selectedInitSector = item.name;
                                         selectedInitSectorId = item.id;
-                                        debugPrint(selectedInitSector);
+                                        // debugPrint(selectedInitSector);
                                         selectedInitCategory = "";
                                         categoryList = [];
                                         getCategoriesInit(selectedInitSectorId);
@@ -1083,7 +1083,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                         selectedInitCategory = item.typename;
                                         selectedInitCategoryId = item.id;
                                         getStreams(selectedInitCategoryId);
-                                        debugPrint(selectedCategory);
+                                        // debugPrint(selectedCategory);
                                       });
                                     }
                                   }).toList();

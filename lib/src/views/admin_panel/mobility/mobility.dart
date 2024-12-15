@@ -19,10 +19,15 @@ class MobilityPage extends StatefulWidget {
 }
 
 class _MobilityPageState extends Base<MobilityPage> {
+  int carPage = 1;
+  int tripsPage = 1;
+  int carPageRows = 5;
+  int tripPageRows = 20;
+  List<int> rowCountListCars = [5, 10, 20, 30, 50, 100];
+  List<int> rowCountListTrips = [20, 50, 100];
   List<RevenueStreams> _streams = [];
   int _currentSortColumn = 0;
   bool _isAscending = true;
-  int _usersPage = 1;
   List<TripModel> _history = [];
   int faresToday = 0,
       tripsToday = 0,
@@ -76,7 +81,8 @@ class _MobilityPageState extends Base<MobilityPage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     // userId = prefs.getString("userid")!;
     _authToken = prefs.getString("authToken")!;
-    var url = Uri.parse(AppConstants.baseUrl + "trips/default?page=1&size=50");
+    var url = Uri.parse(AppConstants.baseUrl +
+        "trips/default?page=$tripsPage&size=$tripPageRows");
 
     // final SharedPreferences prefs = await SharedPreferences.getInstance();
     //Get username and password from shared prefs
@@ -117,7 +123,7 @@ class _MobilityPageState extends Base<MobilityPage> {
   Future<List<RevenueStreams>> getStreams() async {
     List<RevenueStreams> returnValue = [];
     var url = Uri.parse(AppConstants.baseUrl +
-        "revenuestreams/default?page=$_usersPage&size=50");
+        "revenuestreams/municipalityowned/bus/default?page=$carPage&size=$carPageRows");
     String _authToken = "";
     String _username = "";
     String _password = "";
@@ -140,12 +146,12 @@ class _MobilityPageState extends Base<MobilityPage> {
     // print("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
-      RevenueStreamsPaginatedModel incidentsmodel =
+      RevenueStreamsPaginatedModel streamsmodel =
           RevenueStreamsPaginatedModel.fromJson(items);
 
-      returnValue = incidentsmodel.items;
+      returnValue = streamsmodel.items;
       setState(() {
-        _streams = incidentsmodel.items;
+        _streams = streamsmodel.items;
       });
       // Navigator.pushNamed(context, AppRouter.home);
     } else {
@@ -465,7 +471,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                                       SizedBox(height: 5),
                                       SizedBox(
                                         // width: 200,
-                                        height: 290,
+                                        height: 260,
                                         child: DataTable2(
                                           headingRowHeight: 45,
                                           headingRowColor:
@@ -622,12 +628,68 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                     ],
                                                   )
                                                 ],
-                                          // rows: List.generate(
-                                          //   demoRecentFiles.length,
-                                          //   (index) => recentFileDataRow(demoRecentFiles[index]),
-                                          // ),
                                         ),
                                       ),
+                                      SizedBox(
+                                        height: 50,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text("Rows per Page"),
+                                            SizedBox(width: 8),
+                                            SizedBox(
+                                              width: 50,
+                                              child: DropdownButton(
+                                                underline: SizedBox(),
+                                                // isExpanded: true,
+                                                hint: new Text(
+                                                  carPageRows.toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                                // icon: const Icon(Icons.keyboard_arrow_down),
+                                                items: rowCountListCars
+                                                    .map((item) {
+                                                  return DropdownMenuItem(
+                                                    child: Text(
+                                                      item.toString(),
+                                                      style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w400),
+                                                    ),
+                                                    value: item,
+                                                  );
+                                                }).toList(),
+                                                onChanged: (newVal) {
+                                                  setState(() {
+                                                    carPageRows = newVal ?? 10;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                                "1 - ${_streams.length} of $carPageRows"),
+                                            SizedBox(width: 8),
+                                            IconButton(
+                                                onPressed: () {},
+                                                icon: Icon(Icons.arrow_back_ios,
+                                                    size: 14)),
+                                            SizedBox(width: 8),
+                                            IconButton(
+                                                onPressed: () {},
+                                                icon: Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size: 14)),
+                                          ],
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -640,7 +702,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                             BootstrapCol(
                               sizes: "col-lg-12 col-md-12 col-sm-12",
                               child: SizedBox(
-                                height: size.height * .7,
+                                height: size.height * .75,
                                 child: Container(
                                   margin: EdgeInsets.all(16.0),
                                   decoration: BoxDecoration(
@@ -988,6 +1050,66 @@ class _MobilityPageState extends Base<MobilityPage> {
                                           //   demoRecentFiles.length,
                                           //   (index) => recentFileDataRow(demoRecentFiles[index]),
                                           // ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 50,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text("Rows per Page"),
+                                            SizedBox(width: 8),
+                                            SizedBox(
+                                              width: 50,
+                                              child: DropdownButton(
+                                                underline: SizedBox(),
+                                                // isExpanded: true,
+                                                hint: new Text(
+                                                  carPageRows.toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                                // icon: const Icon(Icons.keyboard_arrow_down),
+                                                items: rowCountListTrips
+                                                    .map((item) {
+                                                  return DropdownMenuItem(
+                                                    child: Text(
+                                                      item.toString(),
+                                                      style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w400),
+                                                    ),
+                                                    value: item,
+                                                  );
+                                                }).toList(),
+                                                onChanged: (newVal) {
+                                                  setState(() {
+                                                    tripPageRows = newVal ?? 10;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                                "1 - ${_history.length} of $tripPageRows"),
+                                            SizedBox(width: 8),
+                                            IconButton(
+                                                onPressed: () {},
+                                                icon: Icon(Icons.arrow_back_ios,
+                                                    size: 14)),
+                                            SizedBox(width: 8),
+                                            IconButton(
+                                                onPressed: () {},
+                                                icon: Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size: 14)),
+                                          ],
                                         ),
                                       ),
                                     ],
