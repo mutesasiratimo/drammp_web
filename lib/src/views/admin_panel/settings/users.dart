@@ -285,7 +285,7 @@ class _UsersPageState extends Base<UsersPage> {
                                   DataCell(Text("")),
                                   DataCell(Text("")),
                                   DataCell(Text("")),
-                                  DataCell(Text("No Fares")),
+                                  DataCell(Text("No Users")),
                                   DataCell(Text("")),
                                   // DataCell(Text("")),
                                   DataCell(Text("")),

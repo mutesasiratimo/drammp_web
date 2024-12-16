@@ -60,7 +60,7 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
         'Authorization': 'Bearer $_authToken',
       },
     );
-    debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
+    // debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       // RevenueSectorCategoriesModel sectorrsobj = RevenueSectorCategoriesModel.fromJson(items);
@@ -72,7 +72,7 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
       // List<UserItem> usersmodel = usersobj.items;
 
       returnValue = sectorsmodel;
-      debugPrint(sectorsmodel.toString());
+      // debugPrint(sectorsmodel.toString());
       setState(() {
         sectorCategories = sectorsmodel;
       });

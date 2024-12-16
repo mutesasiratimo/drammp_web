@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:entebbe_dramp_web/src/views/admin_panel/finance/barchartmonthly.dart';
+import 'package:entebbe_dramp_web/src/views/admin_panel/finance/barchartquartely.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:http/http.dart' as http;
@@ -288,7 +290,14 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                     Expanded(
                                       child: Row(
                                         children: [
-                                          Expanded(child: BarChartPage())
+                                          Expanded(
+                                            child: selectedInterval == "Annual"
+                                                ? BarChartPage()
+                                                : selectedInterval ==
+                                                        "Quarterly"
+                                                    ? BarChartPageQuarterly()
+                                                    : BarChartPageMonthly(),
+                                          )
                                         ],
                                       ),
                                     ),

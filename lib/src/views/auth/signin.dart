@@ -80,7 +80,7 @@ class _SignInPageState extends Base<SignInPage> {
         prefs.setBool("isadmin", user.isadmin);
         prefs.setBool("issuperadmin", user.issuperadmin);
 
-        debugPrint('Loggend in user details $item ');
+        // debugPrint('Loggend in user details $item ');
         setState(() {
           responseLoading = false;
         });
@@ -216,10 +216,8 @@ class _SignInPageState extends Base<SignInPage> {
                                 controller: passwordController,
                                 obscureText: obscurePassword,
                                 decoration: InputDecoration(
-                                    prefixIcon: IconButton(
-                                      onPressed: () {},
-                                      icon:
-                                          const Icon(Icons.lock_open_outlined),
+                                    prefixIcon: const Icon(
+                                      Icons.lock_open_outlined,
                                       color: AppConstants.secondaryColor,
                                     ),
                                     suffixIcon: obscurePassword

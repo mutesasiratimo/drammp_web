@@ -1,15 +1,15 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class BarChartPage extends StatefulWidget {
-  BarChartPage({super.key});
+class BarChartPageQuarterly extends StatefulWidget {
+  BarChartPageQuarterly({super.key});
   final Color leftBarColor = Colors.yellow;
   final Color rightBarColor = Colors.green.shade300;
   final Color avgColor = Colors.white;
-  State<StatefulWidget> createState() => BarChartPageState();
+  State<StatefulWidget> createState() => BarChartPageQuarterlyState();
 }
 
-class BarChartPageState extends State<BarChartPage> {
+class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
   final double width = 7;
 
   late List<BarChartGroupData> rawBarGroups;
@@ -23,30 +23,9 @@ class BarChartPageState extends State<BarChartPage> {
     final barGroup1 = makeGroupData(0, 0, 0);
     final barGroup2 = makeGroupData(1, 0, 0);
     final barGroup3 = makeGroupData(2, 0, 0);
-    final barGroup4 = makeGroupData(3, 0, 0);
-    final barGroup5 = makeGroupData(4, 0, 0);
-    final barGroup6 = makeGroupData(5, 0, 0);
-    final barGroup7 = makeGroupData(6, 0, 0);
-    final barGroup8 = makeGroupData(7, 0, 0);
-    final barGroup9 = makeGroupData(8, 0, 0);
-    final barGroup10 = makeGroupData(9, 0.8, 0);
-    final barGroup11 = makeGroupData(10, 0, 0);
-    final barGroup12 = makeGroupData(11, 6.2, 0);
+    final barGroup4 = makeGroupData(3, 7.0, 0);
 
-    final items = [
-      barGroup1,
-      barGroup2,
-      barGroup3,
-      barGroup4,
-      barGroup5,
-      barGroup6,
-      barGroup7,
-      barGroup8,
-      barGroup9,
-      barGroup10,
-      barGroup11,
-      barGroup12
-    ];
+    final items = [barGroup1, barGroup2, barGroup3, barGroup4];
 
     rawBarGroups = items;
 
@@ -180,20 +159,7 @@ class BarChartPageState extends State<BarChartPage> {
   }
 
   Widget bottomTitles(double value, TitleMeta meta) {
-    final titles = <String>[
-      'Ja',
-      'Fe',
-      'Ma',
-      'Ap',
-      'My',
-      'Jn',
-      'Jl',
-      'Au',
-      'Se',
-      'Oc',
-      'No',
-      'De'
-    ];
+    final titles = <String>['Q1', 'Q2', 'Q3', 'Q4'];
 
     final Widget text = Text(
       titles[value.toInt()],

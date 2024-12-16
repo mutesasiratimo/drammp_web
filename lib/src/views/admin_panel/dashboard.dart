@@ -1,15 +1,20 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/weather.dart';
+import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/html.dart';
 import '../../../config/base.dart';
 import '../../../config/constants.dart';
+import '../../../config/functions.dart';
 import '../../../services/messageprovider.dart';
+import '../../../models/homepagestats.dart';
 import 'home/barchart.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +32,8 @@ class _DashboardPageState extends Base<DashboardPage> {
   WeatherFactory wf = WeatherFactory(AppConstants.weatherApiKey);
   Weather? weather;
   Timer? timer;
+  List<DashSectorStats>? dashKitooroStats;
+  List<DashSectorStats>? dashSectorStats;
   final dateFormat = new DateFormat('dd-MM-yyyy');
   String _selectedFilter = "This Week";
   final List<String> _filters = [
@@ -64,10 +71,82 @@ class _DashboardPageState extends Base<DashboardPage> {
   @override
   void initState() {
     salutation = greeting();
+    getKitoorTaxiParkStats();
+    getDashSectorStats();
     initSocket();
     myMessageSink = context.read<MessageNotifierProvider>().notifyMessageSink;
     // WidgetsBinding.instance.addObserver(this);
     super.initState();
+  }
+
+  getKitoorTaxiParkStats() async {
+    // DashSectorStats returnValue ;
+    var url = Uri.parse(AppConstants.baseUrl + "dash/stats/kitoorotaxipark");
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    print("++++DASH STATS++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      List<DashSectorStats> statsmodel = (items as List)
+          .map((data) => DashSectorStats.fromJson(data))
+          .toList();
+
+      setState(() {
+        dashKitooroStats = statsmodel;
+      });
+    }
+  }
+
+  getDashSectorStats() async {
+    // DashSectorStats returnValue ;
+    var url = Uri.parse(AppConstants.baseUrl + "dash/stats/sectors");
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    print("++++DASH STATS++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      List<DashSectorStats> statsmodel = (items as List)
+          .map((data) => DashSectorStats.fromJson(data))
+          .toList();
+
+      setState(() {
+        dashSectorStats = statsmodel;
+      });
+    }
   }
 
   @override
@@ -86,6 +165,8 @@ class _DashboardPageState extends Base<DashboardPage> {
     // });
     context.read<MessageNotifierProvider>().notifyStream.listen((value) {
       debugPrint("Update Data");
+      getDashSectorStats();
+      getKitoorTaxiParkStats();
     });
   }
 
@@ -191,7 +272,8 @@ class _DashboardPageState extends Base<DashboardPage> {
               // ),
               //Entire row
               // ElevatedButton(
-              //     onPressed: () => sendMessage(homeChannel),
+              //     onPressed: () => AppFunctions.requestToPayMtnMomo(
+              //         "2000", "SO008766", "256781780862"),
               //     child: Text("Send Message")),
               BootstrapRow(
                 children: <BootstrapCol>[
@@ -200,772 +282,840 @@ class _DashboardPageState extends Base<DashboardPage> {
                     sizes: 'col-lg-7 col-md-12 col-sm-12',
                     child: Column(
                       children: [
-                        ExpansionTile(
-                          shape: const Border(),
-                          initiallyExpanded: true,
-                          // tilePadding: EdgeInsets.all(2.0),
-                          title: const Text(
-                            "Transport",
-                            style: TextStyle(
-                              color: AppConstants.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ), //header title
-                          children: [
-                            BootstrapRow(
-                              children: <BootstrapCol>[
-                                BootstrapCol(
-                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                  child: Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    color: Colors.white,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(15),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                        dashKitooroStats != null
+                            ? ExpansionTile(
+                                shape: const Border(),
+                                initiallyExpanded: true,
+                                // tilePadding: EdgeInsets.all(2.0),
+                                title: const Text(
+                                  "Kitooro Taxi Park",
+                                  style: TextStyle(
+                                    color: AppConstants.primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ), //header title
+                                children: [
+                                  BootstrapRow(
+                                    children: <BootstrapCol>[
+                                      BootstrapCol(
+                                        sizes: 'col-lg-6 col-md-12 col-sm-12',
+                                        child: Card(
+                                          clipBehavior: Clip.antiAlias,
+                                          color: Colors.white,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 16),
-                                                    child: Text(
-                                                      "Motorbikes",
+                                                    padding: EdgeInsets.all(15),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 16.0),
+                                                          child: Text(
+                                                            "Lockups",
+                                                            // style: textTheme.labelLarge!.copyWith(
+                                                            //   color: textColor,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "${dashKitooroStats![0].sectorcategories[0].streamcount}",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 14,
+                                                            ),
+                                                            // style: textTheme.headlineMedium!.copyWith(
+                                                            //   color: textColor,
+                                                            //   fontWeight: FontWeight.w600,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "UGX ${NumberFormat.compactCurrency(
+                                                              decimalDigits: 1,
+                                                              symbol: '',
+                                                            ).format(dashKitooroStats![0].sectorcategories[0].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
+                                                              decimalDigits: 1,
+                                                              symbol: '',
+                                                            ).format(dashKitooroStats![0].sectorcategories[0].expectedrevenue.round()).toString()}",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    height: 80,
+                                                    width: 80,
+                                                    child: Image.asset(
+                                                      "assets/images/lockup.png",
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const Divider(),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 12.0,
+                                                    left: 8.0,
+                                                    right: 8.0,
+                                                    top: 4.0),
+                                                child: LinearPercentIndicator(
+                                                  // width: ((MediaQuery.of(context)
+                                                  //             .size
+                                                  //             .width) /
+                                                  //         5) -
+                                                  //     50,
+                                                  animation: true,
+                                                  lineHeight: 7.0,
+                                                  animationDuration: 2000,
+                                                  percent: (dashKitooroStats![0]
+                                                          .sectorcategories[0]
+                                                          .paidrevenue /
+                                                      dashKitooroStats![0]
+                                                          .sectorcategories[0]
+                                                          .expectedrevenue),
+                                                  trailing: Text(
+                                                    "${(dashKitooroStats![0].sectorcategories[0].paidrevenue / dashKitooroStats![0].sectorcategories[0].expectedrevenue) * 100}%",
+                                                  ),
+                                                  linearStrokeCap:
+                                                      LinearStrokeCap.roundAll,
+                                                  progressColor: Colors.amber,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      BootstrapCol(
+                                        sizes: 'col-lg-6 col-md-12 col-sm-12',
+                                        child: Card(
+                                          clipBehavior: Clip.antiAlias,
+                                          color: Colors.white,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.all(15),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 16.0),
+                                                          child: Text(
+                                                            "Toll Gate Fee",
+                                                            // style: textTheme.labelLarge!.copyWith(
+                                                            //   color: textColor,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "${dashKitooroStats![0].sectorcategories[1].streamcount}",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 14,
+                                                            ),
+                                                            // style: textTheme.headlineMedium!.copyWith(
+                                                            //   color: textColor,
+                                                            //   fontWeight: FontWeight.w600,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "UGX ${NumberFormat.compactCurrency(
+                                                              decimalDigits: 1,
+                                                              symbol: '',
+                                                            ).format(dashKitooroStats![0].sectorcategories[1].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
+                                                              decimalDigits: 1,
+                                                              symbol: '',
+                                                            ).format(dashKitooroStats![0].sectorcategories[1].expectedrevenue.round()).toString()}",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    height: 80,
+                                                    width: 80,
+                                                    child: Image.asset(
+                                                      "assets/images/tollgate.png",
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const Divider(),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 12.0,
+                                                    left: 8.0,
+                                                    right: 8.0,
+                                                    top: 4.0),
+                                                child: LinearPercentIndicator(
+                                                  // width: ((MediaQuery.of(context)
+                                                  //             .size
+                                                  //             .width) /
+                                                  //         5) -
+                                                  //     50,
+                                                  animation: true,
+                                                  lineHeight: 7.0,
+                                                  animationDuration: 2000,
+                                                  percent: (dashSectorStats![0]
+                                                          .sectorcategories[2]
+                                                          .paidrevenue /
+                                                      dashSectorStats![0]
+                                                          .sectorcategories[2]
+                                                          .expectedrevenue),
+                                                  trailing: Text(
+                                                    "${(dashKitooroStats![0].sectorcategories[1].paidrevenue / dashKitooroStats![0].sectorcategories[1].expectedrevenue) * 100}%",
+                                                  ),
+                                                  linearStrokeCap:
+                                                      LinearStrokeCap.roundAll,
+                                                  progressColor: Colors.green,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : CircularProgressIndicator(),
+                        dashSectorStats != null
+                            ? ExpansionTile(
+                                shape: const Border(),
+                                initiallyExpanded: true,
+                                // tilePadding: EdgeInsets.all(2.0),
+                                title: const Text(
+                                  "Transport",
+                                  style: TextStyle(
+                                    color: AppConstants.primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ), //header title
+                                children: [
+                                  BootstrapRow(
+                                    children: <BootstrapCol>[
+                                      BootstrapCol(
+                                        sizes: 'col-lg-6 col-md-12 col-sm-12',
+                                        child: Card(
+                                          clipBehavior: Clip.antiAlias,
+                                          color: Colors.white,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.all(15),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 16),
+                                                          child: Text(
+                                                            "Motorbikes",
 
-                                                      // style: textTheme.labelLarge!.copyWith(
-                                                      //   color: textColor,
-                                                      // ),
+                                                            // style: textTheme.labelLarge!.copyWith(
+                                                            //   color: textColor,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            dashSectorStats![0]
+                                                                .sectorcategories[
+                                                                    2]
+                                                                .streamcount
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 14,
+                                                            ),
+                                                            // style: textTheme.headlineMedium!.copyWith(
+                                                            //   color: textColor,
+                                                            //   fontWeight: FontWeight.w600,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "UGX ${NumberFormat.compactCurrency(
+                                                              decimalDigits: 1,
+                                                              symbol: '',
+                                                            ).format(dashSectorStats![0].sectorcategories[2].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
+                                                              decimalDigits: 1,
+                                                              symbol: '',
+                                                            ).format(dashSectorStats![0].sectorcategories[2].expectedrevenue.round()).toString()}",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "18,558",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14,
-                                                      ),
-                                                      // style: textTheme.headlineMedium!.copyWith(
-                                                      //   color: textColor,
-                                                      //   fontWeight: FontWeight.w600,
-                                                      // ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "UGX 1.77M/1.86M",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 12,
-                                                      ),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    height: 80,
+                                                    width: 80,
+                                                    child: Image.asset(
+                                                      "assets/images/motorcycle.png",
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                            Container(
-                                              // margin:
-                                              //     const EdgeInsets.all(16.0),
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              height: 80,
-                                              width: 80,
-                                              // decoration: BoxDecoration(
-                                              //   color: Colors.purple.shade100,
-                                              //   borderRadius:
-                                              //       const BorderRadius.all(
-                                              //           Radius.circular(10)),
-                                              // ),
-                                              // child: const Icon(
-                                              //   Icons.motorcycle,
-                                              //   size: 40.0,
-                                              //   color:
-                                              //       AppConstants.primaryColor,
-                                              // ),
-                                              child: Image.asset(
-                                                "assets/images/motorcycle.png",
+                                              const Divider(),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 12.0,
+                                                    left: 8.0,
+                                                    right: 8.0,
+                                                    top: 4.0),
+                                                child: LinearPercentIndicator(
+                                                  // width: ((MediaQuery.of(context)
+                                                  //             .size
+                                                  //             .width) /
+                                                  //         5) -
+                                                  //     50,
+                                                  animation: true,
+                                                  lineHeight: 7.0,
+                                                  animationDuration: 2000,
+                                                  percent: (dashSectorStats![0]
+                                                          .sectorcategories[2]
+                                                          .paidrevenue /
+                                                      dashSectorStats![0]
+                                                          .sectorcategories[2]
+                                                          .expectedrevenue),
+                                                  trailing: Text(
+                                                    "${(dashSectorStats![0].sectorcategories[2].paidrevenue / dashSectorStats![0].sectorcategories[2].expectedrevenue) * 100}%",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  linearStrokeCap:
+                                                      LinearStrokeCap.roundAll,
+                                                  progressColor: Colors.green,
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Divider(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12.0,
-                                              left: 8.0,
-                                              right: 8.0,
-                                              top: 4.0),
-                                          child: LinearPercentIndicator(
-                                            // width: ((MediaQuery.of(context)
-                                            //             .size
-                                            //             .width) /
-                                            //         5) -
-                                            //     50,
-                                            animation: true,
-                                            lineHeight: 7.0,
-                                            animationDuration: 2000,
-                                            percent: 0.9,
-                                            trailing: const Text(
-                                              "90.0%",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            linearStrokeCap:
-                                                LinearStrokeCap.roundAll,
-                                            progressColor: Colors.green,
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                BootstrapCol(
-                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                  child: Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    color: Colors.white,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(15),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                      ),
+                                      BootstrapCol(
+                                        sizes: 'col-lg-6 col-md-12 col-sm-12',
+                                        child: Card(
+                                          clipBehavior: Clip.antiAlias,
+                                          color: Colors.white,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 16.0),
-                                                    child: Text(
-                                                      "Taxis",
-                                                      // style: textTheme.labelLarge!.copyWith(
-                                                      //   color: textColor,
-                                                      // ),
+                                                    padding: EdgeInsets.all(15),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 16.0),
+                                                          child: Text(
+                                                            "Buses",
+                                                            // style: textTheme.labelLarge!.copyWith(
+                                                            //   color: textColor,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "${dashSectorStats![0].sectorcategories[0].streamcount}",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 14,
+                                                            ),
+                                                            // style: textTheme.headlineMedium!.copyWith(
+                                                            //   color: textColor,
+                                                            //   fontWeight: FontWeight.w600,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "UGX ${NumberFormat.compactCurrency(
+                                                              decimalDigits: 1,
+                                                              symbol: '',
+                                                            ).format(dashSectorStats![0].sectorcategories[0].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
+                                                              decimalDigits: 1,
+                                                              symbol: '',
+                                                            ).format(dashSectorStats![0].sectorcategories[0].expectedrevenue.round()).toString()}",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "119",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14,
-                                                      ),
-                                                      // style: textTheme.headlineMedium!.copyWith(
-                                                      //   color: textColor,
-                                                      //   fontWeight: FontWeight.w600,
-                                                      // ),
+                                                  Container(
+                                                    // margin:
+                                                    //     const EdgeInsets.all(16.0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    height: 80,
+                                                    width: 80,
+                                                    child: Image.asset(
+                                                      "assets/images/shuttlebus.png",
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "UGX 340k/960k",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
+                                                    // decoration: BoxDecoration(
+                                                    //   color: Colors.purple.shade100,
+                                                    //   borderRadius:
+                                                    //       const BorderRadius.all(
+                                                    //           Radius.circular(10)),
+                                                    // ),
+                                                    // child: const Icon(
+                                                    //   Icons.local_taxi_outlined,
+                                                    //   size: 40.0,
+                                                    //   color:
+                                                    //       AppConstants.primaryColor,
+                                                    // ),
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                            Container(
-                                              // margin:
-                                              //     const EdgeInsets.all(16.0),
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              height: 80,
-                                              width: 80,
-                                              child: Image.asset(
-                                                "assets/images/shuttlebus.png",
+                                              const Divider(),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 12.0,
+                                                    left: 8.0,
+                                                    right: 8.0,
+                                                    top: 4.0),
+                                                child: LinearPercentIndicator(
+                                                  // width: ((MediaQuery.of(context)
+                                                  //             .size
+                                                  //             .width) /
+                                                  //         5) -
+                                                  //     50,
+                                                  animation: true,
+                                                  lineHeight: 7.0,
+                                                  animationDuration: 2000,
+                                                  percent: (dashSectorStats![0]
+                                                          .sectorcategories[2]
+                                                          .paidrevenue /
+                                                      dashSectorStats![0]
+                                                          .sectorcategories[2]
+                                                          .expectedrevenue),
+                                                  trailing: Text(
+                                                    "${(dashSectorStats![0].sectorcategories[2].paidrevenue / dashSectorStats![0].sectorcategories[2].expectedrevenue).round() * 100}%",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  linearStrokeCap:
+                                                      LinearStrokeCap.roundAll,
+                                                  progressColor: Colors.red,
+                                                ),
                                               ),
-                                              // decoration: BoxDecoration(
-                                              //   color: Colors.purple.shade100,
-                                              //   borderRadius:
-                                              //       const BorderRadius.all(
-                                              //           Radius.circular(10)),
-                                              // ),
-                                              // child: const Icon(
-                                              //   Icons.local_taxi_outlined,
-                                              //   size: 40.0,
-                                              //   color:
-                                              //       AppConstants.primaryColor,
-                                              // ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Divider(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12.0,
-                                              left: 8.0,
-                                              right: 8.0,
-                                              top: 4.0),
-                                          child: LinearPercentIndicator(
-                                            // width: ((MediaQuery.of(context)
-                                            //             .size
-                                            //             .width) /
-                                            //         5) -
-                                            //     50,
-                                            animation: true,
-                                            lineHeight: 7.0,
-                                            animationDuration: 2000,
-                                            percent: 0.35,
-                                            trailing: const Text(
-                                              "35.0%",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            linearStrokeCap:
-                                                LinearStrokeCap.roundAll,
-                                            progressColor: Colors.red,
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        ExpansionTile(
-                          shape: const Border(),
-                          initiallyExpanded: true,
-                          // tilePadding: EdgeInsets.all(2.0),
-                          title: const Text(
-                            "Kitooro Taxi Park",
-                            style: TextStyle(
-                              color: AppConstants.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ), //header title
-                          children: [
-                            BootstrapRow(
-                              children: <BootstrapCol>[
-                                BootstrapCol(
-                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                  child: Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    color: Colors.white,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(15),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                ],
+                              )
+                            : Container(),
+                        dashSectorStats != null
+                            ? ExpansionTile(
+                                shape: const Border(),
+                                initiallyExpanded: true,
+                                // tilePadding: EdgeInsets.all(2.0),
+                                title: const Text(
+                                  "Hospitality",
+                                  style: TextStyle(
+                                    color: AppConstants.primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ), //header title
+                                children: [
+                                  BootstrapRow(
+                                    children: <BootstrapCol>[
+                                      BootstrapCol(
+                                        sizes: 'col-lg-6 col-md-12 col-sm-12',
+                                        child: Card(
+                                          clipBehavior: Clip.antiAlias,
+                                          color: Colors.white,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 16.0),
-                                                    child: Text(
-                                                      "Lockups",
-                                                      // style: textTheme.labelLarge!.copyWith(
-                                                      //   color: textColor,
-                                                      // ),
+                                                  const Padding(
+                                                    padding: EdgeInsets.all(15),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 16.0),
+                                                          child: Text(
+                                                            "Hotels",
+                                                            // style: textTheme.labelLarge!.copyWith(
+                                                            //   color: textColor,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "6",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 14,
+                                                            ),
+                                                            // style: textTheme.headlineMedium!.copyWith(
+                                                            //   color: textColor,
+                                                            //   fontWeight: FontWeight.w600,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "UGX 5M/6M",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "152",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14,
-                                                      ),
-                                                      // style: textTheme.headlineMedium!.copyWith(
-                                                      //   color: textColor,
-                                                      //   fontWeight: FontWeight.w600,
-                                                      // ),
+                                                  Container(
+                                                    // margin:
+                                                    //     const EdgeInsets.all(16.0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    height: 80,
+                                                    width: 80,
+                                                    // decoration: BoxDecoration(
+                                                    //   color: Colors.purple.shade100,
+                                                    //   borderRadius:
+                                                    //       const BorderRadius.all(
+                                                    //           Radius.circular(10)),
+                                                    // ),
+                                                    child: const Icon(
+                                                      Icons.hotel_sharp,
+                                                      size: 50.0,
+                                                      color: AppConstants
+                                                          .primaryColor,
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "UGX 39M/50M",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
+                                                    // child: Image.asset(
+                                                    //   "assets/images/starhotel.png",
+                                                    // ),
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                            Container(
-                                              // margin:
-                                              //     const EdgeInsets.all(16.0),
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              height: 80,
-                                              width: 80,
-                                              // decoration: BoxDecoration(
-                                              //   color: Colors.purple.shade100,
-                                              //   borderRadius:
-                                              //       const BorderRadius.all(
-                                              //           Radius.circular(10)),
-                                              // ),
-                                              child: const Icon(
-                                                Icons.door_front_door_outlined,
-                                                size: 50.0,
-                                                color: Colors.green,
+                                              const Divider(),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 12.0,
+                                                    left: 8.0,
+                                                    right: 8.0,
+                                                    top: 4.0),
+                                                child: LinearPercentIndicator(
+                                                  // width: ((MediaQuery.of(context)
+                                                  //             .size
+                                                  //             .width) /
+                                                  //         5) -
+                                                  //     50,
+                                                  animation: true,
+                                                  lineHeight: 7.0,
+                                                  animationDuration: 2000,
+                                                  percent: 0.85,
+                                                  trailing: const Text(
+                                                    "85.0%",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  linearStrokeCap:
+                                                      LinearStrokeCap.roundAll,
+                                                  progressColor: Colors.green,
+                                                ),
                                               ),
-                                              // child: Image.asset(
-                                              //   "assets/images/starhotel.png",
-                                              // ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Divider(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12.0,
-                                              left: 8.0,
-                                              right: 8.0,
-                                              top: 4.0),
-                                          child: LinearPercentIndicator(
-                                            // width: ((MediaQuery.of(context)
-                                            //             .size
-                                            //             .width) /
-                                            //         5) -
-                                            //     50,
-                                            animation: true,
-                                            lineHeight: 7.0,
-                                            animationDuration: 2000,
-                                            percent: 0.79,
-                                            trailing: const Text(
-                                              "79.0%",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            linearStrokeCap:
-                                                LinearStrokeCap.roundAll,
-                                            progressColor: Colors.amber,
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                BootstrapCol(
-                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                  child: Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    color: Colors.white,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(15),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                      ),
+                                      BootstrapCol(
+                                        sizes: 'col-lg-6 col-md-12 col-sm-12',
+                                        child: Card(
+                                          clipBehavior: Clip.antiAlias,
+                                          color: Colors.white,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 16.0),
-                                                    child: Text(
-                                                      "Toll Gate Fee",
-                                                      // style: textTheme.labelLarge!.copyWith(
-                                                      //   color: textColor,
-                                                      // ),
+                                                  const Padding(
+                                                    padding: EdgeInsets.all(15),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 16.0),
+                                                          child: Text(
+                                                            "Beachfronts",
+                                                            // style: textTheme.labelLarge!.copyWith(
+                                                            //   color: textColor,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "18",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 14,
+                                                            ),
+                                                            // style: textTheme.headlineMedium!.copyWith(
+                                                            //   color: textColor,
+                                                            //   fontWeight: FontWeight.w600,
+                                                            // ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  bottom: 0),
+                                                          child: Text(
+                                                            "UGX 4M/9M",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "195",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14,
-                                                      ),
-                                                      // style: textTheme.headlineMedium!.copyWith(
-                                                      //   color: textColor,
-                                                      //   fontWeight: FontWeight.w600,
-                                                      // ),
+                                                  Container(
+                                                    // margin:
+                                                    //     const EdgeInsets.all(16.0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    height: 80,
+                                                    width: 80,
+                                                    // decoration: BoxDecoration(
+                                                    //   color: Colors.purple.shade100,
+                                                    //   borderRadius:
+                                                    //       const BorderRadius.all(
+                                                    //           Radius.circular(10)),
+                                                    // ),
+                                                    child: const Icon(
+                                                      Icons.waves,
+                                                      size: 50.0,
+                                                      color: Colors.blue,
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "UGX 195k/195k",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              // margin:
-                                              //     const EdgeInsets.all(16.0),
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              height: 80,
-                                              width: 80,
-                                              // decoration: BoxDecoration(
-                                              //   color: Colors.purple.shade100,
-                                              //   borderRadius:
-                                              //       const BorderRadius.all(
-                                              //           Radius.circular(10)),
-                                              // ),
-                                              child: const Icon(
-                                                Icons.toll,
-                                                size: 50.0,
-                                                color: Colors.teal,
-                                              ),
-                                              // child: Image.asset(
-                                              //   "assets/images/motorcycle.png",
-                                              // ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Divider(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12.0,
-                                              left: 8.0,
-                                              right: 8.0,
-                                              top: 4.0),
-                                          child: LinearPercentIndicator(
-                                            // width: ((MediaQuery.of(context)
-                                            //             .size
-                                            //             .width) /
-                                            //         5) -
-                                            //     50,
-                                            animation: true,
-                                            lineHeight: 7.0,
-                                            animationDuration: 2000,
-                                            percent: 1.0,
-                                            trailing: const Text(
-                                              "100%",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            linearStrokeCap:
-                                                LinearStrokeCap.roundAll,
-                                            progressColor: Colors.green,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        ExpansionTile(
-                          shape: const Border(),
-                          initiallyExpanded: true,
-                          // tilePadding: EdgeInsets.all(2.0),
-                          title: const Text(
-                            "Hospitality",
-                            style: TextStyle(
-                              color: AppConstants.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ), //header title
-                          children: [
-                            BootstrapRow(
-                              children: <BootstrapCol>[
-                                BootstrapCol(
-                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                  child: Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    color: Colors.white,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(15),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 16.0),
-                                                    child: Text(
-                                                      "Hotels",
-                                                      // style: textTheme.labelLarge!.copyWith(
-                                                      //   color: textColor,
-                                                      // ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "6",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14,
-                                                      ),
-                                                      // style: textTheme.headlineMedium!.copyWith(
-                                                      //   color: textColor,
-                                                      //   fontWeight: FontWeight.w600,
-                                                      // ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "UGX 5M/6M",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
+                                                    // child: Image.asset(
+                                                    //   "assets/images/motorcycle.png",
+                                                    // ),
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                            Container(
-                                              // margin:
-                                              //     const EdgeInsets.all(16.0),
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              height: 80,
-                                              width: 80,
-                                              // decoration: BoxDecoration(
-                                              //   color: Colors.purple.shade100,
-                                              //   borderRadius:
-                                              //       const BorderRadius.all(
-                                              //           Radius.circular(10)),
-                                              // ),
-                                              child: const Icon(
-                                                Icons.hotel_sharp,
-                                                size: 50.0,
-                                                color:
-                                                    AppConstants.primaryColor,
+                                              const Divider(),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 12.0,
+                                                    left: 8.0,
+                                                    right: 8.0,
+                                                    top: 4.0),
+                                                child: LinearPercentIndicator(
+                                                  // width: ((MediaQuery.of(context)
+                                                  //             .size
+                                                  //             .width) /
+                                                  //         5) -
+                                                  //     50,
+                                                  animation: true,
+                                                  lineHeight: 7.0,
+                                                  animationDuration: 2000,
+                                                  percent: 0.45,
+                                                  trailing: const Text(
+                                                    "45.0%",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  linearStrokeCap:
+                                                      LinearStrokeCap.roundAll,
+                                                  progressColor: Colors.red,
+                                                ),
                                               ),
-                                              // child: Image.asset(
-                                              //   "assets/images/starhotel.png",
-                                              // ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Divider(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12.0,
-                                              left: 8.0,
-                                              right: 8.0,
-                                              top: 4.0),
-                                          child: LinearPercentIndicator(
-                                            // width: ((MediaQuery.of(context)
-                                            //             .size
-                                            //             .width) /
-                                            //         5) -
-                                            //     50,
-                                            animation: true,
-                                            lineHeight: 7.0,
-                                            animationDuration: 2000,
-                                            percent: 0.85,
-                                            trailing: const Text(
-                                              "85.0%",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            linearStrokeCap:
-                                                LinearStrokeCap.roundAll,
-                                            progressColor: Colors.green,
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                BootstrapCol(
-                                  sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                  child: Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    color: Colors.white,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(15),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 16.0),
-                                                    child: Text(
-                                                      "Beachfronts",
-                                                      // style: textTheme.labelLarge!.copyWith(
-                                                      //   color: textColor,
-                                                      // ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "18",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14,
-                                                      ),
-                                                      // style: textTheme.headlineMedium!.copyWith(
-                                                      //   color: textColor,
-                                                      //   fontWeight: FontWeight.w600,
-                                                      // ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 0),
-                                                    child: Text(
-                                                      "UGX 4M/9M",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              // margin:
-                                              //     const EdgeInsets.all(16.0),
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              height: 80,
-                                              width: 80,
-                                              // decoration: BoxDecoration(
-                                              //   color: Colors.purple.shade100,
-                                              //   borderRadius:
-                                              //       const BorderRadius.all(
-                                              //           Radius.circular(10)),
-                                              // ),
-                                              child: const Icon(
-                                                Icons.waves,
-                                                size: 50.0,
-                                                color: Colors.blue,
-                                              ),
-                                              // child: Image.asset(
-                                              //   "assets/images/motorcycle.png",
-                                              // ),
-                                            ),
-                                          ],
-                                        ),
-                                        const Divider(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12.0,
-                                              left: 8.0,
-                                              right: 8.0,
-                                              top: 4.0),
-                                          child: LinearPercentIndicator(
-                                            // width: ((MediaQuery.of(context)
-                                            //             .size
-                                            //             .width) /
-                                            //         5) -
-                                            //     50,
-                                            animation: true,
-                                            lineHeight: 7.0,
-                                            animationDuration: 2000,
-                                            percent: 0.45,
-                                            trailing: const Text(
-                                              "45.0%",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            linearStrokeCap:
-                                                LinearStrokeCap.roundAll,
-                                            progressColor: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                ],
+                              )
+                            : Container()
                       ],
                     ),
                   ), // the 5/12 containing graphs

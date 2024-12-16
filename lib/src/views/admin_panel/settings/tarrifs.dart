@@ -1,8 +1,12 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:convert';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:entebbe_dramp_web/models/tarriffs.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import '../../../../config/constants.dart';
 
@@ -19,6 +23,19 @@ class _TarrifsPageState extends State<TarrifsPage> {
   bool _isAscending = true;
   int _currentSortColumnTarriff = 0;
   bool _isAscendingTarriff = true;
+  String selectedFrequency = "";
+  List<String> frequencyType = [
+    "Weekly",
+    "Monthly",
+    "Quarterly",
+    "Annual",
+    "N/A"
+  ];
+  TextEditingController tarrifNameController = TextEditingController(),
+      categoryNameController = TextEditingController(),
+      frequencyDaysController = TextEditingController(),
+      amountController = TextEditingController(),
+      ownerPhoneController = TextEditingController();
 
   //get tarrifs list
   Future<List<TarriffsModel>> getTarrifs() async {
@@ -70,6 +87,660 @@ class _TarrifsPageState extends State<TarrifsPage> {
     super.initState();
   }
 
+  //SHOW DIALOG FOR TARRIF DETAILS
+  _showTarrifDetails(TarriffsModel tarrif) async {
+    setState(() {
+      tarrifNameController.text = tarrif.purpose;
+      categoryNameController.text = tarrif.sectorsubtypename;
+      selectedFrequency = tarrif.frequency;
+      frequencyDaysController.text = tarrif.frequencydays.toString();
+      amountController.text = tarrif.amount.toString();
+    });
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext ctxt) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 0.0),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Tarrif Details",
+                style: TextStyle(
+                  fontFamily: "Montserrat",
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                  onPressed: () {
+                    context.goNamed("settings", pathParameters: {});
+                    // Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.red,
+                  ))
+            ],
+          ),
+          content:
+              StatefulBuilder(// You need this, notice the parameters below:
+                  builder: (BuildContext context, StateSetter setState) {
+            return SizedBox(
+              width: 400,
+              child: BootstrapContainer(
+                fluid: true,
+                decoration: BoxDecoration(),
+                children: [
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0),
+                            dense: true,
+                            visualDensity: VisualDensity(vertical: 3),
+                            title: Text(
+                              'Tarrif',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Container(
+                              height: 38,
+                              child: TextFormField(
+                                controller: tarrifNameController,
+                                enabled: true,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 4),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  hintText: '',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0),
+                            dense: true,
+                            visualDensity: VisualDensity(vertical: 3),
+                            title: Text(
+                              'Sector Category',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Container(
+                              height: 38,
+                              child: TextFormField(
+                                controller: categoryNameController,
+                                enabled: false,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 4),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  hintText: '',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: ListTile(
+                          title: Text(
+                            'Select Frequency',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: SizedBox(
+                            height: 38,
+                            child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 4),
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Color(0xffB9B9B9)),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xffB9B9B9), width: 1.0),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                hintText: '',
+                              ),
+                              isExpanded: true,
+                              hint: Row(
+                                children: [
+                                  new Text(
+                                    selectedFrequency,
+                                    style: const TextStyle(
+                                        // color: Colors.grey,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              icon: const Icon(Icons.keyboard_arrow_down),
+                              items: frequencyType.map((item) {
+                                return DropdownMenuItem(
+                                  child: Row(
+                                    children: [
+                                      new Text(
+                                        item,
+                                        style: const TextStyle(
+                                            // color: Colors.grey,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                  value: item,
+                                );
+                              }).toList(),
+                              onChanged: (newVal) {
+                                List itemsList = frequencyType.map((item) {
+                                  if (item == newVal) {
+                                    setState(() {
+                                      selectedFrequency = item;
+                                    });
+                                  }
+                                }).toList();
+                              },
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0),
+                            dense: true,
+                            visualDensity: VisualDensity(vertical: 3),
+                            title: Text(
+                              'Frequency Days',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Container(
+                              height: 38,
+                              child: TextFormField(
+                                controller: frequencyDaysController,
+                                enabled: true,
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 4),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  hintText: '',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0),
+                            dense: true,
+                            visualDensity: VisualDensity(vertical: 3),
+                            title: Text(
+                              'Amount',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Container(
+                              height: 38,
+                              child: TextFormField(
+                                controller: amountController,
+                                enabled: true,
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 4),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  hintText: '',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 22.0, vertical: 8.0),
+                    child: ListTile(
+                      leading: Text(
+                        'Status',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      trailing: CupertinoSwitch(
+                        value: tarrif.status == "1",
+                        onChanged: (value) {
+                          // setState(() {
+                          // });
+                        },
+                        trackColor: Colors.red,
+                        activeColor: Colors.green,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+          actions: <Widget>[],
+        );
+      },
+    );
+  }
+
+  //SHOW DIALOG TO CREATE TARRIF
+  _createTarrif() async {
+    setState(() {
+      tarrifNameController.clear();
+      categoryNameController.clear();
+      selectedFrequency = "";
+      frequencyDaysController.clear();
+      amountController.clear();
+    });
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext ctxt) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 0.0),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "New Tarrif",
+                style: TextStyle(
+                  fontFamily: "Montserrat",
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                  onPressed: () {
+                    context.goNamed("settings", pathParameters: {});
+                    // Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.red,
+                  ))
+            ],
+          ),
+          content:
+              StatefulBuilder(// You need this, notice the parameters below:
+                  builder: (BuildContext context, StateSetter setState) {
+            return SizedBox(
+              width: 400,
+              child: BootstrapContainer(
+                fluid: true,
+                decoration: BoxDecoration(),
+                children: [
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0),
+                            dense: true,
+                            visualDensity: VisualDensity(vertical: 3),
+                            title: Text(
+                              'Tarrif',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Container(
+                              height: 38,
+                              child: TextFormField(
+                                controller: tarrifNameController,
+                                enabled: true,
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 4),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  hintText: '',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0),
+                            dense: true,
+                            visualDensity: VisualDensity(vertical: 3),
+                            title: Text(
+                              'Sector Category',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Container(
+                              height: 38,
+                              child: TextFormField(
+                                controller: categoryNameController,
+                                enabled: true,
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 4),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  hintText: '',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: ListTile(
+                          title: Text(
+                            'Select Frequency',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: SizedBox(
+                            height: 38,
+                            child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 4),
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Color(0xffB9B9B9)),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xffB9B9B9), width: 1.0),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(4)),
+                                ),
+                                hintText: '',
+                              ),
+                              isExpanded: true,
+                              hint: Row(
+                                children: [
+                                  new Text(
+                                    selectedFrequency,
+                                    style: const TextStyle(
+                                        // color: Colors.grey,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              icon: const Icon(Icons.keyboard_arrow_down),
+                              items: frequencyType.map((item) {
+                                return DropdownMenuItem(
+                                  child: Row(
+                                    children: [
+                                      new Text(
+                                        item,
+                                        style: const TextStyle(
+                                            // color: Colors.grey,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                  value: item,
+                                );
+                              }).toList(),
+                              onChanged: (newVal) {
+                                List itemsList = frequencyType.map((item) {
+                                  if (item == newVal) {
+                                    setState(() {
+                                      selectedFrequency = item;
+                                    });
+                                  }
+                                }).toList();
+                              },
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0),
+                            dense: true,
+                            visualDensity: VisualDensity(vertical: 3),
+                            title: Text(
+                              'Frequency Days',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Container(
+                              height: 38,
+                              child: TextFormField(
+                                controller: categoryNameController,
+                                enabled: true,
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 4),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  hintText: '',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  BootstrapRow(
+                    children: [
+                      BootstrapCol(
+                        sizes: "col-12",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 0),
+                            dense: true,
+                            visualDensity: VisualDensity(vertical: 3),
+                            title: Text(
+                              'Amount',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Container(
+                              height: 38,
+                              child: TextFormField(
+                                controller: categoryNameController,
+                                enabled: true,
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 4),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xffB9B9B9)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xffB9B9B9), width: 1.0),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(4)),
+                                  ),
+                                  hintText: '',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }),
+          actions: <Widget>[],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -88,6 +759,35 @@ class _TarrifsPageState extends State<TarrifsPage> {
                   margin: EdgeInsets.all(16.0),
                   child: Column(
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: TextButton.icon(
+                              onPressed: () {
+                                _createTarrif();
+                              },
+                              icon: const Icon(
+                                Icons.add,
+                                color: AppConstants.secondaryColor,
+                                size: 20,
+                              ),
+                              label: const Text(
+                                'New Tarrif',
+                                style: TextStyle(
+                                    color: AppConstants.secondaryColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                shape: const StadiumBorder(),
+                                backgroundColor: AppConstants.primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       SizedBox(
                         height: size.height * .65,
                         child: DataTable2(
@@ -293,7 +993,9 @@ class _TarrifsPageState extends State<TarrifsPage> {
                                         )),
                                         DataCell(
                                           IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              _showTarrifDetails(element);
+                                            },
                                             icon: Icon(
                                               Icons.more_horiz_sharp,
                                               color: AppConstants.primaryColor,
