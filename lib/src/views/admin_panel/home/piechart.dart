@@ -72,10 +72,10 @@ class PieChart2State extends Base<PieChartSample2> {
           .map((data) => SectorRevenueDistributionModel.fromJson(data))
           .toList();
 
-      // setState(() {
-      returnVal = statsmodel;
-      dashDistributionStats = statsmodel;
-      // });
+      setState(() {
+        returnVal = statsmodel;
+        dashDistributionStats = statsmodel;
+      });
     }
     return returnVal;
   }
