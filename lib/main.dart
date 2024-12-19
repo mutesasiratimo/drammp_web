@@ -13,12 +13,6 @@ import 'services/push_notifications.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-final isLoggedIn = StateProvider<bool>((ref) {
-  return false;
-});
-final initRoute = StateProvider<String>((ref) {
-  return "/";
-});
 
 // function to lisen to background changes
 Future _firebaseBackgroundMessage(RemoteMessage message) async {

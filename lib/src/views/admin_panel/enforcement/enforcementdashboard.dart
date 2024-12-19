@@ -230,21 +230,16 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.purple.shade50,
       body: SingleChildScrollView(
         child: Column(
           children: [
             BootstrapContainer(
               fluid: true,
-              decoration: BoxDecoration(
-                color: Colors.purple.shade50,
-              ),
               padding: const EdgeInsets.only(top: 0),
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.all(16.0),
                   child: Card(
-                    color: Colors.white,
                     child: Column(
                       children: [
                         SizedBox(height: 8),
@@ -608,7 +603,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                       SizedBox(height: 8),
                                       SizedBox(
                                         // width: 200,
-                                        height: 290,
+                                        height: 250,
                                         child: DataTable2(
                                           headingRowHeight: 40,
                                           headingRowColor:
@@ -786,8 +781,6 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
-                                                                  color: Colors
-                                                                      .black,
                                                                   fontSize: 12),
                                                         )),
                                                         DataCell(Text(
@@ -798,7 +791,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                                                       .bold,
                                                               color: AppConstants
                                                                   .primaryColor,
-                                                              fontSize: 12),
+                                                              fontSize: 14),
                                                         )),
                                                         DataCell(Text(
                                                           element.type
@@ -895,7 +888,6 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                                 hint: new Text(
                                                   _streamsRowCount.toString(),
                                                   style: const TextStyle(
-                                                      color: Colors.black,
                                                       fontSize: 14,
                                                       fontWeight:
                                                           FontWeight.w400),

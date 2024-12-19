@@ -92,18 +92,17 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple.shade50,
       body: PageView(
         controller: revenuePageController,
         // physics: const NeverScrollableScrollPhysics(),
         allowImplicitScrolling: false,
         children: [
           Container(
-            color: Colors.purple.shade50,
+            // color: Colors.purple.shade50,
             margin: EdgeInsets.all(16.0),
             padding: EdgeInsets.all(8.0),
             child: Card(
-              color: Colors.white,
+              // color: Colors.white,
               child: Column(children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -257,14 +256,13 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
                                       "${element.code}",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black,
                                           fontSize: 12),
                                     )),
                                     DataCell(Text(
                                       "${element.name}",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: AppConstants.primaryColor,
+                                          // color: AppConstants.primaryColor,
                                           fontSize: 12),
                                     )),
                                     DataCell(Text(
@@ -315,7 +313,7 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
                   ),
                 ),
                 SizedBox(
-                  height: 80,
+                  height: 50,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -329,9 +327,7 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
                           hint: new Text(
                             _rowsPerPage.toString(),
                             style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400),
+                                fontSize: 14, fontWeight: FontWeight.w400),
                           ),
                           // icon: const Icon(Icons.keyboard_arrow_down),
                           items: rowCountList.map((item) {

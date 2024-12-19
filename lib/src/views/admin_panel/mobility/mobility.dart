@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../config/base.dart';
 import '../../../../config/constants.dart';
 import '../../../../config/functions.dart';
-import '../../../../services/messageprovider.dart';
+import '../../../../provider/messageprovider.dart';
 import '/models/revenuestreamspaginated.dart';
 import '/models/trips.dart';
 import 'map_page.dart';
@@ -195,22 +195,17 @@ class _MobilityPageState extends Base<MobilityPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.purple.shade50,
       body: SingleChildScrollView(
         child: Column(
           children: [
             BootstrapContainer(
               fluid: true,
-              decoration: BoxDecoration(
-                color: Colors.purple.shade50,
-              ),
               padding: const EdgeInsets.only(top: 0),
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.all(16.0),
                   // padding: EdgeInsets.all(16.0),
                   child: Card(
-                    color: Colors.white,
                     child: Column(
                       children: [
                         SizedBox(height: 16),
@@ -234,197 +229,196 @@ class _MobilityPageState extends Base<MobilityPage> {
                           children: <BootstrapCol>[
                             BootstrapCol(
                               sizes: "col-lg-3 col-md-6 col-sm-12",
-                              child: Card(
-                                child: SizedBox(
-                                  height: size.height * .15,
-                                  child: Container(
-                                    margin: EdgeInsets.all(0.0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(16.0)),
-                                        color: Colors.green.shade50),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(width: 12),
-                                        Icon(
-                                          Icons.monetization_on,
-                                          size: 32,
-                                          color: Colors.green.shade900,
-                                        ),
-                                        SizedBox(width: 18),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${faresToday}",
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                              child: SizedBox(
+                                height: size.height * .15,
+                                child: Container(
+                                  margin: EdgeInsets.all(0.0),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(16.0)),
+                                      color: Colors.green.shade50),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(width: 12),
+                                      Icon(
+                                        Icons.monetization_on,
+                                        size: 32,
+                                        color: Colors.green.shade900,
+                                      ),
+                                      SizedBox(width: 18),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "${faresToday}",
+                                            style: TextStyle(
+                                              color: Colors.green.shade900,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
                                             ),
-                                            Text(
-                                              "(UGX) Today.",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400,
-                                              ),
+                                          ),
+                                          Text(
+                                            "(UGX) Today.",
+                                            style: TextStyle(
+                                              color: Colors.green.shade900,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                             BootstrapCol(
                               sizes: "col-lg-3 col-md-6 col-sm-12",
-                              child: Card(
-                                child: SizedBox(
-                                  height: size.height * .15,
-                                  child: Container(
-                                    margin: EdgeInsets.all(0.0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(16.0)),
-                                        color: Colors.blue.shade50),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(width: 12),
-                                        Icon(
-                                          Icons.sync_alt,
-                                          size: 32,
-                                          color: Colors.blue.shade900,
-                                        ),
-                                        SizedBox(width: 18),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${tripsToday}",
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                              child: SizedBox(
+                                height: size.height * .15,
+                                child: Container(
+                                  margin: EdgeInsets.all(0.0),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(16.0)),
+                                      color: Colors.blue.shade50),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(width: 12),
+                                      Icon(
+                                        Icons.sync_alt,
+                                        size: 32,
+                                        color: Colors.blue.shade900,
+                                      ),
+                                      SizedBox(width: 18),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "${tripsToday}",
+                                            style: TextStyle(
+                                              color: Colors.blue.shade900,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
                                             ),
-                                            Text(
-                                              "Trips Today.",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400,
-                                              ),
+                                          ),
+                                          Text(
+                                            "Trips Today.",
+                                            style: TextStyle(
+                                              color: Colors.blue.shade900,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                             BootstrapCol(
                               sizes: "col-lg-3 col-md-6 col-sm-12",
-                              child: Card(
-                                child: SizedBox(
-                                  height: size.height * .15,
-                                  child: Container(
-                                    margin: EdgeInsets.all(0.0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(16.0)),
-                                        color: Colors.purple.shade50),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(width: 12),
-                                        Icon(
-                                          Icons.local_taxi,
-                                          size: 32,
-                                          color: Colors.purple.shade900,
-                                        ),
-                                        SizedBox(width: 18),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${activeVehicles} of ${totalVehicles}",
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                              child: SizedBox(
+                                height: size.height * .15,
+                                child: Container(
+                                  margin: EdgeInsets.all(0.0),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(16.0)),
+                                      color: Colors.purple.shade50),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(width: 12),
+                                      Icon(
+                                        Icons.local_taxi,
+                                        size: 32,
+                                        color: Colors.purple.shade900,
+                                      ),
+                                      SizedBox(width: 18),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "${activeVehicles} of ${totalVehicles}",
+                                            style: TextStyle(
+                                              color: Colors.purple.shade900,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
                                             ),
-                                            Text(
-                                              "Active Vehicles.",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400,
-                                              ),
+                                          ),
+                                          Text(
+                                            "Active Vehicles.",
+                                            style: TextStyle(
+                                              color: Colors.purple.shade900,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                             BootstrapCol(
                               sizes: "col-lg-3 col-md-6 col-sm-12",
-                              child: Card(
-                                child: SizedBox(
-                                  height: size.height * .15,
-                                  child: Container(
-                                    margin: EdgeInsets.all(0.0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(16.0)),
-                                        color: Colors.green.shade50),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(width: 12),
-                                        Icon(Icons.people_alt_outlined,
-                                            size: 32),
-                                        SizedBox(width: 18),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "$passengersToday",
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                              child: SizedBox(
+                                height: size.height * .15,
+                                child: Container(
+                                  margin: EdgeInsets.all(0.0),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(16.0)),
+                                      color: Colors.green.shade50),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(width: 12),
+                                      Icon(
+                                        Icons.people_alt_outlined,
+                                        size: 32,
+                                        color: Colors.black,
+                                      ),
+                                      SizedBox(width: 18),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "$passengersToday",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
                                             ),
-                                            Text(
-                                              "Passengers Today.",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400,
-                                              ),
+                                          ),
+                                          Text(
+                                            "Passengers Today.",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -668,7 +662,6 @@ class _MobilityPageState extends Base<MobilityPage> {
                                                 hint: new Text(
                                                   carPageRows.toString(),
                                                   style: const TextStyle(
-                                                      color: Colors.black,
                                                       fontSize: 14,
                                                       fontWeight:
                                                           FontWeight.w400),

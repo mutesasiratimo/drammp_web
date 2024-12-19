@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../config/constants.dart';
+import '../../../provider/app_preferences_provider.dart';
+import '../../../provider/user_data_provider.dart';
 
 enum SidebarItem {
   dashboard(value: 'Dashboard', iconData: Icons.home),
@@ -40,23 +45,28 @@ class ScaffoldWithSideBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeData = Theme.of(context);
     final selectedRoute = ref.watch(selectedRouteProvider);
     final sideBarkey = ValueKey(Random().nextInt(1000000));
     return AdminScaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       appBar: AppBar(
         // foregroundColor: Colors.white,
         title: const Text(''),
         // toolbarHeight: 50,
         // elevation: 8.0,
         // backgroundColor: Colors.white,
-        actions: [_accountToggle(context)],
+        actions: [
+          _toggleThemeButton(context),
+          SizedBox(width: kDefaultPadding),
+          _accountToggle(context)
+        ],
       ),
       body: navigationShell,
       sideBar: SideBar(
           header: Container(
-            height: 60,
-          ),
+              // height: 60,
+              ),
           key: sideBarkey,
           textStyle: TextStyle(
             // color: Colors.black,
@@ -68,7 +78,8 @@ class ScaffoldWithSideBar extends ConsumerWidget {
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: themeData.appBarTheme.backgroundColor!,
+          // backgroundColor: Colors.white,
           activeBackgroundColor: Colors.indigo.shade200,
           onSelected: (item) {
             final index = getSideBarItem(item).index;
@@ -93,14 +104,68 @@ class ScaffoldWithSideBar extends ConsumerWidget {
     );
   }
 
+  Widget _toggleThemeButton(BuildContext context) {
+    final themeData = Theme.of(context);
+    final isFullWidthButton =
+        (MediaQuery.of(context).size.width > kScreenWidthMd);
+
+    return SizedBox(
+      width: (isFullWidthButton ? null : 48.0),
+      child: TextButton(
+        onPressed: () async {
+          final provider = context.read<AppPreferencesProvider>();
+          final currentThemeMode = provider.themeMode;
+          final themeMode = (currentThemeMode != ThemeMode.dark
+              ? ThemeMode.dark
+              : ThemeMode.light);
+
+          provider.setThemeModeAsync(themeMode: themeMode);
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: themeData.colorScheme.onPrimary,
+          disabledForegroundColor: AppConstants.primaryColor.withOpacity(0.38),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        ),
+        child: Selector<AppPreferencesProvider, ThemeMode>(
+          selector: (context, provider) => provider.themeMode,
+          builder: (context, value, child) {
+            var icon = Icons.dark_mode_rounded;
+            var text = "Dark";
+
+            if (value == ThemeMode.dark) {
+              icon = Icons.light_mode_rounded;
+              text = "Light";
+            }
+
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                ),
+                Visibility(
+                  // visible: false,
+                  visible: isFullWidthButton,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: kDefaultPadding * 0.5),
+                    child: Text(text),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _accountToggle(BuildContext context) {
+    final goRouter = GoRouter.of(context);
     //Logout Function
     clearPrefs() async {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       preferences.clear();
-      context.goNamed(
-        "signin",
-      );
+      goRouter.go("/sign-in");
     }
 
     return Container(
@@ -117,18 +182,36 @@ class ScaffoldWithSideBar extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    backgroundImage:
-                        NetworkImage("https://picsum.photos/id/28/50"),
-                    radius: 20.0,
+                  Selector<UserDataProvider, String>(
+                    selector: (context, provider) =>
+                        provider.userProfileImageUrl,
+                    builder: (context, value, child) {
+                      return CircleAvatar(
+                        backgroundColor: Colors.white,
+                        backgroundImage: NetworkImage(value),
+                        radius: 20.0,
+                      );
+                    },
                   ),
                   SizedBox(width: 16 * 0.5),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Admin User"),
-                      Text("admin@email.com"),
+                      Selector<UserDataProvider, String>(
+                        selector: (context, provider) => provider.fullname,
+                        builder: (context, value, child) {
+                          return Text("$value");
+                        },
+                      ),
+                      Selector<UserDataProvider, String>(
+                        selector: (context, provider) => provider.email,
+                        builder: (context, value, child) {
+                          return Text(
+                            "$value",
+                            style: TextStyle(fontSize: 12),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ],
@@ -149,18 +232,22 @@ class ScaffoldWithSideBar extends ConsumerWidget {
         ],
         child: Row(
           children: [
-            const CircleAvatar(
-              backgroundColor: Colors.white,
-              backgroundImage: NetworkImage("https://picsum.photos/id/28/50"),
-              radius: 16.0,
+            Selector<UserDataProvider, String>(
+              selector: (context, provider) => provider.userProfileImageUrl,
+              builder: (context, value, child) {
+                return CircleAvatar(
+                  backgroundColor: Colors.white,
+                  backgroundImage: NetworkImage(value),
+                  radius: 16.0,
+                );
+              },
             ),
             SizedBox(width: 16 * 0.5),
-            const Text(
-              'Hi, Admin',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
+            Selector<UserDataProvider, String>(
+              selector: (context, provider) => provider.username,
+              builder: (context, value, child) {
+                return Text("Hi $value");
+              },
             ),
           ],
         ),

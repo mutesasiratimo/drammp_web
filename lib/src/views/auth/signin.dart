@@ -4,10 +4,12 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../config/base.dart';
 import '../../../config/constants.dart';
 // import '../admin_panel/home_page.dart';
+import '../../../provider/user_data_provider.dart';
 import '/models/user.dart';
 // import 'signup.dart';
 
@@ -31,7 +33,8 @@ class _SignInPageState extends Base<SignInPage> {
     // messageListener();
   }
 
-  _login(String username, String password) async {
+  _login(String username, String password,
+      UserDataProvider userDataProvider) async {
     var url = Uri.parse(AppConstants.baseUrl + "user/login");
     String _authToken = "";
     debugPrint("++++++" + "LOGIN FUNCTION" + "+++++++");
@@ -66,6 +69,14 @@ class _SignInPageState extends Base<SignInPage> {
       _authToken = user.token;
 
       if (user.issuperadmin || user.isadmin || user.isclerk) {
+        await userDataProvider.setUserDataAsync(
+          username: user.firstname,
+          userProfileImageUrl: 'https://picsum.photos/id/1005/300/300',
+          fullname: "${user.firstname} ${user.lastname}",
+          email: user.email,
+          phone: user.phone,
+          hash: password,
+        );
         prefs.setString("authToken", _authToken);
 
         prefs.setString("firstName", user.firstname);
@@ -123,6 +134,7 @@ class _SignInPageState extends Base<SignInPage> {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
+    final themeData = Theme.of(context);
     return Scaffold(
       body: BootstrapContainer(
         fluid: true,
@@ -154,7 +166,6 @@ class _SignInPageState extends Base<SignInPage> {
                                 "Sign In",
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
-                                  color: Colors.black,
                                   fontSize: 30,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -167,13 +178,16 @@ class _SignInPageState extends Base<SignInPage> {
                                     .goNamed("signup", pathParameters: {}),
                                 // onTap: () => push(const SignUpPage()),
                                 child: RichText(
-                                  text: const TextSpan(
+                                  text: TextSpan(
                                     text: "Don't have an account? ",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
+                                    style: themeData.textTheme.titleSmall!
+                                        .copyWith(
+                                      fontWeight: FontWeight.w600,
                                     ),
+                                    // style: TextStyle(
+                                    //   fontSize: 16,
+                                    //   fontWeight: FontWeight.w500,
+                                    // ),
                                     children: [
                                       TextSpan(
                                         text: "Register Here",
@@ -281,7 +295,6 @@ class _SignInPageState extends Base<SignInPage> {
                                         const Text(
                                           'Remember Me',
                                           style: TextStyle(
-                                              color: Colors.black,
                                               fontWeight: FontWeight.w500,
                                               fontSize: 14),
                                         ),
@@ -318,8 +331,12 @@ class _SignInPageState extends Base<SignInPage> {
                                               emailController.text.isNotEmpty &&
                                                       passwordController
                                                           .text.isNotEmpty
-                                                  ? _login(emailController.text,
-                                                      passwordController.text)
+                                                  ? _login(
+                                                      emailController.text,
+                                                      passwordController.text,
+                                                      context.read<
+                                                          UserDataProvider>(),
+                                                    )
                                                   : showInfoToast(
                                                       'Fill in the email address and password');
                                               ;

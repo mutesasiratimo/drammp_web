@@ -1,10 +1,9 @@
 import 'package:entebbe_dramp_web/src/views/admin_panel/revenuestreams/transport/addindividualrevenuestream.dart';
 import 'package:entebbe_dramp_web/src/views/app_router/scaffold_with_sidebar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../main.dart';
+import '../../../provider/user_data_provider.dart';
 import '../admin_panel/dashboard.dart';
 import '../admin_panel/enforcement/enforcementdashboard.dart';
 import '../admin_panel/finance/financedashboard.dart';
@@ -26,14 +25,17 @@ import '../auth/signin.dart';
 String? userId;
 String defaultRoute = '/sign-in';
 
-void checkLoggedin() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  userId = prefs.getString("userid") ?? "";
-  debugPrint("+=+=+=+=+=+=+=+ $userId");
-}
+const List<String> unrestrictedRoutes = [
+  //'/sign-in', // Remove this line for actual authentication flow.
+  //'/sign-up', // Remove this line for actual authentication flow.
+];
 
-final goRouterProvider = Provider<GoRouter>((ref) {
-  checkLoggedin();
+const List<String> publicRoutes = [
+  '/sign-in', // Enable this line for actual authentication flow.
+  '/sign-up', // Enable this line for actual authentication flow.
+];
+
+goRouterProvider(UserDataProvider userDataProvider) {
   return GoRouter(
     navigatorKey: navigatorKey,
     initialLocation: defaultRoute,
@@ -306,5 +308,24 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             ]),
           ]),
     ],
+    redirect: (context, state) {
+      if (unrestrictedRoutes.contains(state.matchedLocation)) {
+        return null;
+      } else if (publicRoutes.contains(state.matchedLocation)) {
+        // Is public route.
+        if (userDataProvider.isUserLoggedIn()) {
+          // User is logged in, redirect to home page.
+          return '/';
+        }
+      } else {
+        // Not public route.
+        if (!userDataProvider.isUserLoggedIn()) {
+          // User is not logged in, redirect to login page.
+          return '/sign-in';
+        }
+      }
+
+      return null;
+    },
   );
-});
+}

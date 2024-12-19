@@ -750,9 +750,6 @@ class _TarrifsPageState extends State<TarrifsPage> {
           children: [
             BootstrapContainer(
               fluid: true,
-              decoration: BoxDecoration(
-                color: Colors.white,
-              ),
               padding: const EdgeInsets.only(top: 0),
               children: <Widget>[
                 Container(

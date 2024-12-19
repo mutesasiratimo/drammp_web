@@ -11,7 +11,6 @@ import '../../../../config/functions.dart';
 import 'package:http/http.dart' as http;
 import '../../../../models/revenuesectorcategories.dart';
 import 'addrevenuesubtype.dart';
-import 'data_sources.dart';
 
 class SectorSubtypePage extends StatefulWidget {
   const SectorSubtypePage({super.key});
@@ -24,7 +23,6 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
   List<RevenueSectorCategoriesModel> sectorCategories = [];
   bool _sortAscending = true;
   int? _sortColumnIndex;
-  DessertDataSourceAsync? _dessertsDataSource;
   final PaginatorController _controller = PaginatorController();
   PageController sectorPageController = PageController();
   int _rowsPerPage = 10;
@@ -106,7 +104,7 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
             margin: EdgeInsets.all(16.0),
             padding: EdgeInsets.all(8.0),
             child: Card(
-              color: Colors.white,
+              // color: Colors.white,
               child: Column(children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -256,14 +254,12 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
                                       "${element.typecode}",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black,
                                           fontSize: 12),
                                     )),
                                     DataCell(Text(
                                       "${element.typename}",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: AppConstants.primaryColor,
                                           fontSize: 12),
                                     )),
                                     DataCell(Text(
@@ -306,7 +302,7 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
                   ),
                 ),
                 SizedBox(
-                  height: 80,
+                  height: 50,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [

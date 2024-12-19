@@ -2,7 +2,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart' as provider;
 
+import '../../../config/constants.dart';
+import '../../../provider/app_preferences_provider.dart';
 import 'dashboard.dart';
 import 'finance/financedashboard.dart';
 import 'mobility/mobility.dart';
@@ -91,12 +94,16 @@ class HomePage extends ConsumerWidget {
     const String stringParam = 'String parameter';
     const int intParam = 1000000;
     return AdminScaffold(
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text(''),
           // toolbarHeight: 50,
           // elevation: 8.0,
-          actions: [_accountToggle(context)],
+          actions: [
+            _toggleThemeButton(context),
+            SizedBox(width: kDefaultPadding),
+            _accountToggle(context)
+          ],
         ),
         sideBar: SideBar(
             header: Container(
@@ -125,6 +132,63 @@ class HomePage extends ConsumerWidget {
         body: ProviderScope(overrides: [
           paramProvider.overrideWithValue((stringParam, intParam))
         ], child: sideBarItem.body));
+  }
+
+  Widget _toggleThemeButton(BuildContext context) {
+    final themeData = Theme.of(context);
+    final isFullWidthButton =
+        (MediaQuery.of(context).size.width > kScreenWidthMd);
+
+    return SizedBox(
+      width: (isFullWidthButton ? null : 48.0),
+      child: TextButton(
+        onPressed: () async {
+          final provider = context.read<AppPreferencesProvider>();
+          final currentThemeMode = provider.themeMode;
+          final themeMode = (currentThemeMode != ThemeMode.dark
+              ? ThemeMode.dark
+              : ThemeMode.light);
+
+          provider.setThemeModeAsync(themeMode: themeMode);
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: themeData.colorScheme.onPrimary,
+          // disabledForegroundColor:
+          //     themeData.extension<AppColorScheme>()!.primary.withOpacity(0.38),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        ),
+        child: provider.Selector<AppPreferencesProvider, ThemeMode>(
+          selector: (context, provider) => provider.themeMode,
+          builder: (context, value, child) {
+            var icon = Icons.dark_mode_rounded;
+            var text = "Dark";
+
+            if (value == ThemeMode.dark) {
+              icon = Icons.light_mode_rounded;
+              text = "Light";
+            }
+
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: (themeData.textTheme.labelLarge!.fontSize! + 4.0),
+                ),
+                Visibility(
+                  visible: false,
+                  // visible: isFullWidthButton,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(text),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 
   Widget _accountToggle(BuildContext context) {

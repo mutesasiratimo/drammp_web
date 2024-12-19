@@ -161,21 +161,16 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.purple.shade50,
       body: SingleChildScrollView(
         child: Column(
           children: [
             BootstrapContainer(
               fluid: true,
-              decoration: BoxDecoration(
-                color: Colors.purple.shade50,
-              ),
               padding: const EdgeInsets.only(top: 0),
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.all(16.0),
                   child: Card(
-                    color: Colors.white,
                     child: Column(
                       children: [
                         BootstrapRow(
@@ -567,7 +562,7 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                       SizedBox(height: 5),
                                       SizedBox(
                                         // width: 200,
-                                        height: 350,
+                                        height: 300,
                                         child: DataTable2(
                                           headingRowHeight: 45,
                                           headingRowColor:
@@ -972,7 +967,7 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                       SizedBox(height: 5),
                                       SizedBox(
                                         // width: 200,
-                                        height: 350,
+                                        height: 300,
                                         child: DataTable2(
                                           headingRowHeight: 45,
                                           headingRowColor:
