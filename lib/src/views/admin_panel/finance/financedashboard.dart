@@ -370,6 +370,8 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w600,
+                                                    color:
+                                                        Colors.green.shade900,
                                                   ),
                                                 ),
                                               ],
@@ -419,6 +421,7 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w600,
+                                                    color: Colors.red.shade900,
                                                   ),
                                                 ),
                                               ],
@@ -469,6 +472,8 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w600,
+                                                    color:
+                                                        Colors.amber.shade900,
                                                   ),
                                                 ),
                                               ],
@@ -518,6 +523,7 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w600,
+                                                    color: Colors.blue.shade900,
                                                   ),
                                                 ),
                                               ],

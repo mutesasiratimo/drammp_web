@@ -79,9 +79,6 @@ class _FaresPageState extends State<FaresPage> {
           children: [
             BootstrapContainer(
               fluid: true,
-              decoration: BoxDecoration(
-                color: Colors.white,
-              ),
               padding: const EdgeInsets.only(top: 0),
               children: <Widget>[
                 Container(

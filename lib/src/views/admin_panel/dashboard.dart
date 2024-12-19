@@ -282,245 +282,270 @@ class _DashboardPageState extends Base<DashboardPage> {
                                       children: <BootstrapCol>[
                                         BootstrapCol(
                                           sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                          child: Card(
-                                            elevation: 8.0,
-                                            clipBehavior: Clip.antiAlias,
-                                            // color: Colors.white,
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsets.all(15),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom:
-                                                                        16.0),
-                                                            child: Text(
-                                                              "Lockups",
-                                                              // style: textTheme.labelLarge!.copyWith(
-                                                              //   color: textColor,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "${dashKitooroStats![0].sectorcategories[0].streamcount}",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 14,
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 6.0),
+                                            child: Card(
+                                              elevation: 8.0,
+                                              clipBehavior: Clip.antiAlias,
+                                              // color: Colors.white,
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.all(15),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          16.0),
+                                                              child: Text(
+                                                                "Lockups",
+                                                                // style: textTheme.labelLarge!.copyWith(
+                                                                //   color: textColor,
+                                                                // ),
                                                               ),
                                                             ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "UGX ${NumberFormat.compactCurrency(
-                                                                decimalDigits:
-                                                                    1,
-                                                                symbol: '',
-                                                              ).format(dashKitooroStats![0].sectorcategories[0].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
-                                                                decimalDigits:
-                                                                    1,
-                                                                symbol: '',
-                                                              ).format(dashKitooroStats![0].sectorcategories[0].expectedrevenue.round()).toString()}",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontSize: 12,
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "${dashKitooroStats![0].sectorcategories[0].streamcount}",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 14,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "UGX ${NumberFormat.compactCurrency(
+                                                                  decimalDigits:
+                                                                      1,
+                                                                  symbol: '',
+                                                                ).format(dashKitooroStats![0].sectorcategories[0].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
+                                                                  decimalDigits:
+                                                                      1,
+                                                                  symbol: '',
+                                                                ).format(dashKitooroStats![0].sectorcategories[0].expectedrevenue.round()).toString()}",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      height: 80,
-                                                      width: 80,
-                                                      child: Image.asset(
-                                                        "assets/images/lockup.png",
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        height: 70,
+                                                        width: 70,
+                                                        child: Image.asset(
+                                                          "assets/images/doorlock.png",
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 12.0,
-                                                          left: 8.0,
-                                                          right: 8.0,
-                                                          top: 4.0),
-                                                  child: LinearPercentIndicator(
-                                                    // width: ((MediaQuery.of(context)
-                                                    //             .size
-                                                    //             .width) /
-                                                    //         5) -
-                                                    //     50,
-                                                    animation: true,
-                                                    lineHeight: 7.0,
-                                                    animationDuration: 2000,
-                                                    percent: (dashKitooroStats![
-                                                                0]
-                                                            .sectorcategories[0]
-                                                            .paidrevenue /
-                                                        dashKitooroStats![0]
-                                                            .sectorcategories[0]
-                                                            .expectedrevenue),
-                                                    trailing: Text(
-                                                      "${(dashKitooroStats![0].sectorcategories[0].paidrevenue / dashKitooroStats![0].sectorcategories[0].expectedrevenue) * 100}%",
-                                                    ),
-                                                    linearStrokeCap:
-                                                        LinearStrokeCap
-                                                            .roundAll,
-                                                    progressColor: Colors.amber,
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
+                                                  const Divider(),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            bottom: 12.0,
+                                                            left: 8.0,
+                                                            right: 8.0,
+                                                            top: 4.0),
+                                                    child:
+                                                        LinearPercentIndicator(
+                                                      // width: ((MediaQuery.of(context)
+                                                      //             .size
+                                                      //             .width) /
+                                                      //         5) -
+                                                      //     50,
+                                                      animation: true,
+                                                      lineHeight: 7.0,
+                                                      animationDuration: 2000,
+                                                      percent: (dashKitooroStats![
+                                                                  0]
+                                                              .sectorcategories[
+                                                                  0]
+                                                              .paidrevenue /
+                                                          dashKitooroStats![0]
+                                                              .sectorcategories[
+                                                                  0]
+                                                              .expectedrevenue),
+                                                      trailing: Text(
+                                                        "${(dashKitooroStats![0].sectorcategories[0].paidrevenue / dashKitooroStats![0].sectorcategories[0].expectedrevenue) * 100}%",
+                                                      ),
+                                                      linearStrokeCap:
+                                                          LinearStrokeCap
+                                                              .roundAll,
+                                                      progressColor:
+                                                          Colors.amber,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
                                         BootstrapCol(
                                           sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                          child: Card(
-                                            clipBehavior: Clip.antiAlias,
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsets.all(15),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom:
-                                                                        16.0),
-                                                            child: Text(
-                                                              "Toll Gate Fee",
-                                                              // style: textTheme.labelLarge!.copyWith(
-                                                              //   color: textColor,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "${dashKitooroStats![0].sectorcategories[1].streamcount}",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 14,
-                                                              ),
-                                                              // style: textTheme.headlineMedium!.copyWith(
-                                                              //   color: textColor,
-                                                              //   fontWeight: FontWeight.w600,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "UGX ${NumberFormat.compactCurrency(
-                                                                decimalDigits:
-                                                                    1,
-                                                                symbol: '',
-                                                              ).format(dashKitooroStats![0].sectorcategories[1].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
-                                                                decimalDigits:
-                                                                    1,
-                                                                symbol: '',
-                                                              ).format(dashKitooroStats![0].sectorcategories[1].expectedrevenue.round()).toString()}",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontSize: 12,
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 6.0),
+                                            child: Card(
+                                              elevation: 8.0,
+                                              clipBehavior: Clip.antiAlias,
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.all(15),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          16.0),
+                                                              child: Text(
+                                                                "Toll Gate Fee",
+                                                                // style: textTheme.labelLarge!.copyWith(
+                                                                //   color: textColor,
+                                                                // ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "${dashKitooroStats![0].sectorcategories[1].streamcount}",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 14,
+                                                                ),
+                                                                // style: textTheme.headlineMedium!.copyWith(
+                                                                //   color: textColor,
+                                                                //   fontWeight: FontWeight.w600,
+                                                                // ),
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "UGX ${NumberFormat.compactCurrency(
+                                                                  decimalDigits:
+                                                                      1,
+                                                                  symbol: '',
+                                                                ).format(dashKitooroStats![0].sectorcategories[1].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
+                                                                  decimalDigits:
+                                                                      1,
+                                                                  symbol: '',
+                                                                ).format(dashKitooroStats![0].sectorcategories[1].expectedrevenue.round()).toString()}",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      height: 80,
-                                                      width: 80,
-                                                      child: Image.asset(
-                                                        "assets/images/tollgate.png",
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        height: 80,
+                                                        width: 80,
+                                                        child: Image.asset(
+                                                          "assets/images/tollgate.png",
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 12.0,
-                                                          left: 8.0,
-                                                          right: 8.0,
-                                                          top: 4.0),
-                                                  child: LinearPercentIndicator(
-                                                    // width: ((MediaQuery.of(context)
-                                                    //             .size
-                                                    //             .width) /
-                                                    //         5) -
-                                                    //     50,
-                                                    animation: true,
-                                                    lineHeight: 7.0,
-                                                    animationDuration: 2000,
-                                                    percent: (dashSectorStats![
-                                                                0]
-                                                            .sectorcategories[2]
-                                                            .paidrevenue /
-                                                        dashSectorStats![0]
-                                                            .sectorcategories[2]
-                                                            .expectedrevenue),
-                                                    trailing: Text(
-                                                      "${(dashKitooroStats![0].sectorcategories[1].paidrevenue / dashKitooroStats![0].sectorcategories[1].expectedrevenue) * 100}%",
-                                                    ),
-                                                    linearStrokeCap:
-                                                        LinearStrokeCap
-                                                            .roundAll,
-                                                    progressColor: Colors.green,
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
+                                                  const Divider(),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            bottom: 12.0,
+                                                            left: 8.0,
+                                                            right: 8.0,
+                                                            top: 4.0),
+                                                    child:
+                                                        LinearPercentIndicator(
+                                                      // width: ((MediaQuery.of(context)
+                                                      //             .size
+                                                      //             .width) /
+                                                      //         5) -
+                                                      //     50,
+                                                      animation: true,
+                                                      lineHeight: 7.0,
+                                                      animationDuration: 2000,
+                                                      percent: (dashSectorStats![
+                                                                  0]
+                                                              .sectorcategories[
+                                                                  2]
+                                                              .paidrevenue /
+                                                          dashSectorStats![0]
+                                                              .sectorcategories[
+                                                                  2]
+                                                              .expectedrevenue),
+                                                      trailing: Text(
+                                                        "${(dashKitooroStats![0].sectorcategories[1].paidrevenue / dashKitooroStats![0].sectorcategories[1].expectedrevenue) * 100}%",
+                                                      ),
+                                                      linearStrokeCap:
+                                                          LinearStrokeCap
+                                                              .roundAll,
+                                                      progressColor:
+                                                          Colors.green,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -546,276 +571,302 @@ class _DashboardPageState extends Base<DashboardPage> {
                                       children: <BootstrapCol>[
                                         BootstrapCol(
                                           sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                          child: Card(
-                                            clipBehavior: Clip.antiAlias,
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsets.all(15),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 16),
-                                                            child: Text(
-                                                              "Motorbikes",
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 6.0),
+                                            child: Card(
+                                              elevation: 8.0,
+                                              clipBehavior: Clip.antiAlias,
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.all(15),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          16),
+                                                              child: Text(
+                                                                "Motorbikes",
 
-                                                              // style: textTheme.labelLarge!.copyWith(
-                                                              //   color: textColor,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              dashSectorStats![
-                                                                      0]
-                                                                  .sectorcategories[
-                                                                      2]
-                                                                  .streamcount
-                                                                  .toString(),
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 14,
-                                                              ),
-                                                              // style: textTheme.headlineMedium!.copyWith(
-                                                              //   color: textColor,
-                                                              //   fontWeight: FontWeight.w600,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "UGX ${NumberFormat.compactCurrency(
-                                                                decimalDigits:
-                                                                    1,
-                                                                symbol: '',
-                                                              ).format(dashSectorStats![0].sectorcategories[2].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
-                                                                decimalDigits:
-                                                                    1,
-                                                                symbol: '',
-                                                              ).format(dashSectorStats![0].sectorcategories[2].expectedrevenue.round()).toString()}",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontSize: 12,
+                                                                // style: textTheme.labelLarge!.copyWith(
+                                                                //   color: textColor,
+                                                                // ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                dashSectorStats![
+                                                                        0]
+                                                                    .sectorcategories[
+                                                                        2]
+                                                                    .streamcount
+                                                                    .toString(),
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 14,
+                                                                ),
+                                                                // style: textTheme.headlineMedium!.copyWith(
+                                                                //   color: textColor,
+                                                                //   fontWeight: FontWeight.w600,
+                                                                // ),
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "UGX ${NumberFormat.compactCurrency(
+                                                                  decimalDigits:
+                                                                      1,
+                                                                  symbol: '',
+                                                                ).format(dashSectorStats![0].sectorcategories[2].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
+                                                                  decimalDigits:
+                                                                      1,
+                                                                  symbol: '',
+                                                                ).format(dashSectorStats![0].sectorcategories[2].expectedrevenue.round()).toString()}",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      height: 80,
-                                                      width: 80,
-                                                      child: Image.asset(
-                                                        "assets/images/motorcycle.png",
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        height: 80,
+                                                        width: 80,
+                                                        child: Image.asset(
+                                                          "assets/images/motorcycle.png",
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 12.0,
-                                                          left: 8.0,
-                                                          right: 8.0,
-                                                          top: 4.0),
-                                                  child: LinearPercentIndicator(
-                                                    // width: ((MediaQuery.of(context)
-                                                    //             .size
-                                                    //             .width) /
-                                                    //         5) -
-                                                    //     50,
-                                                    animation: true,
-                                                    lineHeight: 7.0,
-                                                    animationDuration: 2000,
-                                                    percent: (dashSectorStats![
-                                                                0]
-                                                            .sectorcategories[2]
-                                                            .paidrevenue /
-                                                        dashSectorStats![0]
-                                                            .sectorcategories[2]
-                                                            .expectedrevenue),
-                                                    trailing: Text(
-                                                      "${(dashSectorStats![0].sectorcategories[2].paidrevenue / dashSectorStats![0].sectorcategories[2].expectedrevenue) * 100}%",
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    linearStrokeCap:
-                                                        LinearStrokeCap
-                                                            .roundAll,
-                                                    progressColor: Colors.green,
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
+                                                  const Divider(),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            bottom: 12.0,
+                                                            left: 8.0,
+                                                            right: 8.0,
+                                                            top: 4.0),
+                                                    child:
+                                                        LinearPercentIndicator(
+                                                      // width: ((MediaQuery.of(context)
+                                                      //             .size
+                                                      //             .width) /
+                                                      //         5) -
+                                                      //     50,
+                                                      animation: true,
+                                                      lineHeight: 7.0,
+                                                      animationDuration: 2000,
+                                                      percent: (dashSectorStats![
+                                                                  0]
+                                                              .sectorcategories[
+                                                                  2]
+                                                              .paidrevenue /
+                                                          dashSectorStats![0]
+                                                              .sectorcategories[
+                                                                  2]
+                                                              .expectedrevenue),
+                                                      trailing: Text(
+                                                        "${(dashSectorStats![0].sectorcategories[2].paidrevenue / dashSectorStats![0].sectorcategories[2].expectedrevenue) * 100}%",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      linearStrokeCap:
+                                                          LinearStrokeCap
+                                                              .roundAll,
+                                                      progressColor:
+                                                          Colors.green,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
                                         BootstrapCol(
                                           sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                          child: Card(
-                                            clipBehavior: Clip.antiAlias,
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsets.all(15),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom:
-                                                                        16.0),
-                                                            child: Text(
-                                                              "Buses",
-                                                              // style: textTheme.labelLarge!.copyWith(
-                                                              //   color: textColor,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "${dashSectorStats![0].sectorcategories[0].streamcount}",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 14,
-                                                              ),
-                                                              // style: textTheme.headlineMedium!.copyWith(
-                                                              //   color: textColor,
-                                                              //   fontWeight: FontWeight.w600,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "UGX ${NumberFormat.compactCurrency(
-                                                                decimalDigits:
-                                                                    1,
-                                                                symbol: '',
-                                                              ).format(dashSectorStats![0].sectorcategories[0].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
-                                                                decimalDigits:
-                                                                    1,
-                                                                symbol: '',
-                                                              ).format(dashSectorStats![0].sectorcategories[0].expectedrevenue.round()).toString()}",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontSize: 12,
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 6.0),
+                                            child: Card(
+                                              elevation: 8.0,
+                                              clipBehavior: Clip.antiAlias,
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.all(15),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          16.0),
+                                                              child: Text(
+                                                                "Buses",
+                                                                // style: textTheme.labelLarge!.copyWith(
+                                                                //   color: textColor,
+                                                                // ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "${dashSectorStats![0].sectorcategories[0].streamcount}",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 14,
+                                                                ),
+                                                                // style: textTheme.headlineMedium!.copyWith(
+                                                                //   color: textColor,
+                                                                //   fontWeight: FontWeight.w600,
+                                                                // ),
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "UGX ${NumberFormat.compactCurrency(
+                                                                  decimalDigits:
+                                                                      1,
+                                                                  symbol: '',
+                                                                ).format(dashSectorStats![0].sectorcategories[0].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
+                                                                  decimalDigits:
+                                                                      1,
+                                                                  symbol: '',
+                                                                ).format(dashSectorStats![0].sectorcategories[0].expectedrevenue.round()).toString()}",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Container(
-                                                      // margin:
-                                                      //     const EdgeInsets.all(16.0),
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      height: 80,
-                                                      width: 80,
-                                                      child: Image.asset(
-                                                        "assets/images/shuttlebus.png",
+                                                      Container(
+                                                        // margin:
+                                                        //     const EdgeInsets.all(16.0),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        height: 80,
+                                                        width: 80,
+                                                        child: Image.asset(
+                                                          "assets/images/shuttlebus.png",
+                                                        ),
+                                                        // decoration: BoxDecoration(
+                                                        //   color: Colors.purple.shade100,
+                                                        //   borderRadius:
+                                                        //       const BorderRadius.all(
+                                                        //           Radius.circular(10)),
+                                                        // ),
+                                                        // child: const Icon(
+                                                        //   Icons.local_taxi_outlined,
+                                                        //   size: 40.0,
+                                                        //   color:
+                                                        //       AppConstants.primaryColor,
+                                                        // ),
                                                       ),
-                                                      // decoration: BoxDecoration(
-                                                      //   color: Colors.purple.shade100,
-                                                      //   borderRadius:
-                                                      //       const BorderRadius.all(
-                                                      //           Radius.circular(10)),
-                                                      // ),
-                                                      // child: const Icon(
-                                                      //   Icons.local_taxi_outlined,
-                                                      //   size: 40.0,
-                                                      //   color:
-                                                      //       AppConstants.primaryColor,
-                                                      // ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 12.0,
-                                                          left: 8.0,
-                                                          right: 8.0,
-                                                          top: 4.0),
-                                                  child: LinearPercentIndicator(
-                                                    // width: ((MediaQuery.of(context)
-                                                    //             .size
-                                                    //             .width) /
-                                                    //         5) -
-                                                    //     50,
-                                                    animation: true,
-                                                    lineHeight: 7.0,
-                                                    animationDuration: 2000,
-                                                    percent: (dashSectorStats![
-                                                                0]
-                                                            .sectorcategories[2]
-                                                            .paidrevenue /
-                                                        dashSectorStats![0]
-                                                            .sectorcategories[2]
-                                                            .expectedrevenue),
-                                                    trailing: Text(
-                                                      "${(dashSectorStats![0].sectorcategories[2].paidrevenue / dashSectorStats![0].sectorcategories[2].expectedrevenue).round() * 100}%",
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    linearStrokeCap:
-                                                        LinearStrokeCap
-                                                            .roundAll,
-                                                    progressColor: Colors.red,
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
+                                                  const Divider(),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            bottom: 12.0,
+                                                            left: 8.0,
+                                                            right: 8.0,
+                                                            top: 4.0),
+                                                    child:
+                                                        LinearPercentIndicator(
+                                                      // width: ((MediaQuery.of(context)
+                                                      //             .size
+                                                      //             .width) /
+                                                      //         5) -
+                                                      //     50,
+                                                      animation: true,
+                                                      lineHeight: 7.0,
+                                                      animationDuration: 2000,
+                                                      percent: (dashSectorStats![
+                                                                  0]
+                                                              .sectorcategories[
+                                                                  2]
+                                                              .paidrevenue /
+                                                          dashSectorStats![0]
+                                                              .sectorcategories[
+                                                                  2]
+                                                              .expectedrevenue),
+                                                      trailing: Text(
+                                                        "${(dashSectorStats![0].sectorcategories[2].paidrevenue / dashSectorStats![0].sectorcategories[2].expectedrevenue).round() * 100}%",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      linearStrokeCap:
+                                                          LinearStrokeCap
+                                                              .roundAll,
+                                                      progressColor: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -841,256 +892,277 @@ class _DashboardPageState extends Base<DashboardPage> {
                                       children: <BootstrapCol>[
                                         BootstrapCol(
                                           sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                          child: Card(
-                                            clipBehavior: Clip.antiAlias,
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    const Padding(
-                                                      padding:
-                                                          EdgeInsets.all(15),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom:
-                                                                        16.0),
-                                                            child: Text(
-                                                              "Hotels",
-                                                              // style: textTheme.labelLarge!.copyWith(
-                                                              //   color: textColor,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "6",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 14,
-                                                              ),
-                                                              // style: textTheme.headlineMedium!.copyWith(
-                                                              //   color: textColor,
-                                                              //   fontWeight: FontWeight.w600,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "UGX 5M/6M",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontSize: 12,
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 6.0),
+                                            child: Card(
+                                              elevation: 8.0,
+                                              clipBehavior: Clip.antiAlias,
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      const Padding(
+                                                        padding:
+                                                            EdgeInsets.all(15),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          16.0),
+                                                              child: Text(
+                                                                "Hotels",
+                                                                // style: textTheme.labelLarge!.copyWith(
+                                                                //   color: textColor,
+                                                                // ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "6",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 14,
+                                                                ),
+                                                                // style: textTheme.headlineMedium!.copyWith(
+                                                                //   color: textColor,
+                                                                //   fontWeight: FontWeight.w600,
+                                                                // ),
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "UGX 5M/6M",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Container(
-                                                      // margin:
-                                                      //     const EdgeInsets.all(16.0),
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      height: 80,
-                                                      width: 80,
-                                                      // decoration: BoxDecoration(
-                                                      //   color: Colors.purple.shade100,
-                                                      //   borderRadius:
-                                                      //       const BorderRadius.all(
-                                                      //           Radius.circular(10)),
-                                                      // ),
-                                                      child: const Icon(
-                                                        Icons.hotel_sharp,
-                                                        size: 50.0,
-                                                        color: AppConstants
-                                                            .primaryColor,
+                                                      Container(
+                                                        // margin:
+                                                        //     const EdgeInsets.all(16.0),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        height: 80,
+                                                        width: 80,
+                                                        // decoration: BoxDecoration(
+                                                        //   color: Colors.purple.shade100,
+                                                        //   borderRadius:
+                                                        //       const BorderRadius.all(
+                                                        //           Radius.circular(10)),
+                                                        // ),
+                                                        child: const Icon(
+                                                          Icons.hotel_sharp,
+                                                          size: 50.0,
+                                                          color: AppConstants
+                                                              .primaryColor,
+                                                        ),
+                                                        // child: Image.asset(
+                                                        //   "assets/images/starhotel.png",
+                                                        // ),
                                                       ),
-                                                      // child: Image.asset(
-                                                      //   "assets/images/starhotel.png",
-                                                      // ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 12.0,
-                                                          left: 8.0,
-                                                          right: 8.0,
-                                                          top: 4.0),
-                                                  child: LinearPercentIndicator(
-                                                    // width: ((MediaQuery.of(context)
-                                                    //             .size
-                                                    //             .width) /
-                                                    //         5) -
-                                                    //     50,
-                                                    animation: true,
-                                                    lineHeight: 7.0,
-                                                    animationDuration: 2000,
-                                                    percent: 0.85,
-                                                    trailing: const Text(
-                                                      "85.0%",
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    linearStrokeCap:
-                                                        LinearStrokeCap
-                                                            .roundAll,
-                                                    progressColor: Colors.green,
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
+                                                  const Divider(),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            bottom: 12.0,
+                                                            left: 8.0,
+                                                            right: 8.0,
+                                                            top: 4.0),
+                                                    child:
+                                                        LinearPercentIndicator(
+                                                      // width: ((MediaQuery.of(context)
+                                                      //             .size
+                                                      //             .width) /
+                                                      //         5) -
+                                                      //     50,
+                                                      animation: true,
+                                                      lineHeight: 7.0,
+                                                      animationDuration: 2000,
+                                                      percent: 0.85,
+                                                      trailing: const Text(
+                                                        "85.0%",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      linearStrokeCap:
+                                                          LinearStrokeCap
+                                                              .roundAll,
+                                                      progressColor:
+                                                          Colors.green,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
                                         BootstrapCol(
                                           sizes: 'col-lg-6 col-md-12 col-sm-12',
-                                          child: Card(
-                                            clipBehavior: Clip.antiAlias,
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    const Padding(
-                                                      padding:
-                                                          EdgeInsets.all(15),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom:
-                                                                        16.0),
-                                                            child: Text(
-                                                              "Beachfronts",
-                                                              // style: textTheme.labelLarge!.copyWith(
-                                                              //   color: textColor,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "18",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 14,
-                                                              ),
-                                                              // style: textTheme.headlineMedium!.copyWith(
-                                                              //   color: textColor,
-                                                              //   fontWeight: FontWeight.w600,
-                                                              // ),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    bottom: 0),
-                                                            child: Text(
-                                                              "UGX 4M/9M",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontSize: 12,
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 6.0),
+                                            child: Card(
+                                              elevation: 8.0,
+                                              clipBehavior: Clip.antiAlias,
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      const Padding(
+                                                        padding:
+                                                            EdgeInsets.all(15),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          16.0),
+                                                              child: Text(
+                                                                "Beachfronts",
+                                                                // style: textTheme.labelLarge!.copyWith(
+                                                                //   color: textColor,
+                                                                // ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "18",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 14,
+                                                                ),
+                                                                // style: textTheme.headlineMedium!.copyWith(
+                                                                //   color: textColor,
+                                                                //   fontWeight: FontWeight.w600,
+                                                                // ),
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          0),
+                                                              child: Text(
+                                                                "UGX 4M/9M",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Container(
-                                                      // margin:
-                                                      //     const EdgeInsets.all(16.0),
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      height: 80,
-                                                      width: 80,
-                                                      // decoration: BoxDecoration(
-                                                      //   color: Colors.purple.shade100,
-                                                      //   borderRadius:
-                                                      //       const BorderRadius.all(
-                                                      //           Radius.circular(10)),
-                                                      // ),
-                                                      child: const Icon(
-                                                        Icons.waves,
-                                                        size: 50.0,
-                                                        color: Colors.blue,
+                                                      Container(
+                                                        // margin:
+                                                        //     const EdgeInsets.all(16.0),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        height: 80,
+                                                        width: 80,
+                                                        // decoration: BoxDecoration(
+                                                        //   color: Colors.purple.shade100,
+                                                        //   borderRadius:
+                                                        //       const BorderRadius.all(
+                                                        //           Radius.circular(10)),
+                                                        // ),
+                                                        child: const Icon(
+                                                          Icons.waves,
+                                                          size: 50.0,
+                                                          color: Colors.blue,
+                                                        ),
+                                                        // child: Image.asset(
+                                                        //   "assets/images/motorcycle.png",
+                                                        // ),
                                                       ),
-                                                      // child: Image.asset(
-                                                      //   "assets/images/motorcycle.png",
-                                                      // ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 12.0,
-                                                          left: 8.0,
-                                                          right: 8.0,
-                                                          top: 4.0),
-                                                  child: LinearPercentIndicator(
-                                                    // width: ((MediaQuery.of(context)
-                                                    //             .size
-                                                    //             .width) /
-                                                    //         5) -
-                                                    //     50,
-                                                    animation: true,
-                                                    lineHeight: 7.0,
-                                                    animationDuration: 2000,
-                                                    percent: 0.45,
-                                                    trailing: const Text(
-                                                      "45.0%",
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    linearStrokeCap:
-                                                        LinearStrokeCap
-                                                            .roundAll,
-                                                    progressColor: Colors.red,
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
+                                                  const Divider(),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            bottom: 12.0,
+                                                            left: 8.0,
+                                                            right: 8.0,
+                                                            top: 4.0),
+                                                    child:
+                                                        LinearPercentIndicator(
+                                                      // width: ((MediaQuery.of(context)
+                                                      //             .size
+                                                      //             .width) /
+                                                      //         5) -
+                                                      //     50,
+                                                      animation: true,
+                                                      lineHeight: 7.0,
+                                                      animationDuration: 2000,
+                                                      percent: 0.45,
+                                                      trailing: const Text(
+                                                        "45.0%",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      linearStrokeCap:
+                                                          LinearStrokeCap
+                                                              .roundAll,
+                                                      progressColor: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),

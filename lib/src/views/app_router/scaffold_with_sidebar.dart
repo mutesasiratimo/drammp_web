@@ -142,10 +142,11 @@ class ScaffoldWithSideBar extends ConsumerWidget {
               children: [
                 Icon(
                   icon,
+                  color: Colors.amber,
                 ),
                 Visibility(
-                  // visible: false,
-                  visible: isFullWidthButton,
+                  visible: false,
+                  // visible: isFullWidthButton,
                   child: Padding(
                     padding: const EdgeInsets.only(left: kDefaultPadding * 0.5),
                     child: Text(text),

@@ -302,6 +302,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600,
+                                                color: Colors.green.shade900,
                                               ),
                                             ),
                                           ],
@@ -353,6 +354,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600,
+                                                color: Colors.red.shade900,
                                               ),
                                             ),
                                           ],
@@ -404,6 +406,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600,
+                                                color: Colors.amber.shade900,
                                               ),
                                             ),
                                           ],
@@ -455,6 +458,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600,
+                                                color: Colors.blue.shade900,
                                               ),
                                             ),
                                           ],

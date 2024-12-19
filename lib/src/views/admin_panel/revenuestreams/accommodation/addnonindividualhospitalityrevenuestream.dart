@@ -792,12 +792,10 @@ class _AddNonIndividualHospitalityRevenueStreamPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple.shade50,
       body: Container(
         margin: EdgeInsets.all(8.0),
         padding: EdgeInsets.all(8.0),
         child: Card(
-          color: Colors.white,
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
