@@ -14,7 +14,6 @@ import '../../../config/constants.dart';
 import '../../../config/functions.dart';
 import '../../../provider/messageprovider.dart';
 import '../../../models/homepagestats.dart';
-import 'home/barchart.dart';
 import 'package:provider/provider.dart';
 
 import 'home/piechart.dart';
@@ -196,7 +195,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                 BootstrapRow(
                   children: <BootstrapCol>[
                     BootstrapCol(
-                      sizes: 'col-lg-6 col-md-8 col-sm-18',
+                      sizes: 'col-lg-6 col-md-8 col-sm-12',
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -311,9 +310,6 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                                           16.0),
                                                               child: Text(
                                                                 "Lockups",
-                                                                // style: textTheme.labelLarge!.copyWith(
-                                                                //   color: textColor,
-                                                                // ),
                                                               ),
                                                             ),
                                                             Padding(
@@ -399,7 +395,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                                   0]
                                                               .expectedrevenue),
                                                       trailing: Text(
-                                                        "${(dashKitooroStats![0].sectorcategories[0].paidrevenue / dashKitooroStats![0].sectorcategories[0].expectedrevenue) * 100}%",
+                                                        "${((dashKitooroStats![0].sectorcategories[0].paidrevenue / dashKitooroStats![0].sectorcategories[0].expectedrevenue) * 100).round()}%",
                                                       ),
                                                       linearStrokeCap:
                                                           LinearStrokeCap
@@ -1247,7 +1243,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                     // color: Colors.orange,
                                     height: 300,
                                     width: 400,
-                                    child: BarChartPage(),
+                                    // child: BarChartPage(),
                                   ),
                                 )
                               ],

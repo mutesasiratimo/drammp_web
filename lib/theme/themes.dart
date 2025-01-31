@@ -34,6 +34,7 @@ class AppThemeData {
       ),
       scaffoldBackgroundColor: kScreenBackgroundColor,
       drawerTheme: const DrawerThemeData(backgroundColor: Color(0xFF343A40)),
+      tabBarTheme: TabBarTheme(labelColor: Colors.black),
       colorScheme: const ColorScheme(
         brightness: Brightness.light,
         primary: kPrimaryColor,
@@ -107,6 +108,7 @@ class AppThemeData {
   ThemeData dark() {
     final themeData = ThemeData.dark(useMaterial3: false).copyWith(
       drawerTheme: const DrawerThemeData(backgroundColor: Color(0xFF343A40)),
+      tabBarTheme: TabBarTheme(labelColor: Colors.white),
       appBarTheme: AppBarTheme(
         // iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: const Color.fromRGBO(66, 66, 66, 1),

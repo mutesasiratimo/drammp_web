@@ -1,5 +1,12 @@
+import 'dart:convert';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../../../../config/constants.dart';
+import '../../../../config/functions.dart';
+import '../../../../models/actualvsexpectedannual.dart';
 
 class BarChartPage extends StatefulWidget {
   BarChartPage({super.key});
@@ -17,9 +24,56 @@ class BarChartPageState extends State<BarChartPage> {
 
   int touchedGroupIndex = -1;
 
+  getAnnualRevenueStats() async {
+    // DashSectorStats returnValue ;
+    var url =
+        Uri.parse(AppConstants.baseUrl + "dash/stats/revenue/annual?year=2024");
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    // print("++++DASH STATS++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final itemsJson = json.decode(response.body);
+      List<AnnualActualVsExpectedModel> statsmodel = (itemsJson as List)
+          .map((data) => AnnualActualVsExpectedModel.fromJson(data))
+          .toList();
+      List<BarChartGroupData> items = [];
+      for (var i in statsmodel) {
+        debugPrint(i.month.toString());
+        setState(() {
+          items.add(
+              makeGroupData(i.month - 1, i.expectedrevenue, i.paidrevenue));
+        });
+      }
+
+      setState(() {
+        rawBarGroups = items;
+        showingBarGroups = rawBarGroups;
+        // dashSectorStats = statsmodel;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    getAnnualRevenueStats();
     final barGroup1 = makeGroupData(0, 0, 0);
     final barGroup2 = makeGroupData(1, 0, 0);
     final barGroup3 = makeGroupData(2, 0, 0);
@@ -29,9 +83,9 @@ class BarChartPageState extends State<BarChartPage> {
     final barGroup7 = makeGroupData(6, 0, 0);
     final barGroup8 = makeGroupData(7, 0, 0);
     final barGroup9 = makeGroupData(8, 0, 0);
-    final barGroup10 = makeGroupData(9, 0.8, 0);
+    final barGroup10 = makeGroupData(9, 0, 0);
     final barGroup11 = makeGroupData(10, 0, 0);
-    final barGroup12 = makeGroupData(11, 6.2, 0);
+    final barGroup12 = makeGroupData(11, 0, 0);
 
     final items = [
       barGroup1,
@@ -65,7 +119,7 @@ class BarChartPageState extends State<BarChartPage> {
             Expanded(
               child: BarChart(
                 BarChartData(
-                  maxY: 20,
+                  maxY: 2000000,
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipColor: ((group) {

@@ -1,5 +1,7 @@
 import 'package:entebbe_dramp_web/src/views/admin_panel/revenuestreams/transport/addindividualrevenuestream.dart';
 import 'package:entebbe_dramp_web/src/views/app_router/scaffold_with_sidebar.dart';
+import 'package:entebbe_dramp_web/src/views/auth/signup.dart';
+import 'package:entebbe_dramp_web/src/views/myportal/myportal.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../main.dart';
@@ -52,7 +54,13 @@ goRouterProvider(UserDataProvider userDataProvider) {
           name: 'signup',
           path: '/sign-up',
           pageBuilder: (context, state) {
-            return const MaterialPage(child: SignInPage());
+            return const MaterialPage(child: SignUpPage());
+          }),
+      GoRoute(
+          name: 'myportal',
+          path: '/myportal',
+          pageBuilder: (context, state) {
+            return const MaterialPage(child: MyPortalPage());
           }),
       StatefulShellRoute.indexedStack(
           builder: (BuildContext context, GoRouterState state,

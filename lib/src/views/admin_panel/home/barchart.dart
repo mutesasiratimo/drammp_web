@@ -1,11 +1,18 @@
+import 'dart:convert';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../../../../config/constants.dart';
+import '../../../../config/functions.dart';
+import '../../../../models/actualvsexpectedannual.dart';
 
 class BarChartPage extends StatefulWidget {
   BarChartPage({super.key});
   final Color leftBarColor = Colors.yellow;
-  final Color rightBarColor = Colors.green.shade700;
-  final Color avgColor = Colors.blue.shade700;
+  final Color rightBarColor = Colors.green.shade300;
+  final Color avgColor = Colors.white;
   State<StatefulWidget> createState() => BarChartPageState();
 }
 
@@ -17,21 +24,68 @@ class BarChartPageState extends State<BarChartPage> {
 
   int touchedGroupIndex = -1;
 
+  getAnnualRevenueStats() async {
+    // DashSectorStats returnValue ;
+    var url =
+        Uri.parse(AppConstants.baseUrl + "dash/stats/revenue/annual?year=2024");
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    // print("++++DASH STATS++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final itemsJson = json.decode(response.body);
+      List<AnnualActualVsExpectedModel> statsmodel = (itemsJson as List)
+          .map((data) => AnnualActualVsExpectedModel.fromJson(data))
+          .toList();
+      List<BarChartGroupData> items = [];
+      for (var i in statsmodel) {
+        debugPrint(i.month.toString());
+        setState(() {
+          items.add(
+              makeGroupData(i.month - 1, i.expectedrevenue, i.paidrevenue));
+        });
+      }
+
+      setState(() {
+        rawBarGroups = items;
+        showingBarGroups = rawBarGroups;
+        // dashSectorStats = statsmodel;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    final barGroup1 = makeGroupData(0, 5, 12);
-    final barGroup2 = makeGroupData(1, 16, 12);
-    final barGroup3 = makeGroupData(2, 18, 5);
-    final barGroup4 = makeGroupData(3, 20, 16);
-    final barGroup5 = makeGroupData(4, 17, 6);
-    final barGroup6 = makeGroupData(5, 19, 1.5);
-    final barGroup7 = makeGroupData(6, 10, 1.5);
-    final barGroup8 = makeGroupData(2, 18, 5);
-    final barGroup9 = makeGroupData(3, 20, 16);
-    final barGroup10 = makeGroupData(4, 17, 6);
-    final barGroup11 = makeGroupData(5, 19, 1.5);
-    final barGroup12 = makeGroupData(6, 10, 1.5);
+    getAnnualRevenueStats();
+    final barGroup1 = makeGroupData(0, 0, 0);
+    final barGroup2 = makeGroupData(1, 0, 0);
+    final barGroup3 = makeGroupData(2, 0, 0);
+    final barGroup4 = makeGroupData(3, 0, 0);
+    final barGroup5 = makeGroupData(4, 0, 0);
+    final barGroup6 = makeGroupData(5, 0, 0);
+    final barGroup7 = makeGroupData(6, 0, 0);
+    final barGroup8 = makeGroupData(7, 0, 0);
+    final barGroup9 = makeGroupData(8, 0, 0);
+    final barGroup10 = makeGroupData(9, 0, 0);
+    final barGroup11 = makeGroupData(10, 0, 0);
+    final barGroup12 = makeGroupData(11, 0, 0);
 
     final items = [
       barGroup1,
@@ -65,7 +119,7 @@ class BarChartPageState extends State<BarChartPage> {
             Expanded(
               child: BarChart(
                 BarChartData(
-                  maxY: 20,
+                  maxY: 2000000,
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipColor: ((group) {
@@ -158,7 +212,7 @@ class BarChartPageState extends State<BarChartPage> {
 
   Widget leftTitles(double value, TitleMeta meta) {
     const style = TextStyle(
-      color: Color(0xff7589a2),
+      color: Color(0xffffffff),
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
@@ -181,24 +235,24 @@ class BarChartPageState extends State<BarChartPage> {
 
   Widget bottomTitles(double value, TitleMeta meta) {
     final titles = <String>[
-      'Jan',
-      '',
-      'Mar',
-      '',
-      'May',
-      '',
-      'Jul',
-      '',
-      'Sep',
-      '',
-      'Nov',
-      ''
+      'Ja',
+      'Fe',
+      'Ma',
+      'Ap',
+      'My',
+      'Jn',
+      'Jl',
+      'Au',
+      'Se',
+      'Oc',
+      'No',
+      'De'
     ];
 
     final Widget text = Text(
       titles[value.toInt()],
       style: const TextStyle(
-        color: Color(0xff7589a2),
+        color: Color(0xffffffff),
         fontWeight: FontWeight.bold,
         fontSize: 14,
       ),
