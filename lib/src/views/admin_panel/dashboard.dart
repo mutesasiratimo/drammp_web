@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+// import 'package:jwt_decode/jwt_decode.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/weather.dart';
@@ -16,7 +17,6 @@ import '../../../config/functions.dart';
 import '../../../provider/messageprovider.dart';
 import '../../../models/homepagestats.dart';
 import 'package:provider/provider.dart';
-
 import 'home/piechart.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -36,19 +36,19 @@ class _DashboardPageState extends Base<DashboardPage> {
   List<DashSectorStats>? dashKitooroStats;
   List<DashSectorStats>? dashSectorStats;
   final dateFormat = new DateFormat('dd-MM-yyyy');
-  String _selectedFilter = "This Week";
+  // String _selectedFilter = "This Week";
   int faresToday = 0,
       tripsToday = 0,
       activeVehicles = 0,
       inactiveVehicles = 0,
       totalVehicles = 0,
       passengersToday = 0;
-  final List<String> _filters = [
-    'This Week',
-    'This Month',
-    'Last Month',
-    'This year',
-  ];
+  // final List<String> _filters = [
+  //   'This Week',
+  //   'This Month',
+  //   'Last Month',
+  //   'This year',
+  // ];
   late Sink<dynamic> myMessageSink;
 
   getWeather() async {
@@ -88,6 +88,10 @@ class _DashboardPageState extends Base<DashboardPage> {
 
     await AppFunctions.authenticate(_username, _password);
     _authToken = prefs.getString("authToken")!;
+    // Map<String, dynamic> payload = Jwt.parseJwt(_authToken);
+
+    // print(DateTime.fromMillisecondsSinceEpoch(payload["expiry"] * 1000,
+    //     isUtc: true));
 
     var response = await http.get(
       url,
@@ -96,7 +100,7 @@ class _DashboardPageState extends Base<DashboardPage> {
         'Authorization': 'Bearer $_authToken',
       },
     );
-    debugPrint("++++++" + response.body.toString() + "+++++++");
+    // debugPrint("++++++" + response.body.toString() + "+++++++");
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       setState(() {
@@ -210,8 +214,9 @@ class _DashboardPageState extends Base<DashboardPage> {
     // });
     context.read<MessageNotifierProvider>().notifyStream.listen((value) {
       debugPrint("Update Data");
-      getDashSectorStats();
+      getMobilityStats();
       getKitoorTaxiParkStats();
+      getDashSectorStats();
     });
   }
 
@@ -247,7 +252,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                         children: [
                           SizedBox(height: 4),
                           Text(
-                            "Good $salutation, Admin.",
+                            "Good $salutation.",
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
@@ -1466,12 +1471,13 @@ class _DashboardPageState extends Base<DashboardPage> {
                           Card(
                             clipBehavior: Clip.antiAlias,
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 BootstrapRow(children: <BootstrapCol>[
                                   BootstrapCol(
                                     sizes: "col-lg-12 col-md-12 col-sm-12",
                                     child: SizedBox(
-                                      height: 220,
+                                      height: 250,
                                       child: PieChartSample2(),
                                     ),
                                   ),
@@ -1483,62 +1489,62 @@ class _DashboardPageState extends Base<DashboardPage> {
                             ),
                           ),
                           SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Text(
-                                "Expected vs. Actual Revenue",
-                                style:
-                                    themeData.textTheme.titleMedium!.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16),
-                          Card(
-                            clipBehavior: Clip.antiAlias,
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    // const Text(
-                                    //   "Fare Collections",
-                                    //   style: TextStyle(
-                                    //       fontSize: 20,
-                                    //       fontWeight: FontWeight.bold),
-                                    // ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: DropdownButton(
-                                        value: _selectedFilter,
-                                        onChanged: (newValue) {
-                                          setState(() {
-                                            _selectedFilter = newValue!;
-                                          });
-                                        },
-                                        items: _filters.map((filter) {
-                                          return DropdownMenuItem(
-                                            value: filter,
-                                            child: Text(filter),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Center(
-                                  child: Container(
-                                    margin: const EdgeInsets.all(18.0),
-                                    // color: Colors.orange,
-                                    height: 300,
-                                    width: 400,
-                                    // child: BarChartPage(),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
+                          // Row(
+                          //   children: [
+                          //     Text(
+                          //       "Expected vs. Actual Revenue",
+                          //       style:
+                          //           themeData.textTheme.titleMedium!.copyWith(
+                          //         fontWeight: FontWeight.w600,
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
+                          // SizedBox(height: 16),
+                          // Card(
+                          //   clipBehavior: Clip.antiAlias,
+                          //   child: Column(
+                          //     children: [
+                          //       Row(
+                          //         mainAxisAlignment: MainAxisAlignment.end,
+                          //         children: [
+                          //           // const Text(
+                          //   "Fare Collections",
+                          //   style: TextStyle(
+                          //       fontSize: 20,
+                          //       fontWeight: FontWeight.bold),
+                          // ),
+                          //           Padding(
+                          //             padding: const EdgeInsets.all(8.0),
+                          //             child: DropdownButton(
+                          //               value: _selectedFilter,
+                          //               onChanged: (newValue) {
+                          //                 setState(() {
+                          //                   _selectedFilter = newValue!;
+                          //                 });
+                          //               },
+                          //               items: _filters.map((filter) {
+                          //                 return DropdownMenuItem(
+                          //                   value: filter,
+                          //                   child: Text(filter),
+                          //                 );
+                          //               }).toList(),
+                          //             ),
+                          //           ),
+                          //         ],
+                          //       ),
+                          //       Center(
+                          //         child: Container(
+                          //           margin: const EdgeInsets.all(18.0),
+                          //           // color: Colors.orange,
+                          //           height: 300,
+                          //           width: 400,
+                          //           // child: BarChartPage(),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
