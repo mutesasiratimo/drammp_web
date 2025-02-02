@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,6 +37,12 @@ class _DashboardPageState extends Base<DashboardPage> {
   List<DashSectorStats>? dashSectorStats;
   final dateFormat = new DateFormat('dd-MM-yyyy');
   String _selectedFilter = "This Week";
+  int faresToday = 0,
+      tripsToday = 0,
+      activeVehicles = 0,
+      inactiveVehicles = 0,
+      totalVehicles = 0,
+      passengersToday = 0;
   final List<String> _filters = [
     'This Week',
     'This Month',
@@ -68,9 +75,47 @@ class _DashboardPageState extends Base<DashboardPage> {
     return 'Evening';
   }
 
+  void getMobilityStats() async {
+    var url = Uri.parse("${AppConstants.baseUrl}dash/stats/mobility");
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+    // debugPrint("++++++++++++++++++++ DAYS OVERDUE ++++++++++++++++++++==");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    _username = prefs.getString("email")!;
+    _password = prefs.getString("password")!;
+
+    await AppFunctions.authenticate(_username, _password);
+    _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        'Authorization': 'Bearer $_authToken',
+      },
+    );
+    debugPrint("++++++" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      setState(() {
+        faresToday = items["fares"];
+        tripsToday = items["trips"];
+        activeVehicles = items["activevehicles"];
+        inactiveVehicles = items["inactivevehicles"];
+        totalVehicles = activeVehicles + inactiveVehicles;
+        passengersToday = items["passengers"];
+      });
+    } else {
+      debugPrint(response.body.toString());
+    }
+  }
+
   @override
   void initState() {
     salutation = greeting();
+    getMobilityStats();
     getKitoorTaxiParkStats();
     getDashSectorStats();
     initSocket();
@@ -177,7 +222,8 @@ class _DashboardPageState extends Base<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-    final size = MediaQuery.of(context).size;
+    final goRouter = GoRouter.of(context);
+    // final size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -400,8 +446,37 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                       linearStrokeCap:
                                                           LinearStrokeCap
                                                               .roundAll,
-                                                      progressColor:
-                                                          Colors.amber,
+                                                      progressColor: (dashKitooroStats![
+                                                                          0]
+                                                                      .sectorcategories[
+                                                                          0]
+                                                                      .paidrevenue /
+                                                                  dashKitooroStats![
+                                                                          0]
+                                                                      .sectorcategories[
+                                                                          0]
+                                                                      .expectedrevenue) <
+                                                              50.0
+                                                          ? Colors.red
+                                                          : (dashKitooroStats![0]
+                                                                              .sectorcategories[
+                                                                                  0]
+                                                                              .paidrevenue /
+                                                                          dashKitooroStats![0]
+                                                                              .sectorcategories[
+                                                                                  0]
+                                                                              .expectedrevenue) >=
+                                                                      50 &&
+                                                                  (dashKitooroStats![0]
+                                                                              .sectorcategories[
+                                                                                  0]
+                                                                              .paidrevenue /
+                                                                          dashKitooroStats![0]
+                                                                              .sectorcategories[0]
+                                                                              .expectedrevenue) <
+                                                                      80
+                                                              ? Colors.amber
+                                                              : Colors.green,
                                                     ),
                                                   ),
                                                 ],
@@ -474,11 +549,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                                   decimalDigits:
                                                                       1,
                                                                   symbol: '',
-                                                                ).format(dashKitooroStats![0].sectorcategories[1].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
-                                                                  decimalDigits:
-                                                                      1,
-                                                                  symbol: '',
-                                                                ).format(dashKitooroStats![0].sectorcategories[1].expectedrevenue.round()).toString()}",
+                                                                ).format(dashKitooroStats![0].sectorcategories[1].paidrevenue.round()).toString()}",
                                                                 style:
                                                                     TextStyle(
                                                                   fontWeight:
@@ -1174,12 +1245,18 @@ class _DashboardPageState extends Base<DashboardPage> {
                       sizes: 'col-lg-5 col-md-12 col-sm-12',
                       child: Column(
                         children: [
-                          Text(
-                            "Revenue Distribution",
-                            style: themeData.textTheme.labelLarge!.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                "Mobility Summary",
+                                style:
+                                    themeData.textTheme.titleMedium!.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
+                          SizedBox(height: 16),
                           Card(
                             clipBehavior: Clip.antiAlias,
                             child: Column(
@@ -1188,7 +1265,213 @@ class _DashboardPageState extends Base<DashboardPage> {
                                   BootstrapCol(
                                     sizes: "col-lg-12 col-md-12 col-sm-12",
                                     child: SizedBox(
-                                      height: size.height * .4,
+                                      height: 150,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 12.0, bottom: 4.0),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  "Fares Today (UGX): $faresToday",
+                                                  style: themeData
+                                                      .textTheme.titleMedium!
+                                                      .copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    SizedBox(height: 18.0),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "Active Vehicles: $activeVehicles/${activeVehicles + inactiveVehicles}",
+                                                          style: themeData
+                                                              .textTheme
+                                                              .titleSmall!
+                                                              .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(height: 6.0),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "Passengers today: $passengersToday",
+                                                          style: themeData
+                                                              .textTheme
+                                                              .titleSmall!
+                                                              .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(height: 6.0),
+                                                    Row(
+                                                      children: [
+                                                        SizedBox(
+                                                          height: 30,
+                                                          child: Text(
+                                                            "Trips today: $tripsToday",
+                                                            style: themeData
+                                                                .textTheme
+                                                                .titleSmall!
+                                                                .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          "Drivers' Details",
+                                                          style: themeData
+                                                              .textTheme
+                                                              .titleSmall!
+                                                              .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                        ClipOval(
+                                                          child: Material(
+                                                            color: AppConstants
+                                                                .primaryColor,
+                                                            child: InkWell(
+                                                              splashColor: Colors
+                                                                  .blue
+                                                                  .shade400, // Splash color
+                                                              onTap: () {},
+                                                              child: SizedBox(
+                                                                  width: 30,
+                                                                  height: 30,
+                                                                  child: Icon(
+                                                                    size: 20.0,
+                                                                    Icons.menu,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  )),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(height: 8.0),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          "View More",
+                                                          style: themeData
+                                                              .textTheme
+                                                              .titleSmall!
+                                                              .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                        ClipOval(
+                                                          child: Material(
+                                                            color: AppConstants
+                                                                .primaryColor,
+                                                            child: InkWell(
+                                                              splashColor: Colors
+                                                                  .blue
+                                                                  .shade400, // Splash color
+                                                              onTap: () =>
+                                                                  goRouter.go(
+                                                                      "/mobility"),
+                                                              child: SizedBox(
+                                                                  width: 30,
+                                                                  height: 30,
+                                                                  child: Icon(
+                                                                    size: 20.0,
+                                                                    Icons
+                                                                        .arrow_circle_right_outlined,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  )),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ]),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Text(
+                                "Revenue Distribution",
+                                style:
+                                    themeData.textTheme.titleMedium!.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16),
+                          Card(
+                            clipBehavior: Clip.antiAlias,
+                            child: Column(
+                              children: [
+                                BootstrapRow(children: <BootstrapCol>[
+                                  BootstrapCol(
+                                    sizes: "col-lg-12 col-md-12 col-sm-12",
+                                    child: SizedBox(
+                                      height: 220,
                                       child: PieChartSample2(),
                                     ),
                                   ),
@@ -1199,12 +1482,19 @@ class _DashboardPageState extends Base<DashboardPage> {
                               ],
                             ),
                           ),
-                          Text(
-                            "Revenue Collection",
-                            style: themeData.textTheme.labelLarge!.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                          SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Text(
+                                "Expected vs. Actual Revenue",
+                                style:
+                                    themeData.textTheme.titleMedium!.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
+                          SizedBox(height: 16),
                           Card(
                             clipBehavior: Clip.antiAlias,
                             child: Column(

@@ -1,12 +1,9 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_scaffold/admin_scaffold.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../config/constants.dart';
 import '../../../provider/app_preferences_provider.dart';
 import '../../../provider/user_data_provider.dart';
@@ -162,12 +159,6 @@ class ScaffoldWithSideBar extends ConsumerWidget {
 
   Widget _accountToggle(BuildContext context) {
     final goRouter = GoRouter.of(context);
-    //Logout Function
-    clearPrefs() async {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      preferences.clear();
-      goRouter.go("/sign-in");
-    }
 
     return Container(
       padding: const EdgeInsets.all(0.0),
@@ -221,7 +212,7 @@ class ScaffoldWithSideBar extends ConsumerWidget {
           ),
           PopupMenuItem(
             onTap: () {
-              clearPrefs();
+              goRouter.go("/logout");
             },
             child: Row(
               children: [

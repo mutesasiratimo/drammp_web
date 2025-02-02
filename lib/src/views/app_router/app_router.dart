@@ -1,5 +1,6 @@
 import 'package:entebbe_dramp_web/src/views/admin_panel/revenuestreams/transport/addindividualrevenuestream.dart';
 import 'package:entebbe_dramp_web/src/views/app_router/scaffold_with_sidebar.dart';
+import 'package:entebbe_dramp_web/src/views/auth/logout_screen.dart';
 import 'package:entebbe_dramp_web/src/views/auth/signup.dart';
 import 'package:entebbe_dramp_web/src/views/myportal/myportal.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,12 @@ goRouterProvider(UserDataProvider userDataProvider) {
           path: '/sign-up',
           pageBuilder: (context, state) {
             return const MaterialPage(child: SignUpPage());
+          }),
+      GoRoute(
+          name: 'logout',
+          path: '/logout',
+          pageBuilder: (context, state) {
+            return const MaterialPage(child: LogoutScreen());
           }),
       GoRoute(
           name: 'myportal',

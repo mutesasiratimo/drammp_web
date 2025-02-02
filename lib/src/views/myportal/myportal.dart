@@ -574,12 +574,6 @@ class _MyPortalPageState extends Base<MyPortalPage> {
 
   Widget _accountToggle(BuildContext context) {
     final goRouter = GoRouter.of(context);
-    //Logout Function
-    clearPrefs() async {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      preferences.clear();
-      goRouter.go("/sign-in");
-    }
 
     return Container(
       padding: const EdgeInsets.all(0.0),
@@ -633,7 +627,7 @@ class _MyPortalPageState extends Base<MyPortalPage> {
           ),
           PopupMenuItem(
             onTap: () {
-              clearPrefs();
+              goRouter.go("/logout");
             },
             child: Row(
               children: [
