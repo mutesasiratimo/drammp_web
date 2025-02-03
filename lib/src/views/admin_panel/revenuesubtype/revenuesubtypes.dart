@@ -1,15 +1,17 @@
-// ignore_for_file: unused_field
+// ignore_for_file: unused_field, unused_local_variable
 
 import 'dart:async';
 import 'dart:convert';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../config/base.dart';
 import '../../../../config/constants.dart';
 import '../../../../config/functions.dart';
 import 'package:http/http.dart' as http;
-import '../../../../models/revenuesectorcategories.dart';
+import '../../../../models/revenuesector.dart';
+import '../../../../models/revenuesectorcategoriesfiltered.dart';
 import 'addrevenuesubtype.dart';
 
 class SectorSubtypePage extends StatefulWidget {
@@ -20,7 +22,7 @@ class SectorSubtypePage extends StatefulWidget {
 }
 
 class _SectorSubtypePageState extends Base<SectorSubtypePage> {
-  List<RevenueSectorCategoriesModel> sectorCategories = [];
+  List<RevenueSectorCategoriesFilteredModel> sectorCategories = [];
   bool _sortAscending = true;
   int? _sortColumnIndex;
   final PaginatorController _controller = PaginatorController();
@@ -30,14 +32,70 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
   bool _isAscending = true;
   int revenueSectorsPage = 1;
   List<int> rowCountList = [10, 20, 30, 40, 50, 100];
-
+  String selectedInitSector = "";
+  String selectedSector = "";
+  String selectedInitSectorId = "";
+  String selectedSectorId = "";
+  List<RevenueSectorsModel> sectorList = <RevenueSectorsModel>[];
   bool _dataSourceLoading = false;
   int _initialRow = 0;
 
   //get sectors list
-  Future<List<RevenueSectorCategoriesModel>> getSectorCategories() async {
-    List<RevenueSectorCategoriesModel> returnValue = [];
-    var url = Uri.parse("${AppConstants.baseUrl}sectorsubtypes");
+  Future<List<RevenueSectorsModel>> getSectors() async {
+    List<RevenueSectorsModel> returnValue = [];
+    var url = Uri.parse("${AppConstants.baseUrl}revenuesectors");
+    // debugPrint(url.toString());
+    // String _ausword = "";
+
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Get username and password from shared prefs
+    // _username = prefs.getString("email")!;
+    // _password = prefs.getString("password")!;
+
+    // await AppFunctions.authenticate(_username, _password);
+    // _authToken = prefs.getString("authToken")!;
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        // 'Authorization': 'Bearer $_authToken',
+      },
+    );
+    // debugPrint("++++++RESPONSE SECTORS" + response.body.toString() + "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
+      List<RevenueSectorsModel> sectorsmodel = (items as List)
+          .map((data) => RevenueSectorsModel.fromJson(data))
+          .toList();
+
+      // List<RevenueSectorsModel> sectorsmodel = usersobj;
+      // List<UserItem> usersmodel = usersobj.items;
+
+      returnValue = sectorsmodel;
+      // debugPrint(sectorsmodel.toString());
+      setState(() {
+        sectorList = sectorsmodel;
+        selectedInitSector = sectorsmodel.first.name;
+        selectedInitSectorId = sectorsmodel.first.id;
+        getSectorCategories(selectedInitSectorId);
+        debugPrint(
+            selectedInitSectorId.toString() + "+++++++++++++++++++===========");
+      });
+    } else {
+      returnValue = [];
+      // showSnackBar("Network Failure: Failed to retrieve transactions");
+    }
+    return returnValue;
+  }
+
+  //get sectors list
+  Future<List<RevenueSectorCategoriesFilteredModel>> getSectorCategories(
+      String sectorid) async {
+    List<RevenueSectorCategoriesFilteredModel> returnValue = [];
+    var url =
+        Uri.parse("${AppConstants.baseUrl}sectorsubtypes/sector/$sectorid");
     debugPrint(url.toString());
     String _authToken = "";
     String _username = "";
@@ -62,8 +120,8 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
     if (response.statusCode == 200) {
       final items = json.decode(response.body);
       // RevenueSectorCategoriesModel sectorrsobj = RevenueSectorCategoriesModel.fromJson(items);
-      List<RevenueSectorCategoriesModel> sectorsmodel = (items as List)
-          .map((data) => RevenueSectorCategoriesModel.fromJson(data))
+      List<RevenueSectorCategoriesFilteredModel> sectorsmodel = (items as List)
+          .map((data) => RevenueSectorCategoriesFilteredModel.fromJson(data))
           .toList();
 
       // List<RevenueSectorCategoriesModel> sectorsmodel = usersobj;
@@ -83,7 +141,7 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
 
   @override
   void initState() {
-    getSectorCategories();
+    getSectors();
     super.initState();
   }
 
@@ -106,51 +164,122 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
             child: Card(
               // color: Colors.white,
               child: Column(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      // width: 200,
-                      // color: Colors.grey[200],
-                      child: ElevatedButton(
-                        onPressed: () {
-                          sectorPageController.jumpToPage(1);
-                          // showInfoToast("Navigate");
-                          // push(const AddRevenueSectorPage());
-                        },
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.add,
-                              color: AppConstants.secondaryColor,
-                              size: 20,
-                            ),
-                            const SizedBox(
-                              width: 8.0,
-                            ),
-                            const Text(
-                              'New',
-                              style: TextStyle(
-                                  color: AppConstants.secondaryColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16),
-                            ),
-                          ],
+                SizedBox(height: 8),
+                BootstrapRow(
+                  children: <BootstrapCol>[
+                    BootstrapCol(
+                      sizes: "col-lg-3 col-md-12 col-sm-12",
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(vertical: 0.0),
+                        title: Text(
+                          'Select Sector',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          shape: const StadiumBorder(),
-                          backgroundColor: AppConstants.primaryColor,
+                        subtitle: SizedBox(
+                          height: 38,
+                          child: DropdownButtonFormField(
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 8),
+                              border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffB9B9B9)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color(0xffB9B9B9), width: 1.0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              hintText: '',
+                            ),
+                            isExpanded: true,
+                            hint: Row(
+                              children: [
+                                new Text(
+                                  selectedInitSector,
+                                  style: const TextStyle(
+                                      // color: Colors.grey,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            items: sectorList.map((item) {
+                              return DropdownMenuItem(
+                                child: Row(
+                                  children: [
+                                    new Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                          // color: Colors.grey,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
+                                ),
+                                value: item,
+                              );
+                            }).toList(),
+                            onChanged: (newVal) {
+                              List itemsList = sectorList.map((item) {
+                                if (item == newVal) {
+                                  setState(() async {
+                                    selectedInitSector = item.name;
+                                    selectedInitSectorId = item.id;
+                                    // debugPrint(selectedInitSector);
+                                    getSectorCategories(selectedInitSectorId);
+                                  });
+                                }
+                              }).toList();
+                            },
+                          ),
                         ),
                       ),
-                    )
+                    ),
+                    BootstrapCol(
+                        sizes: "col-lg-3 col-md-12 col-sm-12",
+                        child: Container()),
+                    BootstrapCol(
+                      sizes: "col-lg-3 col-md-0 col-sm-0",
+                      child: Container(),
+                    ),
+                    BootstrapCol(
+                      sizes: "col-lg-3 col-md-12 col-sm-12",
+                      child: Container(
+                        padding: const EdgeInsets.only(top: 32.0),
+                        child: TextButton.icon(
+                          onPressed: () {
+                            // openSelectBox();
+                          },
+                          icon: const Icon(
+                            Icons.add,
+                            color: AppConstants.secondaryColor,
+                            size: 20,
+                          ),
+                          label: const Text(
+                            'New Stream',
+                            style: TextStyle(
+                                color: AppConstants.secondaryColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            shape: const StadiumBorder(),
+                            backgroundColor: AppConstants.primaryColor,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-                SizedBox(height: 8.0),
+                SizedBox(height: 16.0),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * .55,
                   child: Container(
@@ -206,25 +335,25 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
                             });
                           },
                         ),
-                        DataColumn(
-                          label: const Text("Sector"),
-                          onSort: (columnIndex, _) {
-                            setState(() {
-                              _currentSortColumn = columnIndex;
-                              if (_isAscending == true) {
-                                _isAscending = false;
-                                sectorCategories.sort((userA, userB) => userB
-                                    .sectorid.name
-                                    .compareTo(userA.sectorid.name));
-                              } else {
-                                _isAscending = true;
-                                sectorCategories.sort((userA, userB) => userA
-                                    .sectorid.name
-                                    .compareTo(userB.sectorid.name));
-                              }
-                            });
-                          },
-                        ),
+                        // DataColumn(
+                        //   label: const Text("Sector"),
+                        //   onSort: (columnIndex, _) {
+                        //     setState(() {
+                        //       _currentSortColumn = columnIndex;
+                        //       if (_isAscending == true) {
+                        //         _isAscending = false;
+                        //         sectorCategories.sort((userA, userB) => userB
+                        //             .revenuesectorid
+                        //             .compareTo(userA.revenuesectorid));
+                        //       } else {
+                        //         _isAscending = true;
+                        //         sectorCategories.sort((userA, userB) => userA
+                        //             .revenuesectorid
+                        //             .compareTo(userB.revenuesectorid));
+                        //       }
+                        //     });
+                        //   },
+                        // ),
                         DataColumn(
                           label: const Text("Status"),
                           onSort: (columnIndex, _) {
@@ -262,12 +391,12 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
                                           fontWeight: FontWeight.bold,
                                           fontSize: 12),
                                     )),
-                                    DataCell(Text(
-                                      element.sectorid.name.toString(),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 12),
-                                    )),
+                                    // DataCell(Text(
+                                    //   element.sectorid.name.toString(),
+                                    //   style: const TextStyle(
+                                    //       fontWeight: FontWeight.w600,
+                                    //       fontSize: 12),
+                                    // )),
                                     DataCell(Badge(
                                       backgroundColor:
                                           element.status.toString() == "0"

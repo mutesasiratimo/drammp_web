@@ -38,7 +38,7 @@ class _AppWithGoRouterState extends State<AppWithGoRouter> {
         debugPrint("Timeout");
         _appRouter!.go("/logout");
       },
-      duration: Duration(seconds: 300),
+      duration: Duration(seconds: 600),
       child: provider.MultiProvider(
         providers: [
           // App prefs like dark mode
