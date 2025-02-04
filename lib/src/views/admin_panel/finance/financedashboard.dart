@@ -286,13 +286,16 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                       child: Row(
                                         children: [
                                           Expanded(
-                                            child: selectedInterval == "Annual"
-                                                ? BarChartPage()
-                                                : selectedInterval ==
-                                                        "Quarterly"
-                                                    ? BarChartPageQuarterly()
-                                                    : BarChartPageMonthly(),
+                                            child: BarChartPage(),
                                           )
+                                          // Expanded(
+                                          //   child: selectedInterval == "Annual"
+                                          //       ? BarChartPage()
+                                          //       : selectedInterval ==
+                                          //               "Quarterly"
+                                          //           ? BarChartPageQuarterly()
+                                          //           : BarChartPageMonthly(),
+                                          // )
                                         ],
                                       ),
                                     ),

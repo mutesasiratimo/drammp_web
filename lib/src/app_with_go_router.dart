@@ -1,3 +1,4 @@
+import 'package:entebbe_dramp_web/config/base.dart';
 import 'package:entebbe_dramp_web/config/sessionlister.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,7 +17,7 @@ class AppWithGoRouter extends StatefulWidget {
   State<AppWithGoRouter> createState() => _AppWithGoRouterState();
 }
 
-class _AppWithGoRouterState extends State<AppWithGoRouter> {
+class _AppWithGoRouterState extends Base<AppWithGoRouter> {
   GoRouter? _appRouter;
 
   Future<bool>? _future;
@@ -36,6 +37,7 @@ class _AppWithGoRouterState extends State<AppWithGoRouter> {
     return SessionTimeoutListener(
       onCallBack: () {
         debugPrint("Timeout");
+        showWarningToast("You were logged out due to inactivity");
         _appRouter!.go("/logout");
       },
       duration: Duration(seconds: 600),

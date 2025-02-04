@@ -13,6 +13,8 @@ import '../../../../provider/messageprovider.dart';
 import '/models/revenuestreamspaginated.dart';
 import '/models/trips.dart';
 import 'map_page.dart';
+import 'package:intl/intl.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 
 class MobilityPage extends StatefulWidget {
   const MobilityPage({super.key});
@@ -40,9 +42,19 @@ class _MobilityPageState extends Base<MobilityPage> {
       passengersToday = 0;
   late StreamSubscription streamSub;
   late Stream stream;
+  List<DateTime?>? _dateLists = [
+    DateTime.now(),
+    DateTime.now(),
+  ];
+  final DateTime startDate = DateTime.now().subtract(const Duration(days: 60));
+  // final DateTime startDate = DateTime.now();
+  final DateTime endDate = DateTime.now();
+  var dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ss");
+  // dateFormat.format(element.nextrenewaldate)
 
-  void getMobilityStats() async {
-    var url = Uri.parse("${AppConstants.baseUrl}dash/stats/mobility");
+  void getMobilityStats(DateTime startDate, DateTime endDate) async {
+    var url = Uri.parse(
+        "${AppConstants.baseUrl}dash/stats/mobility/$startDate/$endDate");
     String _authToken = "";
     String _username = "";
     String _password = "";
@@ -173,7 +185,7 @@ class _MobilityPageState extends Base<MobilityPage> {
   void initState() {
     super.initState();
     initSocket();
-    getMobilityStats();
+    getMobilityStats(_dateLists![0]!, _dateLists![1]!);
     getStreams();
     getHistory();
   }
@@ -186,7 +198,7 @@ class _MobilityPageState extends Base<MobilityPage> {
   Future<void> initSocket() async {
     context.read<MessageNotifierProvider>().notifyStream.listen((value) {
       getHistory();
-      getMobilityStats();
+      getMobilityStats(_dateLists![0]!, _dateLists![1]!);
       getStreams();
     });
   }
@@ -212,13 +224,70 @@ class _MobilityPageState extends Base<MobilityPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24.0),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 "Daily Statistics",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  // final DateTimeRange? dateTimeRange =
+                                  //     await showDateRangePicker(
+                                  //   context: context,
+                                  //   firstDate: DateTime.now()
+                                  //       .subtract(const Duration(days: 365)),
+                                  //   lastDate: DateTime.now(),
+
+                                  // );
+
+                                  final List<DateTime?>? dateTimeRange =
+                                      await showCalendarDatePicker2Dialog(
+                                    context: context,
+
+                                    config:
+                                        CalendarDatePicker2WithActionButtonsConfig(
+                                      firstDate: DateTime.now()
+                                          .subtract(const Duration(days: 365)),
+                                      lastDate: DateTime.now(),
+                                      selectedDayTextStyle: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      selectedRangeHighlightColor:
+                                          Colors.blue.shade50,
+                                      selectedDayHighlightColor:
+                                          AppConstants.primaryColor,
+                                      calendarType:
+                                          CalendarDatePicker2Type.range,
+                                    ),
+                                    dialogSize: const Size(400, 500),
+                                    value: _dateLists!,
+                                    // onValueChanged: (dates) => _dialogCalendarPickerValue = dates,
+                                    borderRadius: BorderRadius.circular(15),
+                                  );
+
+                                  if (dateTimeRange != null) {
+                                    setState(() {
+                                      _dateLists = dateTimeRange;
+                                      getMobilityStats(
+                                          _dateLists![0]!, _dateLists![1]!);
+                                    });
+                                  }
+                                },
+                                child: const Text(
+                                  'Select Date Range',
+                                  style: TextStyle(
+                                      color: AppConstants.secondaryColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  shape: const StadiumBorder(),
+                                  backgroundColor: AppConstants.primaryColor,
                                 ),
                               ),
                             ],
@@ -262,7 +331,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                                             ),
                                           ),
                                           Text(
-                                            "(UGX) Today.",
+                                            "(UGX)",
                                             style: TextStyle(
                                               color: Colors.green.shade900,
                                               fontSize: 12,
@@ -311,7 +380,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                                             ),
                                           ),
                                           Text(
-                                            "Trips Today.",
+                                            "Trips",
                                             style: TextStyle(
                                               color: Colors.blue.shade900,
                                               fontSize: 12,
@@ -409,7 +478,7 @@ class _MobilityPageState extends Base<MobilityPage> {
                                             ),
                                           ),
                                           Text(
-                                            "Passengers Today.",
+                                            "Passengers",
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 12,

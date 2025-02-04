@@ -88,6 +88,7 @@ class _SignInPageState extends Base<SignInPage> {
         prefs.setString("userid", user.userid.toString());
         // prefs.setString("dateJoined", user.datecreated.toIso8601String());
         prefs.setBool("isclerk", user.isclerk);
+        // prefs.setBool("isadmin", user.isadmin);
         prefs.setBool("isadmin", user.isadmin);
         prefs.setBool("issuperadmin", user.issuperadmin);
 

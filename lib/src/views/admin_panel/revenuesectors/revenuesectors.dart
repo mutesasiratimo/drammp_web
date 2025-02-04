@@ -9,7 +9,6 @@ import '../../../../config/base.dart';
 import '../../../../config/constants.dart';
 import 'package:http/http.dart' as http;
 import '../../../../config/functions.dart';
-import 'addrevenuesector.dart';
 import '/models/revenuesector.dart';
 
 class RevenuesectorsPage extends StatefulWidget {
@@ -26,9 +25,86 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
   bool _isAscending = true;
   int revenueSectorsPage = 1;
   PageController revenuePageController = PageController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController codeController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
   List<int> rowCountList = [10, 20, 30, 40, 50, 100];
   bool _dataSourceLoading = false;
   int _initialRow = 0;
+  bool responseLoading = false;
+
+  registerSector(String name, code, description) async {
+    var url = Uri.parse("${AppConstants.baseUrl}revenuesectors/create");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    FocusScopeNode currentFocus = FocusScope.of(context);
+
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    setState(() {
+      responseLoading = true;
+    });
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+    String _userId = "";
+
+    if (prefs.getString("userid") != null &&
+        prefs.getString("password") != null) {
+      //Get username and password from shared prefs
+      _username = prefs.getString("email")!;
+      _password = prefs.getString("password")!;
+      _userId = prefs.getString("userid")!;
+
+      await AppFunctions.authenticate(_username, _password);
+      _authToken = prefs.getString("authToken")!;
+    }
+
+    var bodyString = {
+      "id": "",
+      "code": "$code",
+      "name": "$name",
+      "description": "$description",
+      "datecreated": "2025-02-03T18:06:58.773Z",
+      "createdby": "$_userId",
+      "dateupdated": "2025-02-03T18:06:58.773Z",
+      "updatedby": "",
+      "status": "1"
+    };
+    debugPrint(bodyString.toString());
+    debugPrint(url.toString());
+    var body = jsonEncode(bodyString);
+
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "Application/json",
+          'Authorization': 'Bearer $_authToken',
+        },
+        body: body);
+    debugPrint("++++++${response.body}+++++++");
+    debugPrint("++++++${response.statusCode}+++++++");
+    if (response.statusCode == 200) {
+      // final items = json.decode(response.body);
+
+      Navigator.of(context).pop();
+      showSuccessToast("New sector created!");
+
+      setState(() {
+        responseLoading = false;
+      });
+      // showSnackBar("Alert: User account not activated.");
+    } else if (response.statusCode == 409) {
+      setState(() {
+        responseLoading = false;
+      });
+      showWarningToast("Duplication Alert: This sector already exists!!!");
+    } else {
+      setState(() {
+        responseLoading = false;
+      });
+      showErrorToast("Authentication Failure: Invalid credentials.");
+    }
+  }
 
   //get sectors list
   Future<List<RevenueSectorsModel>> getSectors() async {
@@ -89,6 +165,155 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
     super.dispose();
   }
 
+  addSectorDialog() async {
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          ///**StatefulBuilder**
+          builder: (context, setState) {
+            return SimpleDialog(
+              title: const Text('New Sector'),
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * .25,
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                        contentPadding: EdgeInsets.symmetric(vertical: 0),
+                        title: Text(
+                          'Sector Name',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Container(
+                          height: 38,
+                          child: TextFormField(
+                            controller: nameController,
+                            enabled: true,
+                            decoration: const InputDecoration(
+                              disabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffB9B9B9)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color(0xffB9B9B9), width: 1.0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              hintText: '',
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.symmetric(vertical: 0),
+                        title: Text(
+                          'Sector Code',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Container(
+                          height: 38,
+                          child: TextFormField(
+                            controller: codeController,
+                            enabled: true,
+                            decoration: const InputDecoration(
+                              disabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffB9B9B9)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color(0xffB9B9B9), width: 1.0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              hintText: '',
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.symmetric(vertical: 0),
+                        title: Text(
+                          'Description',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Container(
+                          height: 38,
+                          child: TextFormField(
+                            controller: descriptionController,
+                            enabled: true,
+                            decoration: const InputDecoration(
+                              disabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffB9B9B9)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color(0xffB9B9B9), width: 1.0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              hintText: '',
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: () {
+                          registerSector(nameController.text,
+                              codeController.text, descriptionController.text);
+                        },
+                        child: Center(
+                          child: const Text(
+                            'Save',
+                            style: TextStyle(
+                                color: AppConstants.secondaryColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          backgroundColor: AppConstants.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,9 +342,10 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
                       // color: Colors.grey[200],
                       child: ElevatedButton(
                         onPressed: () {
-                          revenuePageController.jumpToPage(1);
-                          showInfoToast("Navigate");
+                          //   revenuePageController.jumpToPage(1);
+                          //   showInfoToast("Navigate");
                           // push(const AddRevenueSectorPage());
+                          addSectorDialog();
                         },
                         child: Row(
                           children: [
@@ -132,7 +358,7 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
                               width: 8.0,
                             ),
                             const Text(
-                              'New',
+                              'New Sector',
                               style: TextStyle(
                                   color: AppConstants.secondaryColor,
                                   fontWeight: FontWeight.w500,
@@ -372,8 +598,8 @@ class _RevenuesectorsPageState extends Base<RevenuesectorsPage> {
             child: Card(
               color: Colors.white,
               child: Padding(
-                  padding: const EdgeInsets.all(50.0),
-                  child: AddRevenueSectorPage()),
+                padding: const EdgeInsets.all(50.0),
+              ),
             ),
           ),
         ],

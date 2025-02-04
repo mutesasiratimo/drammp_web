@@ -12,7 +12,6 @@ import '../../../../config/functions.dart';
 import 'package:http/http.dart' as http;
 import '../../../../models/revenuesector.dart';
 import '../../../../models/revenuesectorcategoriesfiltered.dart';
-import 'addrevenuesubtype.dart';
 
 class SectorSubtypePage extends StatefulWidget {
   const SectorSubtypePage({super.key});
@@ -36,9 +35,91 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
   String selectedSector = "";
   String selectedInitSectorId = "";
   String selectedSectorId = "";
+  String selectedSectorNew = "";
+  String selectedSectorIdNew = "";
+  TextEditingController nameController = TextEditingController();
+  TextEditingController codeController = TextEditingController();
   List<RevenueSectorsModel> sectorList = <RevenueSectorsModel>[];
   bool _dataSourceLoading = false;
   int _initialRow = 0;
+  bool responseLoading = false;
+
+  registerCategory(String name, code) async {
+    var url = Uri.parse("${AppConstants.baseUrl}sectorsubtypes/register");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    FocusScopeNode currentFocus = FocusScope.of(context);
+
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    setState(() {
+      responseLoading = true;
+    });
+    String _authToken = "";
+    String _username = "";
+    String _password = "";
+    String _userId = "";
+
+    if (prefs.getString("userid") != null &&
+        prefs.getString("password") != null) {
+      //Get username and password from shared prefs
+      _username = prefs.getString("email")!;
+      _password = prefs.getString("password")!;
+      _userId = prefs.getString("userid")!;
+
+      await AppFunctions.authenticate(_username, _password);
+      _authToken = prefs.getString("authToken")!;
+    }
+
+    var bodyString = {
+      "id": "",
+      "revenuesectorid": "$selectedSectorIdNew",
+      "typename": "$name",
+      "typecode": "$code",
+      "datecreated": "2025-02-03T18:13:56.332Z",
+      "createdby": "$_userId",
+      "dateupdated": "2025-02-03T18:13:56.332Z",
+      "updatedby": "",
+      "status": "1"
+    };
+    if (selectedSectorIdNew != "") {
+      debugPrint(bodyString.toString());
+      debugPrint(url.toString());
+      var body = jsonEncode(bodyString);
+
+      var response = await http.post(url,
+          headers: {
+            "Content-Type": "Application/json",
+            'Authorization': 'Bearer $_authToken',
+          },
+          body: body);
+      debugPrint("++++++${response.body}+++++++");
+      debugPrint("++++++${response.statusCode}+++++++");
+      if (response.statusCode == 200) {
+        // final items = json.decode(response.body);
+        // debugPrint("++++++${items["regreferenceno"]}+++++++");
+        Navigator.of(context).pop();
+        showSuccessToast("New category created!");
+
+        setState(() {
+          responseLoading = false;
+        });
+        // showSnackBar("Alert: User account not activated.");
+      } else if (response.statusCode == 409) {
+        setState(() {
+          responseLoading = false;
+        });
+        showWarningToast("Duplication Alert: This category already exists!!!");
+      } else {
+        setState(() {
+          responseLoading = false;
+        });
+        showErrorToast("Authentication Failure: Invalid credentials.");
+      }
+    } else {
+      showInfoToast("Select a Sector");
+    }
+  }
 
   //get sectors list
   Future<List<RevenueSectorsModel>> getSectors() async {
@@ -150,6 +231,198 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
     super.dispose();
   }
 
+  addCategoryDialog() async {
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        Color sortOptionTwoColor = Colors.white54;
+        return StatefulBuilder(
+          ///**StatefulBuilder**
+          builder: (context, setState) {
+            return SimpleDialog(
+              title: const Text('New Category'),
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * .25,
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+                        title: Text(
+                          'Select Sector',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: SizedBox(
+                          height: 40,
+                          child: DropdownButtonFormField(
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 8),
+                              border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffB9B9B9)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color(0xffB9B9B9), width: 1.0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              hintText: '',
+                            ),
+                            isExpanded: true,
+                            hint: Row(
+                              children: [
+                                new Text(
+                                  selectedSectorNew,
+                                  style: const TextStyle(
+                                      // color: Colors.grey,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            items: sectorList.map((item) {
+                              return DropdownMenuItem(
+                                child: Row(
+                                  children: [
+                                    new Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                          // color: Colors.grey,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
+                                ),
+                                value: item,
+                              );
+                            }).toList(),
+                            onChanged: (newVal) {
+                              List itemsList = sectorList.map((item) async {
+                                if (item == newVal) {
+                                  setState(() {
+                                    selectedSectorNew = item.name;
+                                    selectedSectorIdNew = item.id;
+                                  });
+                                }
+                              }).toList();
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ListTile(
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 12.0),
+                        title: Text(
+                          'Category Name',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Container(
+                          height: 38,
+                          child: TextFormField(
+                            controller: nameController,
+                            enabled: true,
+                            decoration: const InputDecoration(
+                              disabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffB9B9B9)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color(0xffB9B9B9), width: 1.0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              hintText: '',
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ListTile(
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 12.0),
+                        title: Text(
+                          'Category Code',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Container(
+                          height: 38,
+                          child: TextFormField(
+                            controller: codeController,
+                            enabled: true,
+                            decoration: const InputDecoration(
+                              disabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffB9B9B9)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Color(0xffB9B9B9), width: 1.0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4)),
+                              ),
+                              hintText: '',
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: () async {
+                          await registerCategory(
+                              nameController.text, codeController.text);
+                        },
+                        child: Center(
+                          child: const Text(
+                            'Save',
+                            style: TextStyle(
+                                color: AppConstants.secondaryColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          backgroundColor: AppConstants.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -256,7 +529,7 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
                         padding: const EdgeInsets.only(top: 32.0),
                         child: TextButton.icon(
                           onPressed: () {
-                            // openSelectBox();
+                            addCategoryDialog();
                           },
                           icon: const Icon(
                             Icons.add,
@@ -264,7 +537,7 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
                             size: 20,
                           ),
                           label: const Text(
-                            'New Stream',
+                            'New Category',
                             style: TextStyle(
                                 color: AppConstants.secondaryColor,
                                 fontWeight: FontWeight.w500,
@@ -423,7 +696,6 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
                                   DataCell(Text("")),
                                   DataCell(Text("No Revenue Sectors")),
                                   DataCell(Text("")),
-                                  DataCell(Text("")),
                                 ],
                               )
                             ],
@@ -445,9 +717,7 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
                           hint: new Text(
                             _rowsPerPage.toString(),
                             style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400),
+                                fontSize: 14, fontWeight: FontWeight.w400),
                           ),
                           // icon: const Icon(Icons.keyboard_arrow_down),
                           items: rowCountList.map((item) {
@@ -455,9 +725,7 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
                               child: Text(
                                 item.toString(),
                                 style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
+                                    fontSize: 14, fontWeight: FontWeight.w400),
                               ),
                               value: item,
                             );
@@ -491,77 +759,14 @@ class _SectorSubtypePageState extends Base<SectorSubtypePage> {
             child: Card(
               color: Colors.white,
               child: Padding(
-                  padding: const EdgeInsets.all(50.0),
-                  child: AddSectorSubtypePage()),
+                padding: const EdgeInsets.all(50.0),
+              ),
             ),
           ),
         ],
       ),
     );
   }
-}
-
-Widget accountToggle(BuildContext context) {
-  return Container(
-    padding: const EdgeInsets.all(0.0),
-    margin: const EdgeInsets.only(right: 12.0),
-    child: PopupMenuButton(
-      splashRadius: 0.0,
-      tooltip: '',
-      position: PopupMenuPosition.under,
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const CircleAvatar(
-                  backgroundColor: Colors.white,
-                  backgroundImage:
-                      NetworkImage("https://picsum.photos/id/28/50"),
-                  radius: 20.0,
-                ),
-                SizedBox(width: 15 * 0.5),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Admin User"),
-                    Text("admin@email.com"),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-        const PopupMenuItem(
-          child: Row(
-            children: [
-              Icon(Icons.logout),
-              Text("Sign Out"),
-            ],
-          ),
-        ),
-      ],
-      child: Row(
-        children: [
-          const CircleAvatar(
-            backgroundColor: Colors.white,
-            backgroundImage: NetworkImage("https://picsum.photos/id/28/50"),
-            radius: 16.0,
-          ),
-          SizedBox(width: 15 * 0.5),
-          const Text(
-            'Hi, Admin',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }
 
 class _ErrorAndRetry extends StatelessWidget {

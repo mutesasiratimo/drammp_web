@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bootstrap/flutter_bootstrap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-// import 'package:jwt_decode/jwt_decode.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/weather.dart';
@@ -76,7 +75,8 @@ class _DashboardPageState extends Base<DashboardPage> {
   }
 
   void getMobilityStats() async {
-    var url = Uri.parse("${AppConstants.baseUrl}dash/stats/mobility");
+    var url = Uri.parse(
+        "${AppConstants.baseUrl}dash/stats/mobility/${DateTime.now()}/${DateTime.now()}");
     String _authToken = "";
     String _username = "";
     String _password = "";
@@ -114,6 +114,70 @@ class _DashboardPageState extends Base<DashboardPage> {
     } else {
       debugPrint(response.body.toString());
     }
+  }
+
+  driverDetailsDialog() async {
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          ///**StatefulBuilder**
+          builder: (context, setState) {
+            return SimpleDialog(
+              title: const Text('Driver Details'),
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * .25,
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ListTile(
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 12.0),
+                        title: Text(
+                          'Timothy Mutesasira (256781780862)',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'UBG545H - Toyota Hiace',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Center(
+                          child: const Text(
+                            'Done',
+                            style: TextStyle(
+                                color: AppConstants.secondaryColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          shape: const StadiumBorder(),
+                          backgroundColor: AppConstants.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -335,156 +399,165 @@ class _DashboardPageState extends Base<DashboardPage> {
                                           child: Container(
                                             margin: const EdgeInsets.only(
                                                 bottom: 6.0),
-                                            child: Card(
-                                              elevation: 8.0,
-                                              clipBehavior: Clip.antiAlias,
-                                              // color: Colors.white,
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.all(15),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Padding(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      bottom:
-                                                                          16.0),
-                                                              child: Text(
-                                                                "Lockups",
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      bottom:
-                                                                          0),
-                                                              child: Text(
-                                                                "${dashKitooroStats![0].sectorcategories[0].streamcount}",
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 14,
+                                            child: InkWell(
+                                              onTap: () async {
+                                                SharedPreferences prefs =
+                                                    await SharedPreferences
+                                                        .getInstance();
+                                                bool issuperadmin = prefs
+                                                    .getBool("issuperadmin")!;
+                                                if (issuperadmin) {}
+                                              },
+                                              child: Card(
+                                                elevation: 8.0,
+                                                clipBehavior: Clip.antiAlias,
+                                                // color: Colors.white,
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  15),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Padding(
+                                                                padding: EdgeInsets
+                                                                    .only(
+                                                                        bottom:
+                                                                            16.0),
+                                                                child: Row(
+                                                                  children: [
+                                                                    Text(
+                                                                      "Lockups",
+                                                                    ),
+                                                                  ],
                                                                 ),
                                                               ),
-                                                            ),
-                                                            Padding(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      bottom:
-                                                                          0),
-                                                              child: Text(
-                                                                "UGX ${NumberFormat.compactCurrency(
-                                                                  decimalDigits:
-                                                                      1,
-                                                                  symbol: '',
-                                                                ).format(dashKitooroStats![0].sectorcategories[0].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
-                                                                  decimalDigits:
-                                                                      1,
-                                                                  symbol: '',
-                                                                ).format(dashKitooroStats![0].sectorcategories[0].expectedrevenue.round()).toString()}",
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  fontSize: 12,
+                                                              Padding(
+                                                                padding: EdgeInsets
+                                                                    .only(
+                                                                        bottom:
+                                                                            0),
+                                                                child: Text(
+                                                                  "${dashKitooroStats![0].sectorcategories[0].streamcount}",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        14,
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                              Padding(
+                                                                padding: EdgeInsets
+                                                                    .only(
+                                                                        bottom:
+                                                                            0),
+                                                                child: Text(
+                                                                  "UGX ${NumberFormat.compactCurrency(
+                                                                    decimalDigits:
+                                                                        1,
+                                                                    symbol: '',
+                                                                  ).format(dashKitooroStats![0].sectorcategories[0].paidrevenue.round()).toString()}/${NumberFormat.compactCurrency(
+                                                                    decimalDigits:
+                                                                        1,
+                                                                    symbol: '',
+                                                                  ).format(dashKitooroStats![0].sectorcategories[0].expectedrevenue.round()).toString()}",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    fontSize:
+                                                                        12,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        height: 70,
-                                                        width: 70,
-                                                        child: Image.asset(
-                                                          "assets/images/doorlock.png",
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          height: 70,
+                                                          width: 70,
+                                                          child: Image.asset(
+                                                            "assets/images/doorlock.png",
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const Divider(),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            bottom: 12.0,
-                                                            left: 8.0,
-                                                            right: 8.0,
-                                                            top: 4.0),
-                                                    child:
-                                                        LinearPercentIndicator(
-                                                      // width: ((MediaQuery.of(context)
-                                                      //             .size
-                                                      //             .width) /
-                                                      //         5) -
-                                                      //     50,
-                                                      animation: true,
-                                                      lineHeight: 7.0,
-                                                      animationDuration: 2000,
-                                                      percent: (dashKitooroStats![
-                                                                  0]
-                                                              .sectorcategories[
-                                                                  0]
-                                                              .paidrevenue /
-                                                          dashKitooroStats![0]
-                                                              .sectorcategories[
-                                                                  0]
-                                                              .expectedrevenue),
-                                                      trailing: Text(
-                                                        "${((dashKitooroStats![0].sectorcategories[0].paidrevenue / dashKitooroStats![0].sectorcategories[0].expectedrevenue) * 100).round()}%",
-                                                      ),
-                                                      linearStrokeCap:
-                                                          LinearStrokeCap
-                                                              .roundAll,
-                                                      progressColor: (dashKitooroStats![
-                                                                          0]
-                                                                      .sectorcategories[
-                                                                          0]
-                                                                      .paidrevenue /
-                                                                  dashKitooroStats![
-                                                                          0]
-                                                                      .sectorcategories[
-                                                                          0]
-                                                                      .expectedrevenue) <
-                                                              50.0
-                                                          ? Colors.red
-                                                          : (dashKitooroStats![0]
-                                                                              .sectorcategories[
-                                                                                  0]
-                                                                              .paidrevenue /
-                                                                          dashKitooroStats![0]
-                                                                              .sectorcategories[
-                                                                                  0]
-                                                                              .expectedrevenue) >=
-                                                                      50 &&
-                                                                  (dashKitooroStats![0]
-                                                                              .sectorcategories[
-                                                                                  0]
-                                                                              .paidrevenue /
-                                                                          dashKitooroStats![0]
-                                                                              .sectorcategories[0]
-                                                                              .expectedrevenue) <
-                                                                      80
-                                                              ? Colors.amber
-                                                              : Colors.green,
+                                                      ],
                                                     ),
-                                                  ),
-                                                ],
+                                                    const Divider(),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 12.0,
+                                                              left: 8.0,
+                                                              right: 8.0,
+                                                              top: 4.0),
+                                                      child:
+                                                          LinearPercentIndicator(
+                                                        // width: ((MediaQuery.of(context)
+                                                        //             .size
+                                                        //             .width) /
+                                                        //         5) -
+                                                        //     50,
+                                                        animation: true,
+                                                        lineHeight: 7.0,
+                                                        animationDuration: 2000,
+                                                        percent: (dashKitooroStats![
+                                                                    0]
+                                                                .sectorcategories[
+                                                                    0]
+                                                                .paidrevenue /
+                                                            dashKitooroStats![0]
+                                                                .sectorcategories[
+                                                                    0]
+                                                                .expectedrevenue),
+                                                        trailing: Text(
+                                                          "${((dashKitooroStats![0].sectorcategories[0].paidrevenue / dashKitooroStats![0].sectorcategories[0].expectedrevenue) * 100).round()}%",
+                                                        ),
+                                                        linearStrokeCap:
+                                                            LinearStrokeCap
+                                                                .roundAll,
+                                                        progressColor: (dashKitooroStats![
+                                                                            0]
+                                                                        .sectorcategories[
+                                                                            0]
+                                                                        .paidrevenue /
+                                                                    dashKitooroStats![
+                                                                            0]
+                                                                        .sectorcategories[
+                                                                            0]
+                                                                        .expectedrevenue) <
+                                                                50.0
+                                                            ? Colors.red
+                                                            : (dashKitooroStats![0].sectorcategories[0].paidrevenue /
+                                                                            dashKitooroStats![0]
+                                                                                .sectorcategories[
+                                                                                    0]
+                                                                                .expectedrevenue) >=
+                                                                        50 &&
+                                                                    (dashKitooroStats![0].sectorcategories[0].paidrevenue /
+                                                                            dashKitooroStats![0].sectorcategories[0].expectedrevenue) <
+                                                                        80
+                                                                ? Colors.amber
+                                                                : Colors.green,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1315,7 +1388,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                         ),
                                                       ],
                                                     ),
-                                                    SizedBox(height: 6.0),
+                                                    SizedBox(height: 8.0),
                                                     Row(
                                                       children: [
                                                         Text(
@@ -1330,7 +1403,7 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                         ),
                                                       ],
                                                     ),
-                                                    SizedBox(height: 6.0),
+                                                    SizedBox(height: 8.0),
                                                     Row(
                                                       children: [
                                                         SizedBox(
@@ -1378,26 +1451,63 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                           child: Material(
                                                             color: AppConstants
                                                                 .primaryColor,
-                                                            child: InkWell(
-                                                              splashColor: Colors
-                                                                  .blue
-                                                                  .shade400, // Splash color
-                                                              onTap: () {},
-                                                              child: SizedBox(
-                                                                  width: 30,
-                                                                  height: 30,
-                                                                  child: Icon(
-                                                                    size: 20.0,
-                                                                    Icons.menu,
-                                                                    color: Colors
-                                                                        .white,
-                                                                  )),
+                                                            child:
+                                                                PopupMenuButton<
+                                                                    int>(
+                                                              icon: Icon(
+                                                                size: 20.0,
+                                                                Icons.menu,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                              splashRadius: 3.0,
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(0),
+                                                              itemBuilder:
+                                                                  (context) => [
+                                                                // PopupMenuItem 1
+                                                                PopupMenuItem(
+                                                                  value: 1,
+                                                                  // row with 2 children
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Row(
+                                                                        children: [
+                                                                          Text(
+                                                                            "Timothy Mutesasira",
+                                                                            style:
+                                                                                themeData.textTheme.titleSmall!.copyWith(
+                                                                              fontWeight: FontWeight.w600,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            4,
+                                                                      ),
+                                                                      Row(
+                                                                        children: [
+                                                                          Text(
+                                                                            "256781780862 - UBE545H",
+                                                                            style:
+                                                                                themeData.textTheme.titleSmall!.copyWith(
+                                                                              fontWeight: FontWeight.w400,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
                                                           ),
                                                         ),
                                                       ],
                                                     ),
-                                                    SizedBox(height: 8.0),
+                                                    SizedBox(height: 4.0),
                                                     Row(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
@@ -1425,8 +1535,8 @@ class _DashboardPageState extends Base<DashboardPage> {
                                                                   goRouter.go(
                                                                       "/mobility"),
                                                               child: SizedBox(
-                                                                  width: 30,
-                                                                  height: 30,
+                                                                  width: 40,
+                                                                  height: 40,
                                                                   child: Icon(
                                                                     size: 20.0,
                                                                     Icons
