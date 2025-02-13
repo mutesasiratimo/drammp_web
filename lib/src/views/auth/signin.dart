@@ -137,304 +137,349 @@ class _SignInPageState extends Base<SignInPage> {
     var height = MediaQuery.of(context).size.height;
     final themeData = Theme.of(context);
     return Scaffold(
-      body: BootstrapContainer(
-        fluid: true,
-        children: [
-          BootstrapRow(
-            children: <BootstrapCol>[
-              BootstrapCol(
-                sizes: "col-sm-12 col-md-12 col-lg-6",
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: height * .15,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: width * 0.3,
-                          margin: const EdgeInsets.only(
-                            // top: 10.0,
-                            bottom: 16.0,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            BootstrapContainer(
+              fluid: true,
+              children: [
+                BootstrapRow(
+                  children: <BootstrapCol>[
+                    BootstrapCol(
+                      sizes: "col-sm-12 col-md-12 col-lg-6",
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: height * .15,
                           ),
-                          child: Column(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Text(
-                                "Sign In",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              GestureDetector(
-                                onTap: () => context
-                                    .goNamed("signup", pathParameters: {}),
-                                // onTap: () => push(const SignUpPage()),
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: "Don't have an account? ",
-                                    style: themeData.textTheme.titleSmall!
-                                        .copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    // style: TextStyle(
-                                    //   fontSize: 16,
-                                    //   fontWeight: FontWeight.w500,
-                                    // ),
+                              Expanded(
+                                child: Container(
+                                  // width: width * 0.3,
+                                  margin: EdgeInsets.only(
+                                    // top: 10.0,
+                                    bottom: 16.0,
+                                    left: width * 0.1,
+                                    right: width * 0.1,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      TextSpan(
-                                        text: "Register Here",
+                                      const Text(
+                                        "Sign In",
+                                        textAlign: TextAlign.start,
                                         style: TextStyle(
-                                          color: AppConstants.primaryColor,
-                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w600,
                                         ),
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () => context.goNamed("signup",
+                                            pathParameters: {}),
+                                        // onTap: () => push(const SignUpPage()),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text: "Don't have an account? ",
+                                            style: themeData
+                                                .textTheme.titleSmall!
+                                                .copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            // style: TextStyle(
+                                            //   fontSize: 16,
+                                            //   fontWeight: FontWeight.w500,
+                                            // ),
+                                            children: [
+                                              TextSpan(
+                                                text: "Register Here",
+                                                style: TextStyle(
+                                                  color:
+                                                      AppConstants.primaryColor,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 30,
+                                      ),
+                                      TextField(
+                                        controller: this.emailController,
+                                        decoration: const InputDecoration(
+                                            prefixIcon: Icon(
+                                              Icons.email_outlined,
+                                              color:
+                                                  AppConstants.secondaryColor,
+                                            ),
+                                            hintText:
+                                                "Enter your email address",
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey),
+                                            ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: AppConstants
+                                                      .primaryColor),
+                                            ),
+                                            labelText: "Email",
+                                            labelStyle: TextStyle(
+                                                color:
+                                                    AppConstants.primaryColor)),
+                                      ),
+                                      const SizedBox(
+                                        height: 30,
+                                      ),
+                                      TextField(
+                                        controller: passwordController,
+                                        obscureText: obscurePassword,
+                                        decoration: InputDecoration(
+                                            prefixIcon: const Icon(
+                                              Icons.lock_open_outlined,
+                                              color:
+                                                  AppConstants.secondaryColor,
+                                            ),
+                                            suffixIcon: obscurePassword
+                                                ? IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        obscurePassword =
+                                                            !obscurePassword;
+                                                      });
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons
+                                                          .visibility_off_outlined,
+                                                      color: AppConstants
+                                                          .primaryColor,
+                                                    ),
+                                                  )
+                                                : IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        obscurePassword =
+                                                            !obscurePassword;
+                                                      });
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.visibility_outlined,
+                                                      color: AppConstants
+                                                          .primaryColor,
+                                                    ),
+                                                  ),
+                                            hintText: "Enter your password",
+                                            enabledBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.grey),
+                                            ),
+                                            focusedBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: AppConstants
+                                                      .primaryColor),
+                                            ),
+                                            labelText: "Password",
+                                            labelStyle: const TextStyle(
+                                                color:
+                                                    AppConstants.primaryColor)),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Checkbox(
+                                                  semanticLabel: "Remember Me",
+                                                  value: rememberMe,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      rememberMe = value!;
+                                                    });
+                                                  },
+                                                ),
+                                                const Text(
+                                                  'Remember Me',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 14),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {},
+                                              child: const Text(
+                                                textAlign: TextAlign.end,
+                                                'Forgot Password?',
+                                                style: TextStyle(
+                                                    color: AppConstants
+                                                        .primaryColor,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 60,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          responseLoading
+                                              ? SizedBox(
+                                                  height: 35,
+                                                  width: 35,
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                )
+                                              : Expanded(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      emailController.text
+                                                                  .isNotEmpty &&
+                                                              passwordController
+                                                                  .text
+                                                                  .isNotEmpty
+                                                          ? _login(
+                                                              emailController
+                                                                  .text,
+                                                              passwordController
+                                                                  .text,
+                                                              context.read<
+                                                                  UserDataProvider>(),
+                                                            )
+                                                          : showInfoToast(
+                                                              'Fill in the email address and password');
+                                                      ;
+                                                      // openOtpAlertBox();
+                                                      // pushAndRemoveUntil(const HomePage());
+                                                    },
+                                                    child: const Text(
+                                                      'Login',
+                                                      style: TextStyle(
+                                                          color: AppConstants
+                                                              .secondaryColor,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 16),
+                                                    ),
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      shape:
+                                                          const StadiumBorder(),
+                                                      backgroundColor:
+                                                          AppConstants
+                                                              .primaryColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                        ],
                                       )
                                     ],
                                   ),
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 30,
-                              ),
-                              TextField(
-                                controller: this.emailController,
-                                decoration: const InputDecoration(
-                                    prefixIcon: Icon(
-                                      Icons.email_outlined,
-                                      color: AppConstants.secondaryColor,
-                                    ),
-                                    hintText: "Enter your email address",
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.grey),
-                                    ),
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: AppConstants.primaryColor),
-                                    ),
-                                    labelText: "Email",
-                                    labelStyle: TextStyle(
-                                        color: AppConstants.primaryColor)),
-                              ),
-                              const SizedBox(
-                                height: 30,
-                              ),
-                              TextField(
-                                controller: passwordController,
-                                obscureText: obscurePassword,
-                                decoration: InputDecoration(
-                                    prefixIcon: const Icon(
-                                      Icons.lock_open_outlined,
-                                      color: AppConstants.secondaryColor,
-                                    ),
-                                    suffixIcon: obscurePassword
-                                        ? IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                obscurePassword =
-                                                    !obscurePassword;
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.visibility_off_outlined,
-                                              color: AppConstants.primaryColor,
-                                            ),
-                                          )
-                                        : IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                obscurePassword =
-                                                    !obscurePassword;
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.visibility_outlined,
-                                              color: AppConstants.primaryColor,
-                                            ),
-                                          ),
-                                    hintText: "Enter your password",
-                                    enabledBorder: const UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.grey),
-                                    ),
-                                    focusedBorder: const UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: AppConstants.primaryColor),
-                                    ),
-                                    labelText: "Password",
-                                    labelStyle: const TextStyle(
-                                        color: AppConstants.primaryColor)),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(
-                                    width: width * 0.1,
-                                    child: Row(
-                                      children: [
-                                        Checkbox(
-                                          semanticLabel: "Remember Me",
-                                          value: rememberMe,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              rememberMe = value!;
-                                            });
-                                          },
-                                        ),
-                                        const Text(
-                                          'Remember Me',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {},
-                                    child: const Text(
-                                      'Forgot Password?',
-                                      style: TextStyle(
-                                          color: AppConstants.primaryColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 60,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  responseLoading
-                                      ? SizedBox(
-                                          height: 35,
-                                          width: 35,
-                                          child: CircularProgressIndicator(),
-                                        )
-                                      : Expanded(
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              emailController.text.isNotEmpty &&
-                                                      passwordController
-                                                          .text.isNotEmpty
-                                                  ? _login(
-                                                      emailController.text,
-                                                      passwordController.text,
-                                                      context.read<
-                                                          UserDataProvider>(),
-                                                    )
-                                                  : showInfoToast(
-                                                      'Fill in the email address and password');
-                                              ;
-                                              // openOtpAlertBox();
-                                              // pushAndRemoveUntil(const HomePage());
-                                            },
-                                            child: const Text(
-                                              'Login',
-                                              style: TextStyle(
-                                                  color: AppConstants
-                                                      .secondaryColor,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 16),
-                                            ),
-                                            style: ElevatedButton.styleFrom(
-                                              shape: const StadiumBorder(),
-                                              backgroundColor:
-                                                  AppConstants.primaryColor,
-                                            ),
-                                          ),
-                                        ),
-                                ],
                               )
                             ],
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
+                    ),
+                    BootstrapCol(
+                      sizes: "col-sm-12 col-md-12 col-lg-6",
+                      child: Container(
+                        // height: height * 8,
+                        margin: const EdgeInsets.all(30.0),
+                        padding: const EdgeInsets.all(30),
+                        decoration: const BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8.0)),
+                            color: AppConstants.primaryColor),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: height * .55,
+                              // width: width * .3,
+                              child: Image.asset(
+                                  "assets/images/loginvectorblue.png"),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  color: Colors.white,
+                                  // height: 150,
+                                  width: 80,
+                                  child: Image.asset(
+                                      "assets/images/entebbemlogo.png"),
+                                ),
+                              ],
+                            ),
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    "DRAMMP - Entebbe",
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    "Digital Revenue Assurance & Mobility Managment Platorm",
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
                     )
                   ],
                 ),
-              ),
-              BootstrapCol(
-                sizes: "col-sm-12 col-md-12 col-lg-6",
-                child: Container(
-                  // height: height * 8,
-                  margin: const EdgeInsets.all(30.0),
-                  padding: const EdgeInsets.all(30),
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                      color: AppConstants.primaryColor),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: height * .55,
-                        // width: width * .3,
-                        child: Image.asset("assets/images/loginvectorblue.png"),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            color: Colors.white,
-                            // height: 150,
-                            width: 80,
-                            child:
-                                Image.asset("assets/images/entebbemlogo.png"),
-                          ),
-                        ],
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "DRAMMP - Entebbe",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Digital Revenue Assurance & Mobility Managment Platorm",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

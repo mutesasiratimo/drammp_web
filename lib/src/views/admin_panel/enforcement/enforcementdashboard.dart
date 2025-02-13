@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:convert';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:http/http.dart' as http;
@@ -10,6 +12,7 @@ import '../../../../config/base.dart';
 import '../../../../config/constants.dart';
 import '../../../../config/functions.dart';
 import '../../../../models/revenuesector.dart';
+import '../../../../models/revenuesectorcategoriesfiltered.dart';
 import '/models/revenuestreamspaginated.dart';
 
 class EnforcementDashboardPage extends StatefulWidget {
@@ -37,6 +40,23 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
       pastSixtyDaysCount = 0,
       pastThirtyDaysCount = 0,
       underThirtyDaysCount = 0;
+  String selectedSectorNew = "";
+  String selectedSectorIdNew = "";
+  String selectedCategoryNew = "";
+  String selectedCategoryIdNew = "";
+  String selectedOwnership = "";
+  String selectedSector = "";
+  String selectedSectorId = "";
+  String selectedInitCategory = "";
+  String selectedCategory = "";
+  String selectedInitCategoryId = "";
+  String selectedCategoryId = "";
+  List<String> ownerType = ["Individual", "Non-Individual"];
+  List<RevenueSectorCategoriesFilteredModel> categoryList =
+      <RevenueSectorCategoriesFilteredModel>[];
+  List<RevenueSectorsModel> sectorListNew = <RevenueSectorsModel>[];
+  List<RevenueSectorCategoriesFilteredModel> categoryListNew =
+      <RevenueSectorCategoriesFilteredModel>[];
 
   void exportToExcel() {
     final stopwatch = Stopwatch()..start();
@@ -99,7 +119,7 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
   Future<List<RevenueStreams>> getStreams(String sectorId) async {
     List<RevenueStreams> returnValue = [];
     var url = Uri.parse(AppConstants.baseUrl +
-        "revenuestreams/sector/default/$sectorId?page=$_streamsPage&size=$_streamsRowCount");
+        "revenuestreams/category/default/$sectorId?page=$_streamsPage&size=$_streamsRowCount");
     String _authToken = "";
     String _username = "";
     String _password = "";
@@ -179,6 +199,8 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
   Future<List<RevenueSectorsModel>> getSectors() async {
     List<RevenueSectorsModel> returnValue = [];
     var url = Uri.parse("${AppConstants.baseUrl}revenuesectors");
+    // debugPrint(url.toString());
+    // String _ausword = "";
 
     // final SharedPreferences prefs = await SharedPreferences.getInstance();
     //Get username and password from shared prefs
@@ -203,13 +225,109 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
           .map((data) => RevenueSectorsModel.fromJson(data))
           .toList();
 
-      returnValue = sectorsmodel;
+      // List<RevenueSectorsModel> sectorsmodel = usersobj;
+      // List<UserItem> usersmodel = usersobj.items;
 
+      returnValue = sectorsmodel;
+      // debugPrint(sectorsmodel.toString());
       setState(() {
         sectorList = sectorsmodel;
         selectedInitSector = sectorsmodel.first.name;
         selectedInitSectorId = sectorsmodel.first.id;
-        getStreams(selectedInitSectorId);
+        getCategoriesInit(selectedInitSectorId);
+        // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
+      });
+    } else {
+      returnValue = [];
+      // showSnackBar("Network Failure: Failed to retrieve transactions");
+    }
+    return returnValue;
+  }
+
+  //get sector categories list
+  Future<List<RevenueSectorCategoriesFilteredModel>> getCategoriesInit(
+      String sectorId) async {
+    List<RevenueSectorCategoriesFilteredModel> returnValue = [];
+    setState(() {
+      categoryList = [];
+    });
+    var url =
+        Uri.parse("${AppConstants.baseUrl}sectorsubtypes/sector/$sectorId");
+    // debugPrint(url.toString());
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        // 'Authorization': 'Bearer $_authToken',
+      },
+    );
+    // debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
+    //     response.body.toString() +
+    //     "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
+      List<RevenueSectorCategoriesFilteredModel> categoriesmodel = (items
+              as List)
+          .map((data) => RevenueSectorCategoriesFilteredModel.fromJson(data))
+          .toList();
+
+      // List<RevenueSectorsModel> sectorsmodel = usersobj;
+      // List<UserItem> usersmodel = usersobj.items;
+
+      returnValue = categoriesmodel;
+      // debugPrint(categoriesmodel.toString());
+      setState(() {
+        categoryList = categoriesmodel;
+        selectedInitCategory = categoriesmodel.first.typename;
+        selectedInitCategoryId = categoriesmodel.first.id;
+        getStreams(selectedInitCategoryId);
+        // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
+      });
+    } else {
+      returnValue = [];
+      // showSnackBar("Network Failure: Failed to retrieve transactions");
+    }
+    return returnValue;
+  }
+
+  //get sector categories list
+  Future<List<RevenueSectorCategoriesFilteredModel>> getCategories(
+      String sectorId) async {
+    setState(() {
+      categoryList = [];
+    });
+    List<RevenueSectorCategoriesFilteredModel> returnValue = [];
+    var url =
+        Uri.parse("${AppConstants.baseUrl}sectorsubtypes/sector/$sectorId");
+    // debugPrint(url.toString());
+
+    var response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "Application/json",
+        // 'Authorization': 'Bearer $_authToken',
+      },
+    );
+    // debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
+    //     response.body.toString() +
+    //     "+++++++");
+    if (response.statusCode == 200) {
+      final items = json.decode(response.body);
+      // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
+      List<RevenueSectorCategoriesFilteredModel> categoriesmodel = (items
+              as List)
+          .map((data) => RevenueSectorCategoriesFilteredModel.fromJson(data))
+          .toList();
+
+      // List<RevenueSectorsModel> sectorsmodel = usersobj;
+      // List<UserItem> usersmodel = usersobj.items;
+
+      returnValue = categoriesmodel;
+      // debugPrint(categoriesmodel.toString());
+      setState(() {
+        categoryList = categoriesmodel;
         // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
       });
     } else {
@@ -485,122 +603,218 @@ class _EnforcementDashboardPageState extends Base<EnforcementDashboardPage> {
                                   ),
                                   child: Column(
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          // Text(
-                                          //   "Revenue Streams",
-                                          //   style: TextStyle(
-                                          //     fontSize: 16,
-                                          //     fontWeight: FontWeight.w600,
-                                          //   ),
-                                          // ),
-                                          Container(
-                                            width: 250,
-                                            height: 35,
-                                            margin:
-                                                EdgeInsets.only(bottom: 16.0),
+                                      BootstrapRow(
+                                        children: <BootstrapCol>[
+                                          BootstrapCol(
+                                            sizes:
+                                                "col-lg-3 col-md-12 col-sm-12",
                                             child: ListTile(
                                               contentPadding:
                                                   EdgeInsets.symmetric(
                                                       vertical: 0.0),
-                                              // title: Text(
-                                              //   'Select Sector',
-                                              //   style: TextStyle(
-                                              //     fontSize: 14,
-                                              //     fontWeight: FontWeight.w600,
-                                              //   ),
-                                              // ),
-                                              title: DropdownButtonFormField(
-                                                decoration: InputDecoration(
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          vertical: 0,
-                                                          horizontal: 8),
-                                                  border: OutlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color:
-                                                            Color(0xffB9B9B9)),
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(4)),
-                                                  ),
-                                                  enabledBorder:
-                                                      OutlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color:
-                                                            Color(0xffB9B9B9),
-                                                        width: 1.0),
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(4)),
-                                                  ),
-                                                  hintText: 'Select Sector',
+                                              title: Text(
+                                                'Select Sector',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
                                                 ),
-                                                isExpanded: true,
-                                                hint: new Text(
-                                                  selectedInitSector,
-                                                  style: const TextStyle(
-                                                      // color: Colors.grey,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                                icon: const Icon(
-                                                    Icons.keyboard_arrow_down),
-                                                items: sectorList.map((item) {
-                                                  return DropdownMenuItem(
-                                                    child: new Text(
-                                                      item.name,
-                                                      style: const TextStyle(
-                                                          // color: Colors.grey,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w500),
+                                              ),
+                                              subtitle: SizedBox(
+                                                height: 38,
+                                                child: DropdownButtonFormField(
+                                                  decoration: InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 0,
+                                                            horizontal: 8),
+                                                    border: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color: Color(
+                                                              0xffB9B9B9)),
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  4)),
                                                     ),
-                                                    value: item,
-                                                  );
-                                                }).toList(),
-                                                onChanged: (newVal) {
-                                                  // ignore: unused_local_variable
-                                                  List itemsList =
-                                                      sectorList.map((item) {
-                                                    if (item == newVal) {
-                                                      setState(() async {
-                                                        selectedInitSector =
-                                                            item.name;
-                                                        selectedInitSectorId =
-                                                            item.id;
-                                                        getStreams(
-                                                            selectedInitSectorId);
-                                                      });
-                                                    }
-                                                  }).toList();
-                                                },
+                                                    enabledBorder:
+                                                        OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color:
+                                                              Color(0xffB9B9B9),
+                                                          width: 1.0),
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  4)),
+                                                    ),
+                                                    hintText: '',
+                                                  ),
+                                                  isExpanded: true,
+                                                  hint: Row(
+                                                    children: [
+                                                      new Text(
+                                                        selectedInitSector,
+                                                        style: const TextStyle(
+                                                            // color: Colors.grey,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  icon: const Icon(Icons
+                                                      .keyboard_arrow_down),
+                                                  items: sectorList.map((item) {
+                                                    return DropdownMenuItem(
+                                                      child: Row(
+                                                        children: [
+                                                          new Text(
+                                                            item.name,
+                                                            style:
+                                                                const TextStyle(
+                                                                    // color: Colors.grey,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      value: item,
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (newVal) {
+                                                    List itemsList =
+                                                        sectorList.map((item) {
+                                                      if (item == newVal) {
+                                                        setState(() async {
+                                                          selectedInitSector =
+                                                              item.name;
+                                                          selectedInitSectorId =
+                                                              item.id;
+                                                          // debugPrint(selectedInitSector);
+                                                          selectedInitCategory =
+                                                              "";
+                                                          categoryList = [];
+                                                          getCategoriesInit(
+                                                              selectedInitSectorId);
+                                                        });
+                                                      }
+                                                    }).toList();
+                                                  },
+                                                ),
                                               ),
                                             ),
                                           ),
-                                          TextButton.icon(
-                                            icon: Icon(
-                                              Icons.file_copy_rounded,
-                                              color:
-                                                  AppConstants.secondaryColor,
-                                            ),
-                                            label: Text(
-                                              'Export',
-                                              style: TextStyle(
-                                                color:
-                                                    AppConstants.secondaryColor,
-                                                fontWeight: FontWeight.w500,
+                                          BootstrapCol(
+                                            sizes:
+                                                "col-lg-3 col-md-12 col-sm-12",
+                                            child: ListTile(
+                                              title: Text(
+                                                'Select Category',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              subtitle: SizedBox(
+                                                height: 38,
+                                                child: DropdownButtonFormField(
+                                                  decoration: InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 0,
+                                                            horizontal: 8),
+                                                    border: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color: Color(
+                                                              0xffB9B9B9)),
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  4)),
+                                                    ),
+                                                    enabledBorder:
+                                                        OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color:
+                                                              Color(0xffB9B9B9),
+                                                          width: 1.0),
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  4)),
+                                                    ),
+                                                    hintText: '',
+                                                  ),
+                                                  isExpanded: true,
+                                                  hint: Row(
+                                                    children: [
+                                                      new Text(
+                                                        selectedInitCategory,
+                                                        style: const TextStyle(
+                                                            // color: Colors.grey,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  icon: const Icon(Icons
+                                                      .keyboard_arrow_down),
+                                                  items:
+                                                      categoryList.map((item) {
+                                                    return DropdownMenuItem(
+                                                      child: Row(
+                                                        children: [
+                                                          new Text(
+                                                            item.typename,
+                                                            style:
+                                                                const TextStyle(
+                                                                    // color: Colors.grey,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      value: item,
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (newVal) {
+                                                    List itemsList =
+                                                        categoryList
+                                                            .map((item) {
+                                                      if (item == newVal) {
+                                                        setState(() {
+                                                          selectedInitCategory =
+                                                              item.typename;
+                                                          selectedInitCategoryId =
+                                                              item.id;
+                                                          getStreams(
+                                                              selectedInitCategoryId);
+                                                          // debugPrint(selectedCategory);
+                                                        });
+                                                      }
+                                                    }).toList();
+                                                  },
+                                                ),
                                               ),
                                             ),
-                                            onPressed: exportToExcel,
-                                            style: ElevatedButton.styleFrom(
-                                              shape: const StadiumBorder(),
-                                              backgroundColor:
-                                                  AppConstants.primaryColor,
-                                            ),
+                                          ),
+                                          BootstrapCol(
+                                            sizes: "col-lg-3 col-md-0 col-sm-0",
+                                            child: Container(),
+                                          ),
+                                          BootstrapCol(
+                                            sizes:
+                                                "col-lg-3 col-md-12 col-sm-12",
+                                            child: Container(),
                                           ),
                                         ],
                                       ),

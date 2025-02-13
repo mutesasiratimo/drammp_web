@@ -11,8 +11,8 @@ import '../../../provider/user_data_provider.dart';
 enum SidebarItem {
   dashboard(value: 'Dashboard', iconData: Icons.home),
   revenuestreams(value: 'Revenue Streams', iconData: Icons.business),
-  sectorcategories(value: 'Sector Categories', iconData: Icons.group),
-  revenuesectors(value: 'Revenue Sectors', iconData: Icons.campaign),
+  sectorcategories(value: 'Manage Categories', iconData: Icons.group),
+  revenuesectors(value: 'Manage Sectors', iconData: Icons.campaign),
   mobility(value: 'Mobility Management', iconData: Icons.bus_alert),
   finance(value: 'Finance', iconData: Icons.balance),
   enforcement(value: 'Enforcement', iconData: Icons.policy),

@@ -1,3 +1,4 @@
+import 'package:entebbe_dramp_web/src/views/admin_panel/revenuesectors/addsector.dart';
 import 'package:entebbe_dramp_web/src/views/admin_panel/revenuestreams/transport/addindividualrevenuestream.dart';
 import 'package:entebbe_dramp_web/src/views/app_router/scaffold_with_sidebar.dart';
 import 'package:entebbe_dramp_web/src/views/auth/logout_screen.dart';
@@ -5,6 +6,7 @@ import 'package:entebbe_dramp_web/src/views/auth/signup.dart';
 import 'package:entebbe_dramp_web/src/views/myportal/myportal.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/dialogpage.dart';
 import '../../../main.dart';
 import '../../../provider/user_data_provider.dart';
 import '../admin_panel/dashboard.dart';
@@ -69,6 +71,12 @@ goRouterProvider(UserDataProvider userDataProvider) {
           pageBuilder: (context, state) {
             return const MaterialPage(child: MyPortalPage());
           }),
+      GoRoute(
+        name: '/add-sector',
+        path: '/add-sector',
+        pageBuilder: (context, state) =>
+            DialogPage(builder: (_) => AddSectorPage()),
+      ),
       StatefulShellRoute.indexedStack(
           builder: (BuildContext context, GoRouterState state,
               StatefulNavigationShell navigationShell) {

@@ -5,7 +5,7 @@ class AppConstants {
   // static const secondaryColor = Color(0xff6F1D71);
   static const secondaryColor = Color(0xfffaac18);
   // static const String baseUrl = "http://0.0.0.0:8000/";
-  static const String baseUrl = "https://drammp.space/apidrammp/";
+  static const String baseUrl = "https://drammp.site/apidrammp/";
   //ssh -i /home/mutesasira/gcp mutesasira@35.225.77.49
   // static String baseUrl = "http://35.238.60.172/apidrammp/";
   // static String baseUrl = "http://35.225.77.49/apidrammp/";

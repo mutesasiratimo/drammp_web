@@ -116,8 +116,10 @@ class _AddNonIndividualHospitalityRevenueStreamPageState
   double tarrifAmount = 0.0;
   String tarrifFrequency = "";
   int tarrifFrequencyDays = 0;
-  String lastRenewalDateStr = "2024-11-01T00:00:00.027Z";
-  String nexttRenewalDateStr = "2024-11-01T00:00:00.027Z";
+  String lastRenewalDateStr =
+      DateFormat("yyyy-MM-ddTHH:mm:ssZ").format(DateTime.now());
+  String nexttRenewalDateStr =
+      DateFormat("yyyy-MM-ddTHH:mm:ssZ").format(DateTime.now());
 
   void getCategoryTarrif(String sectorCategoryId) async {
     var url = Uri.parse(
@@ -1075,7 +1077,7 @@ class _AddNonIndividualHospitalityRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Select District',
+                  'Select District/City',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1143,7 +1145,7 @@ class _AddNonIndividualHospitalityRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Select County/Muncipality',
+                  'Select County/Muncipality/Division',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1974,7 +1976,7 @@ class _AddNonIndividualHospitalityRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Select County/Muncipality',
+                  'Select County/Muncipality/Division',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

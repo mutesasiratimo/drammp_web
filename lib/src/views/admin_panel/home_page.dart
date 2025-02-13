@@ -31,14 +31,12 @@ enum SideBarItem {
     body: RevenueStreamsPage(),
   ),
   sectorcategories(
-    value: 'Sector Categories',
+    value: 'Manage Categories',
     iconData: Icons.group,
     body: SectorSubtypePage(),
   ),
   revenuesectors(
-      value: 'Revenue Sectors',
-      iconData: Icons.campaign,
-      body: DashboardPage()),
+      value: 'Manage Sectors', iconData: Icons.campaign, body: DashboardPage()),
   mobility(
       value: 'Mobility Management',
       iconData: Icons.bus_alert,

@@ -37,7 +37,6 @@ class AddIndividualHospitalityRevenueStreamPage extends StatefulWidget {
 class _AddIndividualHospitalityRevenueStreamPageState
     extends Base<AddIndividualHospitalityRevenueStreamPage> {
   PageController addRevenueStreamPageController = PageController();
-  var dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
   int page = 0;
   int counter = 3;
   List list = [0, 1, 2];
@@ -87,11 +86,14 @@ class _AddIndividualHospitalityRevenueStreamPageState
       businessNameController = TextEditingController(),
       brnController = TextEditingController(),
       tinController = TextEditingController();
+  var dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
   double tarrifAmount = 0.0;
   String tarrifFrequency = "";
   int tarrifFrequencyDays = 0;
-  String lastRenewalDateStr = "2024-11-01T00:00:00.027Z";
-  String nexttRenewalDateStr = "2024-11-01T00:00:00.027Z";
+  String lastRenewalDateStr =
+      DateFormat("yyyy-MM-ddTHH:mm:ssZ").format(DateTime.now());
+  String nexttRenewalDateStr =
+      DateFormat("yyyy-MM-ddTHH:mm:ssZ").format(DateTime.now());
 
   void getCategoryTarrif(String sectorCategoryId) async {
     var url = Uri.parse(
@@ -130,52 +132,6 @@ class _AddIndividualHospitalityRevenueStreamPageState
     } else {
       debugPrint(response.body.toString());
     }
-  }
-
-  Future<List<String>> getKlaDivisions() async {
-    print("++++++++++++++++GETTING KLA DIVISIONS ++++++++++");
-    List<String> returnValue = [];
-    var url = Uri.parse(
-        "${AppConstants.baseUrl}locations/subcountiesbydistrict/KAMPALA");
-    String _authToken = "";
-    String _username = "";
-    String _password = "";
-
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    //Get username and password from shared prefs
-    // _username = prefs.getString("email")!;
-    // _password = prefs.getString("password")!;
-
-    // await AppFunctions.authenticate(_username, _password);
-    // _authToken = prefs.getString("authToken")!;
-
-    var response = await http.get(
-      url,
-      headers: {
-        "Content-Type": "Application/json",
-        // 'Authorization': 'Bearer $_authToken',
-      },
-    );
-    debugPrint("++++++${response.body}+++++++");
-    if (response.statusCode == 200) {
-      List<String> stringList =
-          (jsonDecode(response.body) as List<dynamic>).cast<String>();
-      // final items = json.decode(response.body);
-      // Owners usersobj = Owners.fromJson(items);
-
-      // List<String> usersmodel = items;
-      // List<OwnerItem> usersmodel = usersobj.items;
-
-      returnValue = stringList;
-      // debugPrint(usersobj.items.length);
-      setState(() {
-        subcounties = stringList;
-      });
-    } else {
-      returnValue = [];
-      // showSnackBar("Network Failure: Failed to retrieve transactions");
-    }
-    return returnValue;
   }
 
   Future<List<String>> getDistricts() async {
@@ -1112,7 +1068,7 @@ class _AddIndividualHospitalityRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Select District',
+                  'Select District/City',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1180,7 +1136,7 @@ class _AddIndividualHospitalityRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Select County/Muncipality',
+                  'Select County/Muncipality/Division',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1941,7 +1897,7 @@ class _AddIndividualHospitalityRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Select County/Muncipality',
+                  'Select County/Muncipality/Division',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -2257,7 +2213,7 @@ class _AddIndividualHospitalityRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Select District',
+                  'Select District/City',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -2321,7 +2277,7 @@ class _AddIndividualHospitalityRevenueStreamPageState
               ),
               ListTile(
                 title: Text(
-                  'Select County/Muncipality',
+                  'Select County/Muncipality/Division',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
