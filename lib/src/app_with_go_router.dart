@@ -40,7 +40,7 @@ class _AppWithGoRouterState extends Base<AppWithGoRouter> {
         showWarningToast("You were logged out due to inactivity");
         _appRouter!.go("/logout");
       },
-      duration: Duration(seconds: 600),
+      duration: Duration(seconds: 1800),
       child: provider.MultiProvider(
         providers: [
           // App prefs like dark mode

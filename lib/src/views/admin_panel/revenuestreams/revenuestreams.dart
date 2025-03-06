@@ -268,271 +268,532 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
     super.dispose();
   }
 
-  openSelectBoxOld() {
-    return NDialog(
-      dialogStyle: DialogStyle(titleDivider: false),
-      title: Text(
-        "Select to Proceed",
-        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+  showStreamDetails(RevenueStreams stream) async {
+    // await showDialog<void>(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     Color sortOptionTwoColor = Colors.white54;
+    //     return StatefulBuilder(
+    //       ///**StatefulBuilder**
+    //       builder: (context, setState) {
+    //         return SimpleDialog(
+    //           title: const Text('Select to Proceed'),
+    //           children: [
+    //             Container(
+    //               width: MediaQuery.of(context).size.width * .25,
+    //               padding: EdgeInsets.all(16.0),
+    //               child: Column(
+    //                 mainAxisAlignment: MainAxisAlignment.center,
+    //                 children: [
+    //                   SizedBox(height: 10),
+    //                   ListTile(
+    //                     title: Text(
+    //                       'Select Ownership',
+    //                       style: TextStyle(
+    //                         fontSize: 14,
+    //                         fontWeight: FontWeight.w600,
+    //                       ),
+    //                     ),
+    //                     subtitle: DropdownButtonFormField(
+    //                       decoration: InputDecoration(
+    //                         border: OutlineInputBorder(
+    //                           borderSide: BorderSide(color: Color(0xffB9B9B9)),
+    //                           borderRadius:
+    //                               BorderRadius.all(Radius.circular(4)),
+    //                         ),
+    //                         enabledBorder: OutlineInputBorder(
+    //                           borderSide: BorderSide(
+    //                               color: Color(0xffB9B9B9), width: 1.0),
+    //                           borderRadius:
+    //                               BorderRadius.all(Radius.circular(4)),
+    //                         ),
+    //                         hintText: '',
+    //                       ),
+    //                       isExpanded: true,
+    //                       hint: Row(
+    //                         children: [
+    //                           new Text(
+    //                             selectedOwnership,
+    //                             style: const TextStyle(
+    //                                 // color: Colors.grey,
+    //                                 fontSize: 18,
+    //                                 fontWeight: FontWeight.w400),
+    //                           ),
+    //                         ],
+    //                       ),
+    //                       icon: const Icon(Icons.keyboard_arrow_down),
+    //                       items: ownerType.map((item) {
+    //                         return DropdownMenuItem(
+    //                           child: Row(
+    //                             children: [
+    //                               new Text(
+    //                                 item,
+    //                                 style: const TextStyle(
+    //                                     // color: Colors.grey,
+    //                                     fontSize: 18,
+    //                                     fontWeight: FontWeight.w400),
+    //                               ),
+    //                             ],
+    //                           ),
+    //                           value: item,
+    //                         );
+    //                       }).toList(),
+    //                       onChanged: (newVal) {
+    //                         List itemsList = ownerType.map((item) {
+    //                           if (item == newVal) {
+    //                             setState(() {
+    //                               selectedOwnership = item;
+    //                               // debugPrint(selectedOwnership);
+    //                             });
+    //                           }
+    //                         }).toList();
+    //                       },
+    //                     ),
+    //                   ),
+    //                   SizedBox(
+    //                     height: 10,
+    //                   ),
+    //                   ListTile(
+    //                     title: Text(
+    //                       'Select Sector',
+    //                       style: TextStyle(
+    //                         fontSize: 14,
+    //                         fontWeight: FontWeight.w600,
+    //                       ),
+    //                     ),
+    //                     subtitle: DropdownButtonFormField(
+    //                       decoration: InputDecoration(
+    //                         border: OutlineInputBorder(
+    //                           borderSide: BorderSide(color: Color(0xffB9B9B9)),
+    //                           borderRadius:
+    //                               BorderRadius.all(Radius.circular(4)),
+    //                         ),
+    //                         enabledBorder: OutlineInputBorder(
+    //                           borderSide: BorderSide(
+    //                               color: Color(0xffB9B9B9), width: 1.0),
+    //                           borderRadius:
+    //                               BorderRadius.all(Radius.circular(4)),
+    //                         ),
+    //                         hintText: '',
+    //                       ),
+    //                       isExpanded: true,
+    //                       hint: Row(
+    //                         children: [
+    //                           new Text(
+    //                             selectedSectorNew,
+    //                             style: const TextStyle(
+    //                                 // color: Colors.grey,
+    //                                 fontSize: 18,
+    //                                 fontWeight: FontWeight.w400),
+    //                           ),
+    //                         ],
+    //                       ),
+    //                       icon: const Icon(Icons.keyboard_arrow_down),
+    //                       items: sectorList.map((item) {
+    //                         return DropdownMenuItem(
+    //                           child: Row(
+    //                             children: [
+    //                               new Text(
+    //                                 item.name,
+    //                                 style: const TextStyle(
+    //                                     // color: Colors.grey,
+    //                                     fontSize: 18,
+    //                                     fontWeight: FontWeight.w400),
+    //                               ),
+    //                             ],
+    //                           ),
+    //                           value: item,
+    //                         );
+    //                       }).toList(),
+    //                       onChanged: (newVal) {
+    //                         List itemsList = sectorList.map((item) async {
+    //                           if (item == newVal) {
+    //                             setState(() {
+    //                               selectedSectorNew = item.name;
+    //                               selectedSectorIdNew = item.id;
+    //                               // debugPrint(selectedSector);
+    //                               // selectedCategory = "";
+    //                               // categoryList = [];
+    //                               // getCategories(selectedSectorId);
+    //                             });
+    //                             var url = Uri.parse(
+    //                                 "${AppConstants.baseUrl}sectorsubtypes/sector/$selectedSectorIdNew");
+    //                             // debugPrint(url.toString());
+
+    //                             var response = await http.get(
+    //                               url,
+    //                               headers: {
+    //                                 "Content-Type": "Application/json",
+    //                                 // 'Authorization': 'Bearer $_authToken',
+    //                               },
+    //                             );
+    //                             // debugPrint("++++++RESPONSE SECTORS CATEGORIES" +
+    //                             //     response.body.toString() +
+    //                             //     "+++++++");
+    //                             if (response.statusCode == 200) {
+    //                               final items = json.decode(response.body);
+    //                               // RevenueSectorsModel sectorrsobj = RevenueSectorsModel.fromJson(items);
+    //                               List<RevenueSectorCategoriesFilteredModel>
+    //                                   categoriesmodel = (items as List)
+    //                                       .map((data) =>
+    //                                           RevenueSectorCategoriesFilteredModel
+    //                                               .fromJson(data))
+    //                                       .toList();
+
+    //                               // debugPrint(categoriesmodel.toString());
+    //                               setState(() {
+    //                                 categoryListNew = categoriesmodel;
+    //                                 // debugPrint(_users.length.toString() + "+++++++++++++++++++===========");
+    //                               });
+    //                             }
+    //                           }
+    //                         }).toList();
+    //                       },
+    //                     ),
+    //                   ),
+    //                   SizedBox(
+    //                     height: 10,
+    //                   ),
+    //                   ListTile(
+    //                     title: Text(
+    //                       'Select Category',
+    //                       style: TextStyle(
+    //                         fontSize: 14,
+    //                         fontWeight: FontWeight.w600,
+    //                       ),
+    //                     ),
+    //                     subtitle: DropdownButtonFormField(
+    //                       decoration: InputDecoration(
+    //                         border: OutlineInputBorder(
+    //                           borderSide: BorderSide(color: Color(0xffB9B9B9)),
+    //                           borderRadius:
+    //                               BorderRadius.all(Radius.circular(4)),
+    //                         ),
+    //                         enabledBorder: OutlineInputBorder(
+    //                           borderSide: BorderSide(
+    //                               color: Color(0xffB9B9B9), width: 1.0),
+    //                           borderRadius:
+    //                               BorderRadius.all(Radius.circular(4)),
+    //                         ),
+    //                         hintText: '',
+    //                       ),
+    //                       isExpanded: true,
+    //                       hint: Row(
+    //                         children: [
+    //                           new Text(
+    //                             selectedCategoryNew,
+    //                             style: const TextStyle(
+    //                                 // color: Colors.grey,
+    //                                 fontSize: 18,
+    //                                 fontWeight: FontWeight.w400),
+    //                           ),
+    //                         ],
+    //                       ),
+    //                       icon: const Icon(Icons.keyboard_arrow_down),
+    //                       items: categoryListNew.map((item) {
+    //                         return DropdownMenuItem(
+    //                           child: Row(
+    //                             children: [
+    //                               new Text(
+    //                                 item.typename,
+    //                                 style: const TextStyle(
+    //                                     // color: Colors.grey,
+    //                                     fontSize: 18,
+    //                                     fontWeight: FontWeight.w400),
+    //                               ),
+    //                             ],
+    //                           ),
+    //                           value: item,
+    //                         );
+    //                       }).toList(),
+    //                       onChanged: (newVal) {
+    //                         List itemsList = categoryListNew.map((item) {
+    //                           if (item == newVal) {
+    //                             setState(() {
+    //                               selectedCategoryNew = item.typename;
+    //                               selectedCategoryIdNew = item.id;
+    //                               // debugPrint(selectedCategoryNew);
+    //                             });
+    //                           }
+    //                         }).toList();
+    //                       },
+    //                     ),
+    //                   ),
+    //                   SizedBox(height: 30),
+    //                   ElevatedButton(
+    //                     onPressed: () {
+    //                       Navigator.of(context).pop();
+    //                       navigateToPage(
+    //                         selectedOwnership,
+    //                         selectedSectorNew,
+    //                         selectedSectorIdNew,
+    //                         selectedCategoryNew,
+    //                         selectedCategoryIdNew,
+    //                       );
+    //                     },
+    //                     child: Center(
+    //                       child: const Text(
+    //                         'Proceed',
+    //                         style: TextStyle(
+    //                             color: AppConstants.secondaryColor,
+    //                             fontWeight: FontWeight.w500,
+    //                             fontSize: 16),
+    //                       ),
+    //                     ),
+    //                     style: ElevatedButton.styleFrom(
+    //                       shape: const StadiumBorder(),
+    //                       backgroundColor: AppConstants.primaryColor,
+    //                     ),
+    //                   ),
+    //                 ],
+    //               ),
+    //             ),
+    //           ],
+    //         );
+    //       },
+    //     );
+    //   },
+    // );
+    await NDialog(
+      dialogStyle: DialogStyle(titleDivider: true),
+      title: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text("Revenue Stream Details"),
+        ],
       ),
       content: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.65,
-        width: MediaQuery.of(context).size.width * 0.3,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        height: 300,
+        width: MediaQuery.of(context).size.width * .65,
+        child: BootstrapContainer(
           children: [
-            SizedBox(height: 10),
-            ListTile(
-              title: Text(
-                'Select Ownership',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              subtitle: DropdownButtonFormField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                  hintText: '',
-                ),
-                isExpanded: true,
-                hint: Row(
-                  children: [
-                    new Text(
-                      selectedOwnership,
-                      style: const TextStyle(
-                          // color: Colors.grey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400),
-                    ),
-                  ],
-                ),
-                icon: const Icon(Icons.keyboard_arrow_down),
-                items: ownerType.map((item) {
-                  return DropdownMenuItem(
-                    child: Row(
+            BootstrapRow(
+              children: <BootstrapCol>[
+                BootstrapCol(
+                  sizes: "col-sm-12 col-md-12 col-lg-6",
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        new Text(
-                          item,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
+                        RichText(
+                          text: TextSpan(
+                            text: "Name: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "${stream.businessname}",
+                                style: TextStyle(
+                                  color: AppConstants.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        RichText(
+                          text: TextSpan(
+                            text: "Revenue Assurance No: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "${stream.regreferenceno}",
+                                style: TextStyle(
+                                  color: AppConstants.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        RichText(
+                          text: TextSpan(
+                            text: "Category: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "${stream.type}",
+                                style: TextStyle(
+                                  color: AppConstants.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        RichText(
+                          text: TextSpan(
+                            text: "Address/Stage: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "${stream.divisionid}",
+                                style: TextStyle(
+                                  color: AppConstants.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        RichText(
+                          text: TextSpan(
+                            text: "Date Registered: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "${stream.datecreated}",
+                                style: TextStyle(
+                                  color: AppConstants.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                      ],
+                    ),
+                  ),
+                ),
+                BootstrapCol(
+                  sizes: "col-sm-12 col-md-12 col-lg-6",
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: "Amount Due: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "${stream.tarrifamount}",
+                                style: TextStyle(
+                                  color: AppConstants.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        RichText(
+                          text: TextSpan(
+                            text: "Payment Frequency: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "${stream.tarriffrequency}",
+                                style: TextStyle(
+                                  color: AppConstants.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        RichText(
+                          text: TextSpan(
+                            text: "Last Payment Date: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "${stream.lastrenewaldate}",
+                                style: TextStyle(
+                                  color: AppConstants.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        RichText(
+                          text: TextSpan(
+                            text: "Next Due Date: ",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "${stream.nextrenewaldate}",
+                                style: TextStyle(
+                                  color: AppConstants.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    value: item,
-                  );
-                }).toList(),
-                onChanged: (newVal) {
-                  List itemsList = ownerType.map((item) {
-                    if (item == newVal) {
-                      setState(() {
-                        selectedOwnership = item;
-                        // debugPrint(selectedOwnership);
-                      });
-                    }
-                  }).toList();
-                },
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            ListTile(
-              title: Text(
-                'Select Sector',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              subtitle: DropdownButtonFormField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                  hintText: '',
-                ),
-                isExpanded: true,
-                hint: Row(
-                  children: [
-                    new Text(
-                      selectedSector,
-                      style: const TextStyle(
-                          // color: Colors.grey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400),
-                    ),
-                  ],
-                ),
-                icon: const Icon(Icons.keyboard_arrow_down),
-                items: sectorList.map((item) {
-                  return DropdownMenuItem(
-                    child: Row(
-                      children: [
-                        new Text(
-                          item.name,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    value: item,
-                  );
-                }).toList(),
-                onChanged: (newVal) {
-                  List itemsList = sectorList.map((item) async {
-                    if (item == newVal) {
-                      setState(() {
-                        selectedSector = item.name;
-                        selectedSectorId = item.id;
-                        // debugPrint(selectedSector);
-                        // selectedCategory = "";
-                        // categoryList = [];
-                        getCategories(selectedSectorId);
-                      });
-                    }
-                  }).toList();
-                },
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            ListTile(
-              title: Text(
-                'Select Category',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              subtitle: DropdownButtonFormField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xffB9B9B9)),
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Color(0xffB9B9B9), width: 1.0),
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                  hintText: '',
-                ),
-                isExpanded: true,
-                hint: Row(
-                  children: [
-                    new Text(
-                      selectedCategory,
-                      style: const TextStyle(
-                          // color: Colors.grey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400),
-                    ),
-                  ],
-                ),
-                icon: const Icon(Icons.keyboard_arrow_down),
-                items: categoryList.map((item) {
-                  return DropdownMenuItem(
-                    child: Row(
-                      children: [
-                        new Text(
-                          item.typename,
-                          style: const TextStyle(
-                              // color: Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    value: item,
-                  );
-                }).toList(),
-                onChanged: (newVal) {
-                  List itemsList = categoryList.map((item) {
-                    if (item == newVal) {
-                      setState(() {
-                        selectedCategory = item.typename;
-                        selectedCategoryId = item.id;
-                        // debugPrint(selectedCategory);
-                      });
-                    }
-                  }).toList();
-                },
-              ),
-            ),
-            SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                if (selectedOwnership == "Individual") {
-                  // debugPrint(selectedCategory);
-                  // debugPrint(selectedSector);
-                  Navigator.of(context).pop();
-                  revenueStreamPageController.jumpToPage(1);
-                  // selectedSector == "Transport"
-                  //     ? revenueStreamPageController.jumpToPage(1)
-                  //     : selectedSector == "Hospitality"
-                  //         ? revenueStreamPageController
-                  //             .jumpToPage(3)
-                  //         : selectedSector == "Fisheries"
-                  //             ? revenueStreamPageController
-                  //                 .jumpToPage(5)
-                  //             : revenueStreamPageController
-                  //                 .jumpToPage(1);
-                } else if (selectedOwnership == "Non-Individual") {
-                  Navigator.of(context).pop();
-                  revenueStreamPageController.jumpToPage(2);
-
-                  // selectedSector == "Transport"
-                  //     ? revenueStreamPageController.jumpToPage(2)
-                  //     : selectedSector == "Hospitality"
-                  //         ? revenueStreamPageController
-                  //             .jumpToPage(4)
-                  //         : selectedSector == "Fisheries"
-                  //             ? revenueStreamPageController
-                  //                 .jumpToPage(6)
-                  //             : revenueStreamPageController
-                  //                 .jumpToPage(2);
-                } else {
-                  showInfoToast("Please select ownership type.");
-                }
-              },
-              child: Center(
-                child: const Text(
-                  'Proceed',
-                  style: TextStyle(
-                      color: AppConstants.secondaryColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16),
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                shape: const StadiumBorder(),
-                backgroundColor: AppConstants.primaryColor,
-              ),
+                )
+              ],
             ),
           ],
         ),
       ),
-      // actions: <Widget>[],
+      actions: <Widget>[
+        Center(
+            child: MaterialButton(
+          child: const Text(
+            "Close",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          color: AppConstants.primaryColor,
+        )),
+      ],
     ).show(context);
   }
 
@@ -1261,6 +1522,9 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                 });
                               },
                             ),
+                            DataColumn(
+                              label: const Text("More"),
+                            ),
                           ],
                           rows: _streams.isNotEmpty
                               ? _streams // Loops through dataColumnText, each iteration assigning the value to element
@@ -1319,6 +1583,11 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                                 const TextStyle(fontSize: 12),
                                           ),
                                         )),
+                                        DataCell(IconButton(
+                                            onPressed: () {
+                                              showStreamDetails(element);
+                                            },
+                                            icon: Icon(Icons.more_horiz))),
                                       ],
                                     ),
                                   )
@@ -1330,6 +1599,7 @@ class _RevenueStreamsPageState extends Base<RevenueStreamsPage> {
                                       DataCell(Text("")),
                                       DataCell(Text("")),
                                       DataCell(Text("No Revenue Streams")),
+                                      DataCell(Text("")),
                                       DataCell(Text("")),
                                       DataCell(Text("")),
                                     ],
@@ -1563,197 +1833,3 @@ Widget accountToggle(BuildContext context) {
     ),
   );
 }
-
-class _ErrorAndRetry extends StatelessWidget {
-  const _ErrorAndRetry(this.errorMessage, this.retry);
-
-  final String errorMessage;
-  final void Function() retry;
-
-  @override
-  Widget build(BuildContext context) => Center(
-        child: Container(
-            padding: const EdgeInsets.all(10),
-            height: 70,
-            color: Colors.red,
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Oops! $errorMessage',
-                      style: const TextStyle(color: Colors.white)),
-                  TextButton(
-                      onPressed: retry,
-                      child:
-                          const Row(mainAxisSize: MainAxisSize.min, children: [
-                        Icon(
-                          Icons.refresh,
-                          color: Colors.white,
-                        ),
-                        Text('Retry', style: TextStyle(color: Colors.white))
-                      ]))
-                ])),
-      );
-}
-
-class _Loading extends StatefulWidget {
-  @override
-  __LoadingState createState() => __LoadingState();
-}
-
-class __LoadingState extends State<_Loading> {
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-        color: Colors.white.withAlpha(128),
-        // at first show shade, if loading takes longer than 0,5s show spinner
-        child: FutureBuilder(
-            future:
-                Future.delayed(const Duration(milliseconds: 500), () => true),
-            builder: (context, snapshot) {
-              return !snapshot.hasData
-                  ? const SizedBox()
-                  : Center(
-                      child: Container(
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(7),
-                      width: 150,
-                      height: 50,
-                      child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.black,
-                            ),
-                            Text('Loading..')
-                          ]),
-                    ));
-            }));
-  }
-}
-
-class _TitledRangeSelector extends StatefulWidget {
-  const _TitledRangeSelector(
-      {super.key,
-      required this.onChanged,
-      this.title = "",
-      this.caption = "",
-      this.range = const RangeValues(0, 100)});
-
-  final String title;
-  final String caption;
-  final Duration titleToSelectorSwitch = const Duration(seconds: 2);
-  final RangeValues range;
-  final Function(RangeValues) onChanged;
-
-  @override
-  State<_TitledRangeSelector> createState() => _TitledRangeSelectorState();
-}
-
-class _TitledRangeSelectorState extends State<_TitledRangeSelector> {
-  bool _titleVisible = true;
-  RangeValues _values = const RangeValues(0, 100);
-
-  @override
-  void initState() {
-    super.initState();
-
-    _values = widget.range;
-
-    Timer(widget.titleToSelectorSwitch, () {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _titleVisible = false;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(alignment: Alignment.centerLeft, children: [
-      AnimatedOpacity(
-          opacity: _titleVisible ? 1 : 0,
-          duration: const Duration(milliseconds: 1000),
-          child: Align(
-              alignment: Alignment.centerLeft, child: Text(widget.title))),
-      AnimatedOpacity(
-          opacity: _titleVisible ? 0 : 1,
-          duration: const Duration(milliseconds: 1000),
-          child: SizedBox(
-              width: 340,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    DefaultTextStyle(
-                        style:
-                            const TextStyle(fontSize: 15, color: Colors.black),
-                        child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    _values.start.toStringAsFixed(0),
-                                  ),
-                                  Text(
-                                    widget.caption,
-                                  ),
-                                  Text(
-                                    _values.end.toStringAsFixed(0),
-                                  )
-                                ]))),
-                    SizedBox(
-                        height: 24,
-                        child: RangeSlider(
-                          values: _values,
-                          divisions: 9,
-                          min: widget.range.start,
-                          max: widget.range.end,
-                          onChanged: (v) {
-                            setState(() {
-                              _values = v;
-                            });
-                            widget.onChanged(v);
-                          },
-                        ))
-                  ])))
-    ]);
-  }
-}
-
-// Row(
-//                   children: [
-//                     const Text(
-//                       'Home',
-//                       style: TextStyle(
-//                           color: AppConstants.primaryColor,
-//                           fontWeight: FontWeight.w500,
-//                           fontSize: 16),
-//                     ),
-//                     const SizedBox(
-//                       width: 8.0,
-//                     ),
-//                     const Icon(
-//                       Icons.arrow_forward_ios,
-//                       color: AppConstants.primaryColor,
-//                       size: 20,
-//                     ),
-//                     const SizedBox(
-//                       width: 8.0,
-//                     ),
-//                     const Text(
-//                       'Revenuey',
-//                       style: TextStyle(
-//                           color: AppConstants.primaryColor,
-//                           fontWeight: FontWeight.w500,
-//                           fontSize: 16),
-//                     ),
-//                     const SizedBox(
-//                       width: 8.0,
-//                     ),
-//                   ],
-//                 ),

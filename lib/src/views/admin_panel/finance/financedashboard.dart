@@ -12,6 +12,8 @@ import '../../../../config/constants.dart';
 import '../../../../config/functions.dart';
 import '/models/walletlogs.dart';
 import 'barchart.dart';
+import 'barchartmonthly.dart';
+import 'barchartquartely.dart';
 
 class FinanceDashboardPage extends StatefulWidget {
   const FinanceDashboardPage({super.key});
@@ -285,17 +287,17 @@ class _FinanceDashboardPageState extends Base<FinanceDashboardPage> {
                                     Expanded(
                                       child: Row(
                                         children: [
-                                          Expanded(
-                                            child: BarChartPage(),
-                                          )
                                           // Expanded(
-                                          //   child: selectedInterval == "Annual"
-                                          //       ? BarChartPage()
-                                          //       : selectedInterval ==
-                                          //               "Quarterly"
-                                          //           ? BarChartPageQuarterly()
-                                          //           : BarChartPageMonthly(),
+                                          //   child: BarChartPage(),
                                           // )
+                                          Expanded(
+                                            child: selectedInterval == "Annual"
+                                                ? BarChartPage()
+                                                : selectedInterval ==
+                                                        "Quarterly"
+                                                    ? BarChartPageQuarterly()
+                                                    : BarChartPageMonthly(),
+                                          )
                                         ],
                                       ),
                                     ),

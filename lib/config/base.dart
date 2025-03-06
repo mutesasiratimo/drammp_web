@@ -304,31 +304,6 @@ abstract class Base<T extends StatefulWidget> extends State<T>
         (_) => false);
   }
 
-  Future<Container> _buildTextField(hintText, controller, textInputType, width,
-      height, fcolor, tcolor, icolor, action) async {
-    // add other properties here}) { // new
-    return Container(
-      //Type TextField
-      width: width,
-      height: height,
-      color: fcolor,
-      child: TextField(
-        textInputAction: action,
-        controller: controller,
-        keyboardType: textInputType,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.all(10.0),
-          enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          hintText: hintText, // pass the hint text parameter here
-          hintStyle: TextStyle(color: tcolor),
-        ),
-        style: TextStyle(color: icolor),
-      ),
-    );
-  }
-
   // Show loading with optional message params
   showLoading({required String msg}) {}
 

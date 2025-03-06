@@ -30,7 +30,7 @@ class _SignUpPageState extends Base<SignUpPage> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 
-  _register(String firstname, String lastname, String email, String phone,
+  register(String firstname, String lastname, String email, String phone,
       String password) async {
     // context.loaderOverlay.show();
     var url = Uri.parse(AppConstants.baseUrl + "users/signup");

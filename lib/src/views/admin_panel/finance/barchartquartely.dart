@@ -23,7 +23,7 @@ class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
     final barGroup1 = makeGroupData(0, 0, 0);
     final barGroup2 = makeGroupData(1, 0, 0);
     final barGroup3 = makeGroupData(2, 0, 0);
-    final barGroup4 = makeGroupData(3, 7.0, 0);
+    final barGroup4 = makeGroupData(3, 0, 0);
 
     final items = [barGroup1, barGroup2, barGroup3, barGroup4];
 
@@ -41,6 +41,9 @@ class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            const SizedBox(
+              height: 16,
+            ),
             Expanded(
               child: BarChart(
                 BarChartData(
@@ -137,22 +140,22 @@ class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
 
   Widget leftTitles(double value, TitleMeta meta) {
     const style = TextStyle(
-      color: Color(0xffffffff),
+      color: Colors.white,
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
     String text;
     if (value == 0) {
-      text = '100K';
+      text = '1K';
     } else if (value == 10) {
-      text = '500K';
+      text = '5K';
     } else if (value == 19) {
-      text = '1M';
+      text = '10K';
     } else {
       return Container();
     }
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
       space: 0,
       child: Text(text, style: style),
     );
@@ -164,14 +167,14 @@ class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
     final Widget text = Text(
       titles[value.toInt()],
       style: const TextStyle(
-        color: Color(0xffffffff),
+        color: Colors.white,
         fontWeight: FontWeight.bold,
         fontSize: 14,
       ),
     );
 
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
       space: 16, //margin top
       child: text,
     );
@@ -205,7 +208,7 @@ class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
         Container(
           width: width,
           height: 10,
-          color: Colors.white.withOpacity(0.4),
+          color: Colors.white.withValues(alpha: 0.4),
         ),
         const SizedBox(
           width: space,
@@ -213,7 +216,7 @@ class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
         Container(
           width: width,
           height: 28,
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
         ),
         const SizedBox(
           width: space,
@@ -221,7 +224,7 @@ class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
         Container(
           width: width,
           height: 42,
-          color: Colors.white.withOpacity(1),
+          color: Colors.white.withValues(alpha: 1),
         ),
         const SizedBox(
           width: space,
@@ -229,7 +232,7 @@ class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
         Container(
           width: width,
           height: 28,
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
         ),
         const SizedBox(
           width: space,
@@ -237,7 +240,7 @@ class BarChartPageQuarterlyState extends State<BarChartPageQuarterly> {
         Container(
           width: width,
           height: 10,
-          color: Colors.white.withOpacity(0.4),
+          color: Colors.white.withValues(alpha: 0.4),
         ),
       ],
     );

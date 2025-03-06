@@ -2198,7 +2198,7 @@ class _AddIndividualHospitalityRevenueStreamPageState
     );
   }
 
-  Widget _step4() {
+  Widget step4() {
     return Row(
       children: [
         Expanded(

@@ -41,6 +41,9 @@ class BarChartPageMonthlyState extends State<BarChartPageMonthly> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            const SizedBox(
+              height: 16,
+            ),
             Expanded(
               child: BarChart(
                 BarChartData(
@@ -137,41 +140,41 @@ class BarChartPageMonthlyState extends State<BarChartPageMonthly> {
 
   Widget leftTitles(double value, TitleMeta meta) {
     const style = TextStyle(
-      color: Color(0xffffffff),
+      color: Colors.white,
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
     String text;
     if (value == 0) {
-      text = '100K';
+      text = '1K';
     } else if (value == 10) {
-      text = '500K';
+      text = '5K';
     } else if (value == 19) {
-      text = '1M';
+      text = '10K';
     } else {
       return Container();
     }
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
       space: 0,
       child: Text(text, style: style),
     );
   }
 
   Widget bottomTitles(double value, TitleMeta meta) {
-    final titles = <String>['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    final titles = <String>['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'];
 
     final Widget text = Text(
       titles[value.toInt()],
       style: const TextStyle(
-        color: Color(0xffffffff),
+        color: Colors.white,
         fontWeight: FontWeight.bold,
         fontSize: 14,
       ),
     );
 
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
       space: 16, //margin top
       child: text,
     );
@@ -205,7 +208,7 @@ class BarChartPageMonthlyState extends State<BarChartPageMonthly> {
         Container(
           width: width,
           height: 10,
-          color: Colors.white.withOpacity(0.4),
+          color: Colors.white.withValues(alpha: 0.4),
         ),
         const SizedBox(
           width: space,
@@ -213,7 +216,7 @@ class BarChartPageMonthlyState extends State<BarChartPageMonthly> {
         Container(
           width: width,
           height: 28,
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
         ),
         const SizedBox(
           width: space,
@@ -221,7 +224,7 @@ class BarChartPageMonthlyState extends State<BarChartPageMonthly> {
         Container(
           width: width,
           height: 42,
-          color: Colors.white.withOpacity(1),
+          color: Colors.white.withValues(alpha: 1),
         ),
         const SizedBox(
           width: space,
@@ -229,7 +232,7 @@ class BarChartPageMonthlyState extends State<BarChartPageMonthly> {
         Container(
           width: width,
           height: 28,
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
         ),
         const SizedBox(
           width: space,
@@ -237,7 +240,7 @@ class BarChartPageMonthlyState extends State<BarChartPageMonthly> {
         Container(
           width: width,
           height: 10,
-          color: Colors.white.withOpacity(0.4),
+          color: Colors.white.withValues(alpha: 0.4),
         ),
       ],
     );

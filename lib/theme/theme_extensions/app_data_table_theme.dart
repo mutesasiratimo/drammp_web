@@ -13,10 +13,11 @@ class AppDataTableTheme extends ThemeExtension<AppDataTableTheme> {
 
   factory AppDataTableTheme.fromTheme(ThemeData themeData) {
     return AppDataTableTheme(
-      cardTheme: themeData.cardTheme.copyWith(
-        color: Colors.transparent,
-        elevation: 0.0,
-      ),
+      cardTheme: CardTheme(),
+      //  themeData.cardTheme.copyWith(
+      //   color: Colors.transparent,
+      //   elevation: 0.0,
+      // ),
       dataTableThemeData: themeData.dataTableTheme.copyWith(
         headingRowColor: MaterialStateProperty.all(AppConstants.primaryColor),
         headingTextStyle: TextStyle(color: themeData.colorScheme.onPrimary),
